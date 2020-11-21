@@ -101,6 +101,11 @@ class Logger extends AbstractLogger {
 		$plugin_basename = self::$source . '/' . self::$source . '.php';
 		add_filter( "plugin_action_links_{$plugin_basename}", array( $this, 'display_plugin_action_links' ) );
 
+		if( 'none' === $settings->get_log_level() ) {
+			self::$logger = new NullLogger();
+			return;
+		}
+
 		if ( isset( $_COOKIE['PHPSESSID'] ) ) {
 			self::$session_id = $_COOKIE['PHPSESSID'];
 		} else {
