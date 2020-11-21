@@ -47,27 +47,23 @@ class Logger extends AbstractLogger {
 	protected $settings;
 
 	/**
-	 * @param Logger_Settings_Interface $settings
+	 * @param ?Logger_Settings_Interface $settings
 	 *
 	 * @return Logger
 	 */
-	public static function instance( $settings ): Logger {
+	public static function instance( $settings = null ): Logger {
 
-		if ( ! is_null( self::$instance ) ) {
-			return self::$instance;
+		if ( is_null( self::$instance ) ) {
+			 self::$instance = new Logger( $settings );
 		}
-		//
-		// if( 'none' === $settings->get_log_level() ) {
-		// return new NullLogger();
-		// }
 
-		return new Logger( $settings );
+		return self::$instance;
 	}
 
 	/**
 	 * Logger constructor.
 	 *
-	 * @param Logger_Settings_Interface $settings
+	 * @param ?Logger_Settings_Interface $settings
 	 */
 	protected function __construct( $settings = null ) {
 
