@@ -20,10 +20,99 @@
             "BrianHenryIE\\WP_Logger\\": "src"
         }
     },
+    "repositories": [
+        {
+            "url": "https://github.com/WordPress/wordpress-develop",
+            "type": "git"
+        },
+        {
+            "url": "https://github.com/BrianHenryIE/composer-phpstorm",
+            "type": "git"
+        },
+        {
+            "url": "https://github.com/BrianHenryIE/bh-wp-dev",
+            "type": "git"
+        },
+        {
+            "type":"composer",
+            "url":"https://wpackagist.org"
+        }
+    ],
     "require": {
         "php": ">=7.2",
         "wptrt/admin-notices": "dev-master",
         "psr/log": "^1.0.0",
         "katzgrau/klogger": "dev-master"
     },
+        "10up/wp_mock": "0.4.2",
+        "brianhenryie/composer-phpstorm": "dev-master",
+        "brianhenryie/wp-dev": "dev-master",
+        "codeception/module-asserts": "^1.0",
+        "codeception/module-cli": "^1.0",
+        "codeception/module-db": "^1.0.0",
+        "codeception/module-filesystem": "^1.0",
+        "codeception/module-phpbrowser": "^1.0.0",
+        "codeception/module-webdriver": "^1.0",
+        "codeception/util-universalframework": "^1.0",
+        "cweagans/composer-patches": "~1.0",
+        "jaschilz/php-coverage-badger": "^2.0",
+        "kporras07/composer-symlinks": "dev-master",
+        "lucatume/wp-browser": "*",
+        "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master",
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "phpunit/phpcov": "^5.0",
+        "phpunit/phpunit": ">=7.0",
+        "voku/portable-ascii": "dev-master",
+        "wordpress/wordpress": "^5.5",
+        "wpackagist-plugin/woocommerce": "^4.7",
+        "wpackagist-theme/twentytwenty": "*"
+    },
+    "extra": {
+        "patches": {
+            "jaschilz/php-coverage-badger": {
+                "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
+            },
+            "squizlabs/php_codesniffer": {
+                "Add GitHub Actions Annotations report type": "https://github.com/squizlabs/PHP_CodeSniffer/pull/2918.patch"
+            }
+        },
+        "symlinks": {
+            "wp-content": "wordpress/wp-content",
+            "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin"
+        },
+        "phpstorm": {
+            "exclude_folders": {
+                "folders": [
+                    "vendor/wordpress/wordpress/src",
+                    "vendor/wordpress/wordpress/build",
+                    "wp-content/plugins/bh-wp-logger",
+                    "wordpress/wp-content"
+                ],
+                "include_folders": [
+                    "vendor/wordpress/wordpress/"
+                ],
+                "composer-symlinks": false
+            }
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "vendor/bin/wp core download --path=wordpress --allow-root || true;",
+            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root || true",
+            "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
+            "mkdir -p wordpress/wp-content/uploads",
+            "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
+            "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+        ],
+        "post-update-cmd": [
+            "vendor/bin/wp core download --path=wordpress --allow-root || true;",
+            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root || true",
+            "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
+            "mkdir -p wordpress/wp-content/uploads",
+            "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
+            "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+        ],
+        "create-plugin-archive": [
+            "BrianHenryIE\\WP_Dev\\CreatePluginArchive::createZip"
+        ]
 }
