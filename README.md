@@ -1,10 +1,16 @@
 # BH WP Logger
 
-Wraps existing PSR-3 loggers and adds some UI.
+Zero-config logger UI for WordPress plugins.
 
-* [PSR-3](https://www.php-fig.org/psr/psr-3/)
+```php
+$logger = Logger::instance();
+```
+
+Wraps existing [PSR-3](https://www.php-fig.org/psr/psr-3/) loggers and adds some UI.
+
 * [KLogger](https://github.com/katzgrau/KLogger)
 * [WC_Logger](https://github.com/katzgrau/KLogger)
+* [PSR-3 NullLogger](https://github.com/php-fig/log/blob/master/Psr/Log/NullLogger.php)
 
 Uses KLogger by default, WC_Logger when WooCommerce is active, NullLogger when log level is set to "none".
 

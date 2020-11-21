@@ -69,7 +69,24 @@ class Logger extends AbstractLogger {
 	 *
 	 * @param Logger_Settings_Interface $settings
 	 */
-	protected function __construct( $settings ) {
+	protected function __construct( $settings = null ) {
+
+		// Zero-config.
+		if( is_null( $settings ) ) {
+
+			// Find the plugin slug from the filepath.
+			// This doesn't work well with symlinks.
+			$file = str_replace( WP_PLUGIN_DIR, '', __DIR__ );
+			if( 1 ===  preg_match('/\/([^\/]*)/', $file, $output_array) ) {
+				$plugin_slug = $output_array[1];
+			} // TODO: else...
+
+			$settings = new class( $plugin_slug ) extends Logger_Settings_Abstract {
+				public function get_plugin_slug(): string {
+					return $this->plugin_slug;
+				}
+			};
+		}
 
 		self::$source    = $settings->get_plugin_slug();
 		self::$min_level = $settings->get_log_level();
