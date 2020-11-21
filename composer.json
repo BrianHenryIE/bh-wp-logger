@@ -44,6 +44,7 @@
         "psr/log": "^1.0.0",
         "katzgrau/klogger": "dev-master"
     },
+    "require-dev": {
         "10up/wp_mock": "0.4.2",
         "brianhenryie/composer-phpstorm": "dev-master",
         "brianhenryie/wp-dev": "dev-master",
@@ -55,6 +56,7 @@
         "codeception/module-webdriver": "^1.0",
         "codeception/util-universalframework": "^1.0",
         "cweagans/composer-patches": "~1.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
         "jaschilz/php-coverage-badger": "^2.0",
         "kporras07/composer-symlinks": "dev-master",
         "lucatume/wp-browser": "*",
@@ -62,8 +64,10 @@
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpunit/phpcov": "^5.0",
         "phpunit/phpunit": ">=7.0",
+        "squizlabs/php_codesniffer": "dev-master#1371c59bd5da5cfc877ab8478753362edc9bbc9b",
         "voku/portable-ascii": "dev-master",
         "wordpress/wordpress": "^5.5",
+        "wp-coding-standards/wpcs": "*",
         "wpackagist-plugin/woocommerce": "^4.7",
         "wpackagist-theme/twentytwenty": "*"
     },
@@ -115,4 +119,5 @@
         "create-plugin-archive": [
             "BrianHenryIE\\WP_Dev\\CreatePluginArchive::createZip"
         ]
+    }
 }
