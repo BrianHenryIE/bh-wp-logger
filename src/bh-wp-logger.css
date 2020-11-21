@@ -1,0 +1,37 @@
+
+/* Logs styles */
+
+/* The th */
+#level {
+    width: 10px;
+    padding: 0;
+}
+
+
+/* the td */
+.level.column-level {
+    padding: 0;
+}
+
+
+
+.level-error .level.column-level {
+    background-color: #dc3232;
+}
+
+.level-warning .level.column-level {
+    background-color: #ffb900;
+}
+
+.level-notice .level.column-level {
+    background-color: #00a0d2;
+}
+
+.level-info .level.column-level {
+    background-color: #FFF;
+}
+
+.level-debug .level.column-level {
+    background-color: #ccd0d4;
+}
+

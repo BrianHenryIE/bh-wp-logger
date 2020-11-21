@@ -1,80 +1,93 @@
-[![WordPress tested 5.5](https://img.shields.io/badge/WordPress-v5.5%20tested-0073aa.svg)](https://wordpress.org/plugins/plugin_slug) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/plugin_slug/)
-
 # BH WP Logger
 
-## Contributing
+Wraps existing PSR-3 loggers and adds some UI.
 
-Clone this repo, open PhpStorm, then run `composer install` to install the dependencies.
+* [PSR-3](https://www.php-fig.org/psr/psr-3/)
+* [KLogger](https://github.com/katzgrau/KLogger)
+* [WC_Logger](https://github.com/katzgrau/KLogger)
 
-```
-git clone https://github.com/brianhenryie/plugin_slug.git;
-open -a PhpStorm ./;
-composer install;
-```
+Uses KLogger by default, WC_Logger when WooCommerce is active, NullLogger when log level is set to "none".
 
-For integration and acceptance tests, a local webserver must be running with `localhost/plugin_slug/` pointing at the root of the repo. MySQL must also be running locally – with two databases set up with:
+## UI 
 
-```
-mysql_username="root"
-mysql_password="secret"
+Displays logs in `WP_List_Table`.
 
-# export PATH=${PATH}:/usr/local/mysql/bin
+![Logs WP_List_Table](./assets/logs-wp-list-table.png "Logs WP_List_Table")
 
-# Make .env available to bash.
-export $(grep -v '^#' .env.testing | xargs)
+Show a dismissable admin error notice each time there is a new error.
 
-# Create the databases.
-mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED WITH mysql_native_password BY '"$TEST_DB_PASSWORD"';";
-mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_SITE_DB_NAME"; USE "$TEST_SITE_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_SITE_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
-mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_DB_NAME"; USE "$TEST_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
-```
+![Admin Error Notice](./assets/admin-error-notice.png "Admin error notice")
 
-### WordPress Coding Standards
+Adds a link to the logs view on the plugin's entry on plugins.php.
 
-See documentation on [WordPress.org](https://make.wordpress.org/core/handbook/best-practices/coding-standards/) and [GitHub.com](https://github.com/WordPress/WordPress-Coding-Standards).
+![Plugins page logs link](./assets/plugins-page-logs-link.png "Plugins page logs link")
 
-Correct errors where possible and list the remaining with:
 
-```
-vendor/bin/phpcbf; vendor/bin/phpcs
-```
+## Use
 
-### Tests
+### Composer
 
-Tests use the [Codeception](https://codeception.com/) add-on [WP-Browser](https://github.com/lucatume/wp-browser) and include vanilla PHPUnit tests with [WP_Mock](https://github.com/10up/wp_mock). 
+```json
+"repositories": [
+    {
+      "url": "https://github.com/BrianHenryIE/bh-wp-logger",
+      "type": "git"
+    },
 
-Run tests with:
-
-```
-vendor/bin/codecept run unit;
-vendor/bin/codecept run wpunit;
-vendor/bin/codecept run integration;
-vendor/bin/codecept run acceptance;
+"require": {
+    "brianhenryie/wp-logger": "dev-master"
 ```
 
-Output and merge code coverage with:
+If you're using [Mozart](https://github.com/coenjacobs/mozart) for namespace prefixing, you can configure it to not copy KLogger's files twice (we just need one of its PSR-4 and classmap autoloaders )
 
-```
-vendor/bin/codecept run unit --coverage unit.cov;
-vendor/bin/codecept run wpunit --coverage wpunit.cov;
-vendor/bin/phpcov merge --clover tests/_output/clover.xml --html tests/_output/html tests/_output --text;
-```
 
-To save changes made to the acceptance database:
-
-```
-export $(grep -v '^#' .env.testing | xargs)
-mysqldump -u $TEST_SITE_DB_USER -p$TEST_SITE_DB_PASSWORD $TEST_SITE_DB_NAME > tests/_data/dump.sql
-```
-
-To clear Codeception cache after moving/removing test files:
-
-```
-vendor/bin/codecept clean
+```json
+    "mozart": {
+      "override_autoload": {
+        "katzgrau/klogger": {
+          "psr-4": {
+            "Katzgrau\\KLogger\\": "src/"
+          }
+        }
+      }
 ```
 
-### More Information
+### Instantiate
 
-See [github.com/BrianHenryIE/WordPress-Plugin-Boilerplate](https://github.com/BrianHenryIE/WordPress-Plugin-Boilerplate) for initial setup rationale. 
+```php
+// Use a PSR-4 autoloader for the bh-wp-logger dependencies.
 
-# Acknowledgements
+// Use this for its own files.
+require_once '/path/to/bh-wp-logger/autoload.php';
+
+$logger_settings = new class() implements Logger_Settings_Interface {
+
+    public function get_log_level(): string {
+        return get_option( 'my-plugin-log-level', LogLevel::NOTICE );
+    }
+
+    public function get_plugin_slug(): string {
+        return 'bh-wp-logger-test-plugin';
+    }
+};
+
+$logger = Logger::instance( $logger_settings );
+```
+
+Then pass around your `$logger` instance; use `NullLogger` in your tests.
+
+### Best Practice
+
+From my brief experience using this, I find it useful to add a `debug` log at the beginning of every function and an appropriate `info`...`error` as the function returns.
+
+## TODO
+
+* Auto-delete old logs
+* Check log directory is not publicly accessible
+* Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json
+* Paging and filtering
+* Hyperlinks in messages
+
+# Status
+
+Very much a v0.1.

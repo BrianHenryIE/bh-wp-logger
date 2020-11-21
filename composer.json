@@ -1,0 +1,29 @@
+{
+    "name": "brianhenryie/wp-logger",
+    "description": "This is a short description of what plugin_title does.",
+    "type": "library",
+    "license": "GPL-2.0+-or-later",
+    "authors": [
+        {
+            "name": "Brian Henry",
+            "email": "BrianHenryIE@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "process-timeout": 0,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "BrianHenryIE\\WP_Logger\\": "src"
+        }
+    },
+    "require": {
+        "php": ">=7.2",
+        "wptrt/admin-notices": "dev-master",
+        "psr/log": "^1.0.0",
+        "katzgrau/klogger": "dev-master"
+    },
+}
