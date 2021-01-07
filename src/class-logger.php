@@ -355,6 +355,8 @@ class Logger extends AbstractLogger {
 	/**
 	 * Show a notice for recent errors in the logs.
 	 *
+	 * TODO: Do not show on plugin install page.
+	 *
 	 * @hooked admin_init
 	 */
 	public function admin_notices() {
@@ -367,14 +369,17 @@ class Logger extends AbstractLogger {
 
 		if ( false !== $last_error ) {
 
-			$error_text = isset( $last_error['message'] ) ? trim( $last_error['message'] ) : '';
-			$error_time = isset( $last_error['time'] ) ? $last_error['time'] : '';
+			$is_dismissed_option_name = self::$source . '_recent_error';
+			delete_option( $is_dismissed_option_name );
 
-			$title   = 'Recent error';
-			$content = '';
+			$error_text = isset( $last_error['message'] ) ? trim( $last_error['message'] ) : '';
+			$error_time = isset( $last_error['timestamp'] ) ? $last_error['timestamp'] : '';
+
+			$title   = false;
+			$content = "<strong>{$this->settings->get_plugin_name()}</strong>. Error: ";
 
 			if ( ! empty( $error_text ) ) {
-				$content .= "<i>{$error_text}</i> ";
+				$content .= "\"{$error_text}\" ";
 			}
 
 			if ( ! empty( $error_time ) && is_int( $error_time ) ) {
@@ -390,8 +395,9 @@ class Logger extends AbstractLogger {
 				$content .= ' <a href="' . $log_link . '">View Logs</a>.</p></div>';
 			}
 
+			// ID must be globally unique because it is the css id that will be used.
 			$notices->add(
-				'recent_error',
+				self::$source . 'recent-error',
 				$title,   // The title for this notice.
 				$content, // The content for this notice.
 				array(
@@ -402,17 +408,17 @@ class Logger extends AbstractLogger {
 			);
 
 			/**
-			 * When the notice is dismissed, delete the error detail option, and prevent the dismissed flag
-			 * from saving (i.e. don't prevent it displaying when the next error occurs).
+			 * When the notice is dismissed, delete the error detail option (to stop the notice being recreated),
+			 * and delete the saved dismissed flag (which would prevent it displaying when the next error occurs).
 			 *
 			 * @see update_option()
 			 */
-			$is_dismissed_option_name = self::$source . '_recent_error';
-			$on_dismiss               = function ( $old_value, $value, $option ) use ( $error_detail_option_name, $is_dismissed_option_name ) {
+			$on_dismiss = function( $old_value, $value, $option ) use ( $error_detail_option_name, $is_dismissed_option_name ) {
+				error_log( 'Should be deleting ' . $error_detail_option_name );
 				delete_option( $error_detail_option_name );
-				return $value;
+				delete_option( $option );
 			};
-			add_filter( "pre_update_option_{$is_dismissed_option_name}", $on_dismiss, 10, 3 );
+			add_action( "update_option_{$is_dismissed_option_name}", $on_dismiss, 10, 3 );
 
 		}
 
