@@ -68,21 +68,7 @@ class Logger extends AbstractLogger {
 	protected function __construct( $settings = null ) {
 
 		// Zero-config.
-		if( is_null( $settings ) ) {
-
-			// Find the plugin slug from the filepath.
-			// This doesn't work well with symlinks.
-			$file = str_replace( WP_PLUGIN_DIR, '', __DIR__ );
-			if( 1 ===  preg_match('/\/([^\/]*)/', $file, $output_array) ) {
-				$plugin_slug = $output_array[1];
-			} // TODO: else...
-
-			$settings = new class( $plugin_slug ) extends Logger_Settings_Abstract {
-				public function get_plugin_slug(): string {
-					return $this->plugin_slug;
-				}
-			};
-		}
+		$settings = $settings ?? new Logger_Settings();
 
 		self::$source    = $settings->get_plugin_slug();
 		self::$min_level = $settings->get_log_level();
@@ -97,7 +83,7 @@ class Logger extends AbstractLogger {
 		$plugin_basename = self::$source . '/' . self::$source . '.php';
 		add_filter( "plugin_action_links_{$plugin_basename}", array( $this, 'display_plugin_action_links' ) );
 
-		if( 'none' === $settings->get_log_level() ) {
+		if ( 'none' === $settings->get_log_level() ) {
 			self::$logger = new NullLogger();
 			return;
 		}
@@ -195,8 +181,8 @@ class Logger extends AbstractLogger {
 		update_option(
 			self::$source . '-recent-error-data',
 			array(
-				'message' => $message,
-				'time'    => time(),
+				'message'   => $message,
+				'timestamp' => time(),
 			)
 		);
 

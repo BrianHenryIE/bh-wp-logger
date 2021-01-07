@@ -16,6 +16,7 @@ $autoload_classmap = array(
 	Logger::class                    => __DIR__ . '/class-logger.php',
 	Logs_Table::class                => __DIR__ . '/class-logs-table.php',
 	Logger_Settings_Interface::class => __DIR__ . '/interface-logger-settings.php',
+	Logger_Settings::class           => __DIR__ . '/class-logger-settings.php',
 );
 
 spl_autoload_register(
