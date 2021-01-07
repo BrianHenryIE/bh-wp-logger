@@ -216,7 +216,8 @@ class Logger extends AbstractLogger {
 	 */
 	public static function add_context_to_logs( $entry, $log_data_array ) {
 
-		if ( $log_data_array['context']['source'] !== self::$source ) {
+		// Only act on logs for this plugin.
+		if ( ! isset( $log_data_array['context']['source'] ) || $log_data_array['context']['source'] !== self::$source ) {
 			return $entry;
 		}
 
