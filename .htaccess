@@ -1,0 +1,29 @@
+# Serve the contents of /wordpress/ from the root URL for the project.
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^.*bh-wp-logger$ [NC,OR]
+RewriteCond %{REQUEST_URI} !wordpress/
+RewriteRule (.*) wordpress/$1 [L]
+
+# Remove /wordpress from any querystring, i.e. it was being added to login redirect.
+RewriteEngine on
+RewriteCond %{QUERY_STRING} ^(.*)%2Fwordpress(.*)$ [NC]
+RewriteRule (.*) %{REQUEST_URI}?%1%2 [R=301,L,NE]
+
+# Enable WP_DEBUG.
+#php_flag log_errors 1
+#php_value error_log "wp-content/php_errors.log"
+
+# WP_DEBUG_DISPLAY
+# ini_set( 'display_errors', 1 );
+#php_flag display_errors 1 # not working.
+#SetEnv display_errors=1
+
+#SetEnv WP_ENVIRONMENT_TYPE=local
+
+#php_value WP_DEBUG_DISPLAY true
+
+#php_flag display_errors 1
+
+# Is this workin??
+#php_value include_path "%{DOCUMENT_ROOT}/bh-wp-logger"
+#php_value auto_prepend_file "env.php"

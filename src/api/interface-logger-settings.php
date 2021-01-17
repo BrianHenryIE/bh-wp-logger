@@ -1,6 +1,6 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger;
+namespace BrianHenryIE\WP_Logger\api;
 
 use Psr\Log\LogLevel;
 
@@ -26,5 +26,7 @@ interface Logger_Settings_Interface {
 	 * @return string
 	 */
 	public function get_plugin_slug(): string;
+
+	public function get_plugin_basename(): string;
 
 }

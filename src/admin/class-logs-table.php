@@ -6,37 +6,45 @@
  * Time should show (UTC,local and "five hours ago")
  */
 
-namespace BrianHenryIE\WP_Logger;
+namespace BrianHenryIE\WP_Logger\admin;
 
+use BrianHenryIE\WP_Logger\api\API_Interface;
+use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use Psr\Log\LoggerInterface;
 use WP_List_Table;
-
-// TODO: autoload-classmap
-if ( ! class_exists( 'WP_List_Table' ) ) {
-	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
-}
 
 class Logs_Table extends WP_List_Table {
 
 	/**
-	 * @var Logger
+	 * @var LoggerInterface
 	 */
 	protected $logger;
+
+	/** @var Logger_Settings_Interface  */
+	protected $settings;
+
+	/** @var API_Interface  */
+	protected $api;
 
 	/**
 	 * Logs_Table constructor.
 	 *
-	 * @param Logger $logger
-	 * @param array  $args
+	 * @param API_Interface             $api
+	 * @param Logger_Settings_Interface $settings
+	 * @param LoggerInterface           $logger
+	 * @param array                     $args
 	 */
-	public function __construct( $logger, $args = array() ) {
+	public function __construct( $api, $settings, $logger, $args = array() ) {
 		parent::__construct( $args );
 
-		$this->logger = $logger;
+		$this->logger   = $logger;
+		$this->settings = $settings;
+		$this->api      = $api;
 	}
 
 	public function get_data() {
 
-		$link = Logger::get_log_file();
+		$link = $this->api->get_log_file();
 
 		if ( is_null( $link ) ) {
 			// TODO: "No logs yet." message. Maybe with "current log level is:".

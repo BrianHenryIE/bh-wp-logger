@@ -15,11 +15,6 @@
         "process-timeout": 0,
         "sort-packages": true
     },
-    "autoload": {
-        "psr-4": {
-            "BrianHenryIE\\WP_Logger\\": "src"
-        }
-    },
     "repositories": [
         {
             "url": "https://github.com/WordPress/wordpress-develop",
@@ -42,7 +37,8 @@
         "php": ">=7.2",
         "wptrt/admin-notices": "dev-master",
         "psr/log": "^1.0.0",
-        "katzgrau/klogger": "dev-master"
+        "katzgrau/klogger": "dev-master",
+      "ext-json": "*"
     },
     "require-dev": {
         "10up/wp_mock": "0.4.2",
@@ -82,7 +78,8 @@
         },
         "symlinks": {
             "wp-content": "wordpress/wp-content",
-            "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin"
+            "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin",
+            "src": "test-plugin/vendor/bh-wp-logger"
         },
         "phpstorm": {
             "exclude_folders": {
