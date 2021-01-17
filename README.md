@@ -103,21 +103,23 @@ $logger_settings = new class() implements Logger_Settings_Interface {
 	public function get_plugin_basename(): string {
 		return "my-plugin-name/my-plugin-name.php";
 	}
-}
-$logger = Logger::instance();
+};
+$logger = Logger::instance( $logger_settings );
 ```
 
 Then pass around your `$logger` instance; use `NullLogger` in your tests.
 
-Minimal which should work:
+If no settings are provided, the plugin details are determined automatically which will be marginally slower.
 
 ```php
 $logger = Logger::instance();
 ```
 
+After the logger has been instantiated once, subsequent calls to `::instance()` return the existing instance and any `$logger_settings` passed is ignored.
+
 ### WooCommerce Settings
 
-Something like this can be used for WooCommerce Setting API.
+Something like this can be used for WooCommerce Settings API.
 
 ```php
 
