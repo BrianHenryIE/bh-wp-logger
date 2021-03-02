@@ -1,6 +1,6 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\api;
+namespace BrianHenryIE\WP_Logger\API;
 
 interface API_Interface {
 
@@ -28,4 +28,6 @@ interface API_Interface {
 
 	public function get_common_context(): array;
 
+
+	public function determine_plugin_slug_from_backtrace(): ?string;
 }

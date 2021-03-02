@@ -1,14 +1,14 @@
 <?php
 /**
- * Adds a
+ * The UI around the logs table.
  */
 
 namespace BrianHenryIE\WP_Logger\admin;
 
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
-use WPTRT\AdminNotices\Notices;
+
 
 class Logs_Page {
 
@@ -59,8 +59,10 @@ class Logs_Page {
 	public function display_page() {
 
 		$logs_table = new Logs_Table( $this->api, $this->settings, $this->logger );
-
 		$logs_table->prepare_items();
+
+		update_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', time() );
+
 		$logs_table->display();
 	}
 

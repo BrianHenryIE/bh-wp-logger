@@ -1,6 +1,6 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\api;
+namespace BrianHenryIE\WP_Logger\API;
 
 use Psr\Log\LogLevel;
 

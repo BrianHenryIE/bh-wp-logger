@@ -26,7 +26,7 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
-use BrianHenryIE\WP_Logger\api\Logger_Settings;
+use BrianHenryIE\WP_Logger\API\Logger_Settings;
 use BrianHenryIE\WP_Logger\Logger;
 
 use BH_WP_Logger_Test_Plugin\includes\Activator;

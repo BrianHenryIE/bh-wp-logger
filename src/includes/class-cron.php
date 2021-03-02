@@ -2,8 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\includes;
 
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 
 class Cron {
 

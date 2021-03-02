@@ -8,8 +8,8 @@
 
 namespace BrianHenryIE\WP_Logger\admin;
 
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 use WP_List_Table;
 

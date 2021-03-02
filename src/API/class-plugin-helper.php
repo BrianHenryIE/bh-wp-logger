@@ -5,7 +5,7 @@
  * Works OK with symlinks, except when there's symlinks in symlinks.
  */
 
-namespace BrianHenryIE\WP_Logger\api;
+namespace BrianHenryIE\WP_Logger\API;
 
 class Plugin_Helper {
 
@@ -21,6 +21,8 @@ class Plugin_Helper {
 	/**
 	 * Given a slug, searches the get_plugins() array for the plugin details.
 	 *
+	 * TODO: TextDomain is not an essential part of a miinimum viable WordPress plugin (only `Plugin Name`).
+	 *
 	 * @param string $slug
 	 *
 	 * @return array|null
@@ -32,7 +34,7 @@ class Plugin_Helper {
 		$plugin_data = array_filter(
 			$plugins,
 			function( $plugin ) use ( $slug ) {
-				return ( $plugin['TextDomain'] == $slug );
+				return ( $plugin['TextDomain'] === $slug );
 			}
 		);
 
@@ -53,9 +55,9 @@ class Plugin_Helper {
 	 * Should work with one level of symlinks.
 	 * Does not work with symlinks inside symlinks.
 	 *
-	 * @return string
+	 * @return ?string
 	 */
-	public function discover_plugin_basename( $dir = null ): string {
+	public function discover_plugin_basename( $dir = null ): ?string {
 
 		$dir = $dir ?? __DIR__;
 
@@ -70,12 +72,15 @@ class Plugin_Helper {
 		// Check for a standard WordPress install...
 		// __DIR__ has no trailing slash.
 		$capture_first_string_after_slash_in_plugins_dir = '/' . preg_quote( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)', DIRECTORY_SEPARATOR ) . '/';
-
+		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
 		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $dir, $output_array ) ) {
 			$plugin_directory = $output_array[1];
 
-			return $this->get_plugin_data_from_slug( $plugin_directory )['basename'];
+			$plugin_data = $this->get_plugin_data_from_slug( $plugin_directory );
 
+			if ( ! is_null( $plugin_data ) ) {
+				return $this->get_plugin_data_from_slug( $plugin_directory )['basename'];
+			}
 		} else {
 
 			// If we're in a live plugin in another directory, it's probably symlinked inside WP_PLUGIN_DIR.
@@ -129,8 +134,13 @@ class Plugin_Helper {
 
 							if ( isset( $plugin_data['Name'] ) && ! empty( $plugin_data['Name'] ) ) {
 								$plugin_slug = $plugin_data['TextDomain'];
-								return $this->get_plugin_data_from_slug( $plugin_slug )['basename'];
 
+								$get_plugin_data_from_slug = $this->get_plugin_data_from_slug( $plugin_slug );
+								if ( ! is_null( $get_plugin_data_from_slug ) && isset( $get_plugin_data_from_slug['basename'] ) ) {
+									return $get_plugin_data_from_slug['basename'];
+								} else {
+									return null;
+								}
 							}
 						}
 					}
@@ -138,7 +148,7 @@ class Plugin_Helper {
 			}
 		}
 
-		return '';
+		return null;
 	}
 
 	/**

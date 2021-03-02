@@ -5,8 +5,8 @@
 
 namespace BrianHenryIE\WP_Logger\admin;
 
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 use WPTRT\AdminNotices\Notices;
 
@@ -46,9 +46,18 @@ class Admin {
 
 		$error_detail_option_name = $this->settings->get_plugin_slug() . '-recent-error-data';
 
+		// If we're on the logs page, don't show the admin notice linking to the logs page.
+		if ( isset( $_GET['page'] ) && $this->settings->get_plugin_slug() . '-logs' === $_GET['page'] ) {
+			delete_option( $error_detail_option_name );
+			return;
+		}
+
 		$last_error = get_option( $error_detail_option_name );
 
-		if ( false !== $last_error ) {
+		$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
+		$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
+
+		if ( false !== $last_error && ( $last_log_time > $last_logs_view_time ) ) {
 
 			$is_dismissed_option_name = "wptrt_notice_dismissed_{$this->settings->get_plugin_slug()}-recent-error";
 
@@ -103,13 +112,6 @@ class Admin {
 			add_filter( "pre_update_option_{$is_dismissed_option_name}", $on_dismiss, 10, 3 );
 
 			// wptrt_notice_dismissed_bh-wp-logger-test-plugin-recent-error
-
-			add_action(
-				'update_option',
-				function() {
-
-				}
-			);
 
 		}
 

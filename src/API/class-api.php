@@ -1,9 +1,10 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\api;
+namespace BrianHenryIE\WP_Logger\API;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Spatie\Backtrace\Backtrace;
 use WC_Admin_Status;
 use function WP_CLI\Utils\normalize_path;
 
@@ -17,14 +18,24 @@ class API implements API_Interface {
 
 
 	/**
+	 *
+	 * TODO: IS getmypid() reliable?
+	 *
+	 * @see https://stackoverflow.com/questions/10404979/get-unique-worker-thread-process-request-id-in-php
+	 *
 	 * @var string[] Common data for context. "state"?
 	 */
 	protected $common_context = array();
 
 
-	public function __construct( $settings, $logger = null ) {
-		$this->logger   = $logger ?? new NullLogger();
+
+	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
+		$this->logger   = $logger;
 		$this->settings = $settings;
+	}
+
+	public function set_logger( LoggerInterface $logger ) {
+		$this->logger = $logger;
 	}
 
 	public function delete_old_logs(): void {
@@ -62,7 +73,7 @@ class API implements API_Interface {
 
 	public function get_log_file( $date = null ) {
 
-		if ( class_exists( WC_Admin_Status::class ) ) {
+		if ( false && class_exists( WC_Admin_Status::class ) ) {
 
 			$logs_files = WC_Admin_Status::scan_log_files();
 
@@ -115,6 +126,34 @@ class API implements API_Interface {
 
 	public function set_common_context( $key, $value ): void {
 		$this->common_context[ $key ] = $value;
+	}
+
+	/**
+	 * Loops through the debug backtrace until it finds a folder with wp-content/plugins as its parent.
+	 *
+	 * @return string
+	 */
+	public function determine_plugin_slug_from_backtrace(): string {
+
+		$backtrace = Backtrace::create()->offset( 2 );
+
+		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
+
+		// TODO: We probably only care about the following couple (after the two skipped).
+		// TODO: What about WooCommerce (any plugin-in-plugin...) where WooCommerce maybe raised the issues, but it's due to another plugin's code.
+		$frames = $backtrace->frames();
+
+		foreach ( $frames as $frame ) {
+
+			if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $frame->file, $output_array ) ) {
+
+				$slug = $output_array[1];
+
+				return $slug;
+			}
+		}
+
+		return '';
 	}
 }
 

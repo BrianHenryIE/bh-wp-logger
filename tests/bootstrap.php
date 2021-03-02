@@ -12,3 +12,5 @@ $GLOBALS['plugin_basename']                         = $plugin_name . '/' . $plug
 $GLOBALS['wordpress_root_dir']                      = $project_root_dir . '/wordpress';
 
 
+// Needed in unit tests but breaks wpunit tests.
+// define( 'ABSPATH', $GLOBALS['wordpress_root_dir'] );

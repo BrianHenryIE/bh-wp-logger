@@ -2,9 +2,9 @@
 
 namespace BrianHenryIE\WP_Logger;
 
-use BrianHenryIE\WP_Logger\api\API;
-use BrianHenryIE\WP_Logger\api\Logger_Settings;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API;
+use BrianHenryIE\WP_Logger\API\Logger_Settings;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\includes\BH_WP_Logger;
 use Psr\Log\LoggerInterface;
 
@@ -12,6 +12,10 @@ class Logger extends BH_WP_Logger implements LoggerInterface {
 
 	/** @var Logger */
 	protected static $instance;
+
+	protected function __construct( $api, $settings ) {
+		parent::__construct( $api, $settings );
+	}
 
 	/**
 	 * @param ?Logger_Settings_Interface $settings

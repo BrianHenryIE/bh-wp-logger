@@ -2,8 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\admin;
 
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 
 class Plugins_Page {
@@ -31,6 +31,7 @@ class Plugins_Page {
 
 	/**
 	 * Adds 'Logs' link to the most recent logs in the WooCommerce logs page.
+	 * Attempts to place it immediately before the deactivate link.
 	 *
 	 * Hooked early presuming other changes will be prepended, i.e.
 	 * Other Links | Logs | Deactivate
@@ -44,13 +45,26 @@ class Plugins_Page {
 	 */
 	public function display_plugin_action_links( $links ) {
 
-		$plugin_links = array();
-		$logs_link    = $this->api->get_log_url();
+		// Presumably the deactivate link.
+		$deactivate_link = array_pop( $links );
+
+		$logs_link = $this->api->get_log_url();
 		if ( ! is_null( $logs_link ) ) {
-			$plugin_links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
+
+			$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
+			$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
+
+			if ( 0 !== $last_log_time
+				&& $last_log_time > $last_logs_view_time ) {
+				$links[] = '<b><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></b>';
+			} else {
+				$links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
+			}
 		}
 
-		return array_merge( $plugin_links, $links );
+		$links[] = $deactivate_link;
+
+		return $links;
 	}
 
 }

@@ -141,6 +141,22 @@ $setting_fields[] = array(
 );
 ```
 
+## WP_Mock
+
+If using WP_Mock for your tests, and you are instantiating this logger, the following should help:
+
+```php
+\WP_Mock::userFunction(
+    'get_current_user_id'
+);
+
+\WP_Mock::userFunction(
+    'wp_normalize_path',
+    array(
+        'return_arg' => true
+    )
+);
+```
 
 ### Best Practice
 
@@ -154,6 +170,7 @@ From my brief experience using this, I find it useful to add a `debug` log at th
 * Paging and filtering
 * Hyperlinks in messages
 * Log notice should dismiss when the log page is visited
+* Record timestamp the logs were last viewed at, make the plugins.php link bold if new logs are present.
 
 # Status
 

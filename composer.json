@@ -15,6 +15,11 @@
         "process-timeout": 0,
         "sort-packages": true
     },
+    "autoload": {
+        "files": [
+            "src/autoload.php"
+        ]
+    },
     "repositories": [
         {
             "url": "https://github.com/WordPress/wordpress-develop",
@@ -34,46 +39,44 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
-        "wptrt/admin-notices": "dev-master",
-        "psr/log": "^1.0.0",
+        "ext-json": "*",
         "katzgrau/klogger": "dev-master",
-      "ext-json": "*"
+        "php": ">=7.4",
+        "psr/log": "^1.0.0",
+        "spatie/backtrace": "^1.0.0",
+        "wptrt/admin-notices": "dev-master"
     },
     "require-dev": {
         "10up/wp_mock": "0.4.2",
         "brianhenryie/composer-phpstorm": "dev-master",
         "brianhenryie/wp-dev": "dev-master",
-        "codeception/module-asserts": "^1.0",
-        "codeception/module-cli": "^1.0",
-        "codeception/module-db": "^1.0.0",
-        "codeception/module-filesystem": "^1.0",
-        "codeception/module-phpbrowser": "^1.0.0",
-        "codeception/module-webdriver": "^1.0",
-        "codeception/util-universalframework": "^1.0",
-        "cweagans/composer-patches": "~1.0",
+        "codeception/module-asserts": "*",
+        "codeception/module-cli": "*",
+        "codeception/module-db": "*",
+        "codeception/module-filesystem": "*",
+        "codeception/module-phpbrowser": "*",
+        "codeception/module-webdriver": "*",
+        "codeception/util-universalframework": "*",
+        "cweagans/composer-patches": "*",
         "dealerdirect/phpcodesniffer-composer-installer": "*",
         "jaschilz/php-coverage-badger": "^2.0",
         "kporras07/composer-symlinks": "dev-master",
         "lucatume/wp-browser": "*",
         "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master",
-        "phpcompatibility/phpcompatibility-wp": "*",
-        "phpunit/phpcov": "^5.0",
-        "phpunit/phpunit": ">=7.0",
-        "squizlabs/php_codesniffer": "dev-master#1371c59bd5da5cfc877ab8478753362edc9bbc9b",
+        "squizlabs/php_codesniffer": "*",
         "voku/portable-ascii": "dev-master",
         "wordpress/wordpress": "^5.5",
         "wp-coding-standards/wpcs": "*",
+        "wp-cli/wp-cli-bundle": "*",
         "wpackagist-plugin/woocommerce": "^4.7",
-        "wpackagist-theme/twentytwenty": "*"
+        "wpackagist-theme/twentytwenty": "*",
+        "phpunit/phpunit": "*"
+
     },
     "extra": {
         "patches": {
             "jaschilz/php-coverage-badger": {
                 "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
-            },
-            "squizlabs/php_codesniffer": {
-                "Add GitHub Actions Annotations report type": "https://github.com/squizlabs/PHP_CodeSniffer/pull/2918.patch"
             }
         },
         "symlinks": {

@@ -3,7 +3,7 @@
  * To provide defaults.
  */
 
-namespace BrianHenryIE\WP_Logger\api;
+namespace BrianHenryIE\WP_Logger\API;
 
 use Psr\Log\LogLevel;
 
@@ -30,7 +30,7 @@ class Logger_Settings implements Logger_Settings_Interface {
 	}
 
 	public function get_plugin_slug(): string {
-		if( is_null($this->plugin_data)  ) {
+		if ( is_null( $this->plugin_data ) ) {
 			$this->plugin_data = ( new Plugin_Helper() )->discover_plugin_data();
 		}
 		return $this->plugin_data['TextDomain'];

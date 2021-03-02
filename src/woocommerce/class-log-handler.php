@@ -7,8 +7,8 @@
 
 namespace BrianHenryIE\WP_Logger\woocommerce;
 
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 use WC_Log_Levels;
 
@@ -72,6 +72,7 @@ class Log_Handler {
 
 		unset( $context['source'] );
 
+		// TODO: regex to replace email addresses with b**********e@gmail.com etc.
 		return $entry . "\n" . wp_json_encode( $context );
 	}
 

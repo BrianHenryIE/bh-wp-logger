@@ -5,12 +5,13 @@
 
 namespace BrianHenryIE\WP_Logger\includes;
 
+use BrianHenryIE\WP_Logger\includes\Functions;
 use BrianHenryIE\WP_Logger\admin\Admin;
 use BrianHenryIE\WP_Logger\admin\Logs_Page;
 use BrianHenryIE\WP_Logger\admin\Plugins_Page;
-use BrianHenryIE\WP_Logger\api\API_Interface;
-use BrianHenryIE\WP_Logger\api\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\api\PHP_Error_Handler;
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\woocommerce\Log_Handler;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\AbstractLogger;
@@ -33,6 +34,7 @@ class BH_WP_Logger extends AbstractLogger {
 	 * @var Logger_Settings_Interface
 	 */
 	protected $settings;
+
 	/**
 	 * @var API_Interface
 	 */
@@ -41,10 +43,12 @@ class BH_WP_Logger extends AbstractLogger {
 	/**
 	 * Logger constructor.
 	 *
+	 * TODO: This uses WC_Logger for all plugins, not just WooCommerce related ones.
+	 *
 	 * @param API_Interface              $api
 	 * @param ?Logger_Settings_Interface $settings
 	 */
-	protected function __construct( $api, $settings ) {
+	public function __construct( $api, $settings ) {
 
 		$this->settings = $settings;
 		$this->api      = $api;
@@ -63,8 +67,8 @@ class BH_WP_Logger extends AbstractLogger {
 		$hook         = "plugin_action_links_{$this->settings->get_plugin_basename()}";
 		add_filter( $hook, array( $plugins_page, 'display_plugin_action_links' ) );
 
-		$php_error_handler = new PHP_Error_Handler( $settings );
-		add_action( 'plugins_loaded', array( $php_error_handler, 'init' ) );
+		$php_error_handler = new PHP_Error_Handler( $settings, $this );
+		add_action( 'plugins_loaded', array( $php_error_handler, 'init' ), 2 );
 
 		// This comes after the links are added, so past logs can be accessed after logging is disabled.
 		if ( 'none' === $settings->get_log_level() ) {
@@ -90,7 +94,7 @@ class BH_WP_Logger extends AbstractLogger {
 			$this->api->set_common_context( 'user_id', $current_user_id );
 		}
 
-		if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+		if ( false && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
 
 			add_action(
 				'plugins_loaded',
@@ -133,8 +137,38 @@ class BH_WP_Logger extends AbstractLogger {
 
 		}
 
-	}
+		/**
+		 * A filter which can be run to find which plugins have a plugin instantiated.
+		 * Added in particular so loggers can be created for arbitrary plugins to capture their PHP errors, i.e.
+		 * we want to know which plugins already have a logger so we don't interfere unnecessarily.
+		 */
+		add_filter(
+			'bh-wp-loggers',
+			function( $loggers ) use ( $settings ) {
+				// TODO: what should be returned?
+				$value           = (array) $settings;
+				$value['logger'] = $this;
 
+				$loggers[ $settings->get_plugin_slug() ] = $value;
+				return $loggers;
+			}
+		);
+
+		add_filter(
+			"bh-wp-loggers-{$settings->get_plugin_slug()}",
+			function() {
+				return $this;
+			}
+		);
+
+		$functions = new Functions( $api, $settings, $this );
+
+		add_action( 'deprecated_function_run', array( $functions, 'log_deprecated_functions_only_once_per_day' ), 10, 3 );
+		add_action( 'deprecated_argument_run', array( $functions, 'log_deprecated_arguments_only_once_per_day' ), 10, 3 );
+		add_action( 'doing_it_wrong_run', array( $functions, 'log_doing_it_wrong_only_once_per_day' ), 10, 3 );
+		add_action( 'deprecated_hook_run', array( $functions, 'log_deprecated_hook_only_once_per_day' ), 10, 4 );
+
+	}
 
 	public function log( $level, $message, $context = array() ) {
 
@@ -160,6 +194,7 @@ class BH_WP_Logger extends AbstractLogger {
 
 		$this->logger->log( $level, $message, $context );
 
+		update_option( $this->settings->get_plugin_slug() . '-last-log-time', time() );
 	}
 
 	/**
@@ -183,6 +218,9 @@ class BH_WP_Logger extends AbstractLogger {
 
 		$debug_backtrace            = debug_backtrace( null, 2 );
 		$context['debug_backtrace'] = $debug_backtrace;
+
+		global $wp_current_filter;
+		$context['filters'] = $wp_current_filter;
 
 		$this->log( LogLevel::ERROR, $message, $context );
 	}
