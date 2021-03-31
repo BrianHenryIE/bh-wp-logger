@@ -147,6 +147,13 @@ If using WP_Mock for your tests, and you are instantiating this logger, the foll
 
 ```php
 \WP_Mock::userFunction(
+    'is_admin',
+    array(
+        'return_arg' => false
+    )
+);
+
+\WP_Mock::userFunction(
     'get_current_user_id'
 );
 
