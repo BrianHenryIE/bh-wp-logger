@@ -53,8 +53,10 @@ $wordpress_classmap = array();
 if ( defined( 'ABSPATH' ) ) {
 	$wordpress_classmap[ WP_List_Table::class ] = ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 
-	// TODO: Can we do without this in autoload?
-	require_once ABSPATH . '/wp-admin/includes/plugin.php';
+	// TODO: Can we do without this in autoload? presumably better not to include admin files.
+    if( file_exists( ABSPATH . '/wp-admin/includes/plugin.php' ) ) {
+        require_once ABSPATH . '/wp-admin/includes/plugin.php';
+    }
 }
 
 $classmaps = array_merge( $autoload_classmap, $wordpress_classmap );
