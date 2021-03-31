@@ -8,30 +8,49 @@ namespace BrianHenryIE\WP_Logger\admin;
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use WPTRT\AdminNotices\Notices;
 
 class Admin {
 
 	/** @var LoggerInterface */
-	protected $logger;
+	protected LoggerInterface $logger;
 
 	/** @var Logger_Settings_Interface  */
-	protected $settings;
+	protected Logger_Settings_Interface $settings;
 
 	/** @var API_Interface  */
-	protected $api;
+	protected API_Interface $api;
 
 	/**
 	 * @param API_Interface             $api
 	 * @param Logger_Settings_Interface $settings
-	 * @param LoggerInterface           $logger
+	 * @param ?LoggerInterface           $logger
 	 */
-	public function __construct( $api, $settings, $logger = null ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 
-		$this->logger   = $logger;
+		$this->logger   = $logger ?? new NullLogger();
 		$this->settings = $settings;
 		$this->api      = $api;
+
+		$this->boot_notices();
 	}
+
+	protected Notices $notices;
+
+    /**
+     *
+     */
+	public function boot_notices() {
+
+	    // Don't add this unless we're on an admin screen or handling an ajax request.
+	    if( ! is_admin() && ( ! defined('DOING_AJAX') || ! DOING_AJAX ) ) {
+	        return;
+        }
+
+        $this->notices = new Notices();
+        $this->notices->boot();
+    }
 
 	/**
 	 * Show a notice for recent errors in the logs.
@@ -41,8 +60,6 @@ class Admin {
 	 * @hooked admin_init
 	 */
 	public function admin_notices() {
-
-		$notices = new Notices();
 
 		$error_detail_option_name = $this->settings->get_plugin_slug() . '-recent-error-data';
 
@@ -87,7 +104,7 @@ class Admin {
 			}
 
 			// ID must be globally unique because it is the css id that will be used.
-			$notices->add(
+			$this->notices->add(
 				$this->settings->get_plugin_slug() . '-recent-error',
 				$title,   // The title for this notice.
 				$content, // The content for this notice.
@@ -115,7 +132,6 @@ class Admin {
 
 		}
 
-		$notices->boot();
 	}
 
 }
