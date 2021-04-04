@@ -34,6 +34,10 @@
             "type": "git"
         },
         {
+            "url": "https://github.com/BrianHenryIE/admin-notices",
+            "type": "git"
+        },
+        {
             "type":"composer",
             "url":"https://wpackagist.org"
         }
@@ -44,7 +48,7 @@
         "php": ">=7.4",
         "psr/log": "^1.0.0",
         "spatie/backtrace": "^1.0.0",
-        "wptrt/admin-notices": "dev-master"
+        "wptrt/admin-notices": "dev-merged"
     },
     "require-dev": {
         "10up/wp_mock": "0.4.2",
