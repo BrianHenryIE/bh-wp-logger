@@ -16,8 +16,8 @@
         "sort-packages": true
     },
     "autoload": {
-        "files": [
-            "src/autoload.php"
+        "classmap": [
+            "src/"
         ]
     },
     "repositories": [
