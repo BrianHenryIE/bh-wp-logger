@@ -6,7 +6,7 @@
  * Time should show (UTC,local and "five hours ago")
  */
 
-namespace BrianHenryIE\WP_Logger\admin;
+namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;

@@ -13,13 +13,11 @@
  * @subpackage BH_WP_GetEnhanced_Shop/includes
  */
 
-namespace BrianHenryIE\WP_Logger\includes;
+namespace BrianHenryIE\WP_Logger\Includes;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
-use Exception;
 use Psr\Log\LoggerInterface;
-use ReflectionFunction;
 
 /**
  *

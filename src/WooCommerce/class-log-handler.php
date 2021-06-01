@@ -5,7 +5,7 @@
  * @see WC_Log_Handler
  */
 
-namespace BrianHenryIE\WP_Logger\woocommerce;
+namespace BrianHenryIE\WP_Logger\WooCommerce;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
@@ -72,7 +72,7 @@ class Log_Handler {
 
 		unset( $context['source'] );
 
-		// TODO: regex to replace email addresses with b**********e@gmail.com etc.
+		// TODO: regex to replace email addresses with b**********e@gmail.com, credit card numbers etc.
 		return $entry . "\n" . wp_json_encode( $context );
 	}
 

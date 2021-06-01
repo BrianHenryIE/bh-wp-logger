@@ -3,16 +3,15 @@
  *
  */
 
-namespace BrianHenryIE\WP_Logger\includes;
+namespace BrianHenryIE\WP_Logger\Includes;
 
-use BrianHenryIE\WP_Logger\includes\Functions;
-use BrianHenryIE\WP_Logger\admin\Admin;
-use BrianHenryIE\WP_Logger\admin\Logs_Page;
-use BrianHenryIE\WP_Logger\admin\Plugins_Page;
+use BrianHenryIE\WP_Logger\Admin\Admin;
+use BrianHenryIE\WP_Logger\Admin\Logs_Page;
+use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\API\PHP_Error_Handler;
-use BrianHenryIE\WP_Logger\woocommerce\Log_Handler;
+use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;

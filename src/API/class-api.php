@@ -3,10 +3,9 @@
 namespace BrianHenryIE\WP_Logger\API;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Spatie\Backtrace\Backtrace;
 use WC_Admin_Status;
-use function WP_CLI\Utils\normalize_path;
+
 
 class API implements API_Interface {
 
@@ -40,6 +39,8 @@ class API implements API_Interface {
 
 	public function delete_old_logs(): void {
 
+
+	    // TODO: delete the last visited option if it's older than the most recent logs.
 	}
 
 	public function get_common_context(): array {

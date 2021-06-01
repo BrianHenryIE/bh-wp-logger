@@ -1,6 +1,9 @@
 <?php
+/**
+ * Automatically delete old log files.
+ */
 
-namespace BrianHenryIE\WP_Logger\includes;
+namespace BrianHenryIE\WP_Logger\Includes;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;

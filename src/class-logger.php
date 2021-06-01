@@ -5,7 +5,7 @@ namespace BrianHenryIE\WP_Logger;
 use BrianHenryIE\WP_Logger\API\API;
 use BrianHenryIE\WP_Logger\API\Logger_Settings;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\includes\BH_WP_Logger;
+use BrianHenryIE\WP_Logger\Includes\BH_WP_Logger;
 use Psr\Log\LoggerInterface;
 
 class Logger extends BH_WP_Logger implements LoggerInterface {
