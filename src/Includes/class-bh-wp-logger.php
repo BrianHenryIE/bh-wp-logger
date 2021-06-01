@@ -58,6 +58,10 @@ class BH_WP_Logger extends AbstractLogger {
 		add_action( 'admin_menu', array( $logs_page, 'add_page' ) );
 		add_action( 'admin_footer', array( $logs_page, 'print_css' ) );
 
+		$cron = new Cron( $api, $settings );
+		add_action( 'plugins_loaded', array( $cron, 'register_cron_job') );
+		add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
+
 		$admin = new Admin( $api, $settings );
 		add_action( 'admin_init', array( $admin, 'admin_notices' ) );
 

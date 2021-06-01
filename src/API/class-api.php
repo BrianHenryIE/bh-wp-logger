@@ -2,6 +2,7 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Spatie\Backtrace\Backtrace;
 use WC_Admin_Status;
@@ -9,12 +10,10 @@ use WC_Admin_Status;
 
 class API implements API_Interface {
 
+    use LoggerAwareTrait;
+
 	/** @var Logger_Settings_Interface */
 	protected $settings;
-
-	/** @var LoggerInterface     */
-	protected $logger;
-
 
 	/**
 	 *
@@ -33,12 +32,23 @@ class API implements API_Interface {
 		$this->settings = $settings;
 	}
 
-	public function set_logger( LoggerInterface $logger ) {
-		$this->logger = $logger;
-	}
 
 	public function delete_old_logs(): void {
 
+	    $logs_dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR;
+
+        $existing_logs = glob("{$logs_dir}{$this->settings->get_plugin_slug()}*.log");
+
+        // e.g. bh-wc-auto-purchase-easypost-2021-06-01.log
+        foreach( $existing_logs as $log_filename ) {
+
+            if( 1 === preg_match('/^'. $this->settings->get_plugin_slug() .'-(\d{4}-\d{2}-\d{2})\.log$/', $log_filename, $output_array) ) {
+                if( strtotime($output_array[1]) < time() - MONTH_IN_SECONDS ) {
+                    unlink($log_filename);
+
+                }
+            }
+        }
 
 	    // TODO: delete the last visited option if it's older than the most recent logs.
 	}
