@@ -9,12 +9,12 @@ $logger = Logger::instance();
 Wraps existing [PSR-3](https://www.php-fig.org/psr/psr-3/) loggers and adds some UI.
 
 * [KLogger](https://github.com/katzgrau/KLogger)
-* [WC_Logger](https://github.com/katzgrau/KLogger)
+* [~~WC_Logger~~](https://github.com/woocommerce/woocommerce/blob/trunk/includes/class-wc-logger.php) (currently unhooked)
 * [PSR-3 NullLogger](https://github.com/php-fig/log/blob/master/Psr/Log/NullLogger.php)
 
-Uses KLogger by default, WC_Logger when WooCommerce is active, NullLogger when log level is set to "none".
+Uses KLogger by default, ~~WC_Logger when WooCommerce is active~~, NullLogger when log level is set to "none".
 
-Uses PHP's `set_error_handler()` to catch PHP deprecated/warning/notice/errors.
+~~Uses PHP's `set_error_handler()` to catch PHP deprecated/warning/notice/errors.~~ (currently unhooked)
 
 ## UI 
 
@@ -33,43 +33,29 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 ## Use
 
-### Composer + Mozart
+### Composer
 
-This has been written with [Mozart](https://github.com/coenjacobs/mozart) in mind to prefix namespaces.
-
-Until this reaches v1.0, it is best to specify the current dev-master commit in your project (which will be different to the one used in this block).
+This relies on a fork of [WPTT/admin-notices](https://github.com/WPTT/admin-notices/issues/14) due to issue [#14 "Dismiss" button not persistently dismissing notices](https://github.com/WPTT/admin-notices/issues/14) which I've fixed but maybe not in the best way.
 
 ```json
 "repositories": [
     {
       "url": "https://github.com/BrianHenryIE/bh-wp-logger",
       "type": "git"
-    }
+    },
+    {
+        "url": "https://github.com/BrianHenryIE/admin-notices",
+        "type": "git"
+    },
 },
 "require": {
-    "brianhenryie/wp-logger": "dev-master#e328c1a17c11b0fd20834453be1ba999b3a3d280"
-},
-"extra": {
-    "mozart": {
-      "override_autoload": {
-        "brianhenryie/wp-logger": {
-          "psr-4": {
-            "BrianHenryIE\\WP_Logger\\": "src"
-          }
-        },
-        "katzgrau/klogger": {
-          "psr-4": {
-            "Katzgrau\\KLogger\\": "src/"
-          }
-        }
-      }
-  }
+    "brianhenryie/wp-logger": "dev-master"
 }
 ```
 
-
-
 ### Instantiate
+
+You should use [brianhenryie/strauss](https://github.com/BrianHenryIE/strauss) to prefix the library's namespace. Then Strauss's autoloader will include the files for you. Otherwise:
 
 Include the files:
 
@@ -80,10 +66,16 @@ Include the files:
 require_once '/path/to/bh-wp-logger/autoload.php';
 ```
 
+The following will work, but it will be faster and more reliable to provide the settings:
+
+```php
+$logger = Logger::instance();
+```
+
 Provide the settings:
 
 ```php
-$logger_settings = new class() implements Logger_Settings_Interface {
+$logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Settings_Interface {
 
 	public function get_log_level(): string {
 		return LogLevel::INFO;
@@ -108,12 +100,6 @@ $logger = Logger::instance( $logger_settings );
 ```
 
 Then pass around your `$logger` instance; use `NullLogger` in your tests.
-
-If no settings are provided, the plugin details are determined automatically which will be marginally slower.
-
-```php
-$logger = Logger::instance();
-```
 
 After the logger has been instantiated once, subsequent calls to `::instance()` return the existing instance and any `$logger_settings` passed is ignored.
 
