@@ -45,7 +45,8 @@ class PHP_Error_Handler_Test extends \Codeception\TestCase\WPTestCase {
 
 		set_error_handler( $my_handler );
 
-		new PHP_Error_Handler( $settings, $logger );
+		$php_error_handler = new PHP_Error_Handler( $settings, $logger );
+        $php_error_handler->init();
 
 		$my_handler_2 = function( $errno, $errstr, $errfile = null, $errline = null ) {};
 
@@ -111,7 +112,7 @@ class PHP_Error_Handler_Test extends \Codeception\TestCase\WPTestCase {
 
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'my-plugin/my-plugin',
+				'get_plugin_slug' => 'my-plugin',
 				'get_plugin_basename' =>  'my-plugin/my-plugin.php'
 			)
 		);
@@ -144,7 +145,7 @@ class PHP_Error_Handler_Test extends \Codeception\TestCase\WPTestCase {
 
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'my-plugin/my-plugin',
+				'get_plugin_slug' => 'my-plugin',
 				'get_plugin_basename' =>  'my-plugin/my-plugin.php'
 			)
 		);

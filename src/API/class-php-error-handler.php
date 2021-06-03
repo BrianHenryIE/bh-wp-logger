@@ -200,7 +200,7 @@ class PHP_Error_Handler {
 	 *
 	 * @return string
 	 */
-	protected function errno_to_psr3( $errno ) {
+	protected function errno_to_psr3( int $errno ): string {
 
 		$errorType = array(
 			E_ERROR             => LogLevel::ERROR,
