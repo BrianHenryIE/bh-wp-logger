@@ -53,7 +53,6 @@
     "require-dev": {
         "10up/wp_mock": "0.4.2",
         "brianhenryie/composer-phpstorm": "dev-master",
-        "brianhenryie/wp-dev": "dev-master",
         "codeception/module-asserts": "*",
         "codeception/module-cli": "*",
         "codeception/module-db": "*",
