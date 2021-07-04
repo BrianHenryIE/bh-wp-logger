@@ -7,14 +7,14 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use WPTRT\AdminNotices\Notices;
 
 class Admin {
 
-	/** @var LoggerInterface */
-	protected LoggerInterface $logger;
+	use LoggerAwareTrait;
 
 	/** @var Logger_Settings_Interface  */
 	protected Logger_Settings_Interface $settings;
@@ -25,11 +25,11 @@ class Admin {
 	/**
 	 * @param API_Interface             $api
 	 * @param Logger_Settings_Interface $settings
-	 * @param ?LoggerInterface           $logger
+	 * @param ?LoggerInterface          $logger
 	 */
 	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 
-		$this->logger   = $logger ?? new NullLogger();
+		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
 		$this->api      = $api;
 
@@ -38,19 +38,19 @@ class Admin {
 
 	protected Notices $notices;
 
-    /**
-     *
-     */
+	/**
+	 *
+	 */
 	public function boot_notices() {
 
-	    // Don't add this unless we're on an admin screen or handling an ajax request.
-	    if( ! is_admin() && ( ! defined('DOING_AJAX') || ! DOING_AJAX ) ) {
-	        return;
-        }
+		// Don't add this unless we're on an admin screen or handling an ajax request.
+		if ( ! is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
+			return;
+		}
 
-        $this->notices = new Notices();
-        $this->notices->boot();
-    }
+		$this->notices = new Notices();
+		$this->notices->boot();
+	}
 
 	/**
 	 * Show a notice for recent errors in the logs.

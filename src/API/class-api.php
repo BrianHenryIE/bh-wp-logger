@@ -2,15 +2,17 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Spatie\Backtrace\Backtrace;
+use Spatie\Backtrace\Frame;
 use WC_Admin_Status;
 
 
 class API implements API_Interface {
 
-    use LoggerAwareTrait;
+	use LoggerAwareTrait;
 
 	/** @var Logger_Settings_Interface */
 	protected $settings;
@@ -33,24 +35,32 @@ class API implements API_Interface {
 	}
 
 
+	/**
+	 * Deletes log files older than MONTH_IN_SECONDS.
+	 *
+	 * @used-by Cron::delete_old_logs()
+	 */
 	public function delete_old_logs(): void {
 
-	    $logs_dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR;
+		$logs_dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR;
 
-        $existing_logs = glob("{$logs_dir}{$this->settings->get_plugin_slug()}*.log");
+		$existing_logs = glob( "{$logs_dir}{$this->settings->get_plugin_slug()}*.log" );
 
-        // e.g. bh-wc-auto-purchase-easypost-2021-06-01.log
-        foreach( $existing_logs as $log_filename ) {
+		// e.g. bh-wc-auto-purchase-easypost-2021-06-01.log
+		foreach ( $existing_logs as $log_filename ) {
 
-            if( 1 === preg_match('/^'. $this->settings->get_plugin_slug() .'-(\d{4}-\d{2}-\d{2})\.log$/', $log_filename, $output_array) ) {
-                if( strtotime($output_array[1]) < time() - MONTH_IN_SECONDS ) {
-                    unlink($log_filename);
+			if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2})\.log$/', $log_filename, $output_array ) ) {
+				if ( strtotime( $output_array[1] ) < time() - MONTH_IN_SECONDS ) {
+					$this->logger->debug( 'deleting old log file ' . $logs_dir . $log_filename );
+					unlink( $logs_dir . $log_filename );
+				} elseif ( 0 === filesize( $logs_dir . $log_filename ) ) {
+					$this->logger->debug( 'deleting empty log file ' . $logs_dir . $log_filename );
+					unlink( $logs_dir . $log_filename );
+				}
+			}
+		}
 
-                }
-            }
-        }
-
-	    // TODO: delete the last visited option if it's older than the most recent logs.
+		// TODO: delete the last visited option if it's older than the most recent logs.
 	}
 
 	public function get_common_context(): array {
@@ -84,7 +94,7 @@ class API implements API_Interface {
 
 	public function get_log_file( $date = null ) {
 
-		if ( false && class_exists( WC_Admin_Status::class ) ) {
+		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && class_exists( WC_Admin_Status::class ) ) {
 
 			$logs_files = WC_Admin_Status::scan_log_files();
 
@@ -142,9 +152,9 @@ class API implements API_Interface {
 	/**
 	 * Loops through the debug backtrace until it finds a folder with wp-content/plugins as its parent.
 	 *
-	 * @return string
+	 * @return ?string
 	 */
-	public function determine_plugin_slug_from_backtrace(): string {
+	public function determine_plugin_slug_from_backtrace(): ?string {
 
 		$backtrace = Backtrace::create()->offset( 2 );
 
@@ -164,7 +174,34 @@ class API implements API_Interface {
 			}
 		}
 
-		return '';
+		return null;
 	}
+
+	/**
+	 *
+	 * Get the backtrace and skips:
+	 * * function calls from inside this file
+	 * * call_user_func_array()
+	 * * function calls from other plugins using this same library (using filename).
+	 *
+	 * @return Frame[]
+	 */
+	public function get_backtrace(): array {
+
+		$starting_from_frame_closure = function( Frame $frame ): bool {
+			if ( __FILE__ === $frame->file
+				|| 'call_user_func_array' === $frame->method
+			// || ( substr( $frame->file, -strlen( 'class-php-error-handler.php' ) ) === basename( 'class-php-error-handler.php' ) )
+				|| basename( $frame->file ) === 'class-php-error-handler.php'
+			) {
+				return false;
+			}
+			return true;
+		};
+
+		return Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->frames();
+
+	}
+
 }
 

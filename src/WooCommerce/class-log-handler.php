@@ -9,13 +9,13 @@ namespace BrianHenryIE\WP_Logger\WooCommerce;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WC_Log_Levels;
 
 class Log_Handler {
 
-	/** @var LoggerInterface */
-	protected $logger;
+	use LoggerAwareTrait;
 
 	/** @var Logger_Settings_Interface  */
 	protected $settings;
@@ -28,16 +28,17 @@ class Log_Handler {
 	 * @param Logger_Settings_Interface $settings
 	 * @param LoggerInterface           $logger
 	 */
-	public function __construct( $api, $settings, $logger = null ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger = null ) {
 
 		$this->logger   = $logger;
 		$this->settings = $settings;
 		$this->api      = $api;
 	}
+
 	/**
 	 * The standard WooCommerce logger does not record the $context.
 	 *
-	 * Add context when min log level is Debug, for Errors and worse, and when WP_DEBUG is true.
+	 * Add context when min log level is Debug, and for Errors and worse.
 	 *
 	 * @hooked woocommerce_format_log_entry
 	 *
@@ -55,16 +56,16 @@ class Log_Handler {
 	 *
 	 * @return string
 	 */
-	public function add_context_to_logs( $entry, $log_data_array ) {
+	public function add_context_to_logs( string $entry, array $log_data_array ): string {
 
 		// Only act on logs for this plugin.
 		if ( ! isset( $log_data_array['context']['source'] ) || $log_data_array['context']['source'] !== $this->settings->get_plugin_slug() ) {
 			return $entry;
 		}
 
+		// Always record the context when it's an error, or when loglevel is DEBUG.
 		if ( ! ( WC_Log_Levels::get_level_severity( $log_data_array['level'] ) >= WC_Log_Levels::ERROR
-				 || WC_Log_Levels::DEBUG === $this->settings->get_log_level()
-				 || ( defined( WP_DEBUG ) && WP_DEBUG ) ) ) {
+			|| WC_Log_Levels::DEBUG === $this->settings->get_log_level() ) ) {
 			return $entry;
 		}
 

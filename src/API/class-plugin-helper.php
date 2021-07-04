@@ -9,11 +9,17 @@ namespace BrianHenryIE\WP_Logger\API;
 
 class Plugin_Helper {
 
-	public function discover_plugin_data() {
+	/**
+	 *
+	 * @used-by Logger_Settings
+	 *
+	 * @return ?array
+	 */
+	public function discover_plugin_data(): ?array {
 
-		$directory = $this->discover_plugin_basename();
+		$directory = $this->discover_plugin_relative_directory();
 
-		$plugin_data = $this->get_plugin_data_from_directory( $directory );
+		$plugin_data = $this->get_plugin_data_from_plugin_directory( $directory );
 
 		return $plugin_data;
 	}
@@ -21,7 +27,9 @@ class Plugin_Helper {
 	/**
 	 * Given a slug, searches the get_plugins() array for the plugin details.
 	 *
-	 * TODO: TextDomain is not an essential part of a miinimum viable WordPress plugin (only `Plugin Name`).
+	 * TODO: TextDomain is not an essential part of a minimum viable WordPress plugin (only `Plugin Name`).
+	 *
+	 * @used-by Logger_Settings
 	 *
 	 * @param string $slug
 	 *
@@ -49,7 +57,7 @@ class Plugin_Helper {
 	}
 
 	/**
-	 * Find the first half of the plugin basename... i.e. the directory it appears in under WP_PLUGIN_DIR.
+	 * Find the plugin relative directory... i.e. the directory it appears in under WP_PLUGIN_DIR.
 	 *
 	 * Find the plugin directory from the filepath.
 	 * Should work with one level of symlinks.
@@ -57,8 +65,9 @@ class Plugin_Helper {
 	 *
 	 * @return ?string
 	 */
-	public function discover_plugin_basename( $dir = null ): ?string {
+	public function discover_plugin_relative_directory( $dir = null ): ?string {
 
+		// __DIR_ is the directory this file is in. (i.e. NOT the calling directory).
 		$dir = $dir ?? __DIR__;
 
 		// If the $dir has a file at the end, remove it.
@@ -71,16 +80,13 @@ class Plugin_Helper {
 
 		// Check for a standard WordPress install...
 		// __DIR__ has no trailing slash.
-		$capture_first_string_after_slash_in_plugins_dir = '/' . preg_quote( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)', DIRECTORY_SEPARATOR ) . '/';
-		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
+		$capture_first_string_after_slash_in_plugins_dir = '~' . preg_quote( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)', DIRECTORY_SEPARATOR ) . '~';
+		// $capture_first_string_after_slash_in_plugins_dir = '~' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '~';
 		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $dir, $output_array ) ) {
 			$plugin_directory = $output_array[1];
 
-			$plugin_data = $this->get_plugin_data_from_slug( $plugin_directory );
+			return $plugin_directory;
 
-			if ( ! is_null( $plugin_data ) ) {
-				return $this->get_plugin_data_from_slug( $plugin_directory )['basename'];
-			}
 		} else {
 
 			// If we're in a live plugin in another directory, it's probably symlinked inside WP_PLUGIN_DIR.
@@ -94,24 +100,25 @@ class Plugin_Helper {
 			if ( $opendirectory = opendir( WP_PLUGIN_DIR ) ) {
 				while ( ( $plugins_dir_entry = readdir( $opendirectory ) ) !== false ) {
 
-					if ( is_link( WP_PLUGIN_DIR . "/{$plugins_dir_entry}" ) ) {
+					if ( is_link( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugins_dir_entry ) ) {
 
 						// __DIR__ is the true path on the filesystem.
 						$dir_parts = explode( DIRECTORY_SEPARATOR, $dir );
 
 						$plugin_internal_path = '';
 
-						// Keep prefixing with additional levels of directory
+						// Keep prefixing with additional levels of directory.
 						foreach ( array_reverse( $dir_parts ) as $parent_dir ) {
 
-							$plugin_internal_path = "{$parent_dir}/" . $plugin_internal_path;
+							$plugin_internal_path = $parent_dir . DIRECTORY_SEPARATOR . $plugin_internal_path;
 
 							$filepath = WP_PLUGIN_DIR . "/{$plugins_dir_entry}/{$plugin_internal_path}$filename";
 
+							// This is the filepath with the symlink in it.
 							if ( file_exists( $filepath ) ) {
 								closedir( $opendirectory );
 
-								return $this->get_plugin_data_from_slug( $plugins_dir_entry )['basename'];
+								return $plugins_dir_entry;
 							}
 						}
 					}
@@ -120,54 +127,27 @@ class Plugin_Helper {
 			}
 		}
 
-		$dir_parts = explode( DIRECTORY_SEPARATOR, $dir );
-		// Assuming here the logging library is in a subdir or two of the plugin itself.
-		while ( array_pop( $dir_parts ) ) {
-			// List the WP_PLUGIN_DIR directory, check for symlinks.
-			$current_dir = implode( DIRECTORY_SEPARATOR, $dir_parts );
-			if ( $opendirectory = opendir( $current_dir ) ) {
-				while ( ( $file = readdir( $opendirectory ) ) !== false ) {
-					if ( is_file( $current_dir . DIRECTORY_SEPARATOR . $file ) ) {
-
-						if ( '.php' === substr( $file, -4 ) ) {
-							$plugin_data = get_plugin_data( $current_dir . DIRECTORY_SEPARATOR . $file, false, false );
-
-							if ( isset( $plugin_data['Name'] ) && ! empty( $plugin_data['Name'] ) ) {
-								$plugin_slug = $plugin_data['TextDomain'];
-
-								$get_plugin_data_from_slug = $this->get_plugin_data_from_slug( $plugin_slug );
-								if ( ! is_null( $get_plugin_data_from_slug ) && isset( $get_plugin_data_from_slug['basename'] ) ) {
-									return $get_plugin_data_from_slug['basename'];
-								} else {
-									return null;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
 		return null;
 	}
 
 	/**
-	 * @param string $directory The WP_PLUGIN_DIR subdirectory for the plugin.
+	 * @param string $relative_plugin_directory The WP_PLUGIN_DIR subdirectory for the plugin.
 	 *
-	 * @return string
+	 * @return ?array
 	 */
-	public function get_plugin_data_from_directory( $directory ): array {
+	public function get_plugin_data_from_plugin_directory( string $relative_plugin_directory ): ?array {
 
 		$plugins = get_plugins();
 
 		foreach ( $plugins as $plugin_file => $plugin_data ) {
-			if ( explode( '/', $plugin_file )[0] === $directory ) {
+			if ( explode( '/', $plugin_file )[0] === $relative_plugin_directory ) {
+				$plugin_data['basename'] = $plugin_file;
 				return $plugin_data;
 			}
 		}
 
 		// TODO: something else.
-		return array();
+		return null;
 	}
 
 }

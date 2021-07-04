@@ -10,15 +10,13 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WP_List_Table;
 
 class Logs_Table extends WP_List_Table {
 
-	/**
-	 * @var LoggerInterface
-	 */
-	protected $logger;
+	use LoggerAwareTrait;
 
 	/** @var Logger_Settings_Interface  */
 	protected $settings;
@@ -169,9 +167,9 @@ class Logs_Table extends WP_List_Table {
 
 			case 'message':
 			case 'context':
-				return json_encode( $item[ $column_name ], JSON_PRETTY_PRINT );
+				return esc_html( wp_json_encode( $item[ $column_name ], JSON_PRETTY_PRINT ) );
 			default:
-				return print_r( $item, true ); // Show the whole array for troubleshooting purposes
+				return esc_html( print_r( $item, true ) ); // Show the whole array for troubleshooting purposes
 		}
 	}
 

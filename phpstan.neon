@@ -1,0 +1,13 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+    bootstrapFiles:
+        - src/autoload.php
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    scanDirectories:
+        - wp-content/plugins
+        - vendor/wp-cli
+    ignoreErrors:
+        - '#LoggerInterface\|null#'

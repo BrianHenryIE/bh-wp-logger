@@ -7,28 +7,29 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 
 class Logs_Page {
 
-	/** @var LoggerInterface */
-	protected $logger;
+	use LoggerAwareTrait;
 
 	/** @var Logger_Settings_Interface  */
-	protected $settings;
+	protected Logger_Settings_Interface $settings;
 
 	/** @var API_Interface  */
-	protected $api;
+	protected API_Interface $api;
 
 	/**
 	 * @param API_Interface             $api
 	 * @param Logger_Settings_Interface $settings
 	 * @param LoggerInterface           $logger
 	 */
-	public function __construct( $api, $settings, $logger = null ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 
-		$this->logger   = $logger;
+		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
 		$this->api      = $api;
 	}
@@ -54,7 +55,12 @@ class Logs_Page {
 	}
 
 	/**
-	 * Registered in @see add_page()
+	 * Display the page.
+	 * Record the last visited time.
+	 *
+	 * Registered above.
+	 *
+	 * @see add_page()
 	 */
 	public function display_page() {
 

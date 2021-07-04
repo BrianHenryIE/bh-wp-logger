@@ -12,8 +12,10 @@ use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\API\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
+use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use WC_Logger_Interface;
@@ -26,28 +28,20 @@ use WP_CLI;
  */
 class BH_WP_Logger extends AbstractLogger {
 
-	/** @var WC_Logger_Interface|AbstractLogger The true logger, once available. */
+	/** @var WC_Logger_Interface|LoggerInterface The true logger, once available. */
 	protected $logger;
 
-	/**
-	 * @var Logger_Settings_Interface
-	 */
-	protected $settings;
+	protected Logger_Settings_Interface $settings;
 
-	/**
-	 * @var API_Interface
-	 */
-	protected $api;
+	protected API_Interface $api;
 
 	/**
 	 * Logger constructor.
 	 *
-	 * TODO: This uses WC_Logger for all plugins, not just WooCommerce related ones.
-	 *
-	 * @param API_Interface              $api
-	 * @param ?Logger_Settings_Interface $settings
+	 * @param API_Interface             $api
+	 * @param Logger_Settings_Interface $settings
 	 */
-	public function __construct( $api, $settings ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings ) {
 
 		$this->settings = $settings;
 		$this->api      = $api;
@@ -59,7 +53,7 @@ class BH_WP_Logger extends AbstractLogger {
 		add_action( 'admin_footer', array( $logs_page, 'print_css' ) );
 
 		$cron = new Cron( $api, $settings );
-		add_action( 'plugins_loaded', array( $cron, 'register_cron_job') );
+		add_action( 'plugins_loaded', array( $cron, 'register_cron_job' ) );
 		add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 
 		$admin = new Admin( $api, $settings );
@@ -70,7 +64,7 @@ class BH_WP_Logger extends AbstractLogger {
 		$hook         = "plugin_action_links_{$this->settings->get_plugin_basename()}";
 		add_filter( $hook, array( $plugins_page, 'display_plugin_action_links' ) );
 
-		$php_error_handler = new PHP_Error_Handler( $settings, $this );
+		$php_error_handler = new PHP_Error_Handler( $api, $settings, $this );
 		add_action( 'plugins_loaded', array( $php_error_handler, 'init' ), 2 );
 
 		// This comes after the links are added, so past logs can be accessed after logging is disabled.
@@ -97,7 +91,9 @@ class BH_WP_Logger extends AbstractLogger {
 			$this->api->set_common_context( 'user_id', $current_user_id );
 		}
 
-		if ( false && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+		// If Settings says this is a WooCommerce plugin, and WooCommerce is active, use WC_Logger.
+		if ( $this->settings instanceof WooCommerce_Logger_Interface
+			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 
 			add_action(
 				'plugins_loaded',
@@ -109,8 +105,11 @@ class BH_WP_Logger extends AbstractLogger {
 				1
 			);
 
+			// Add context to WooCommerce logs.
 			$wc_log_handler = new Log_Handler( $api, $settings );
 			add_filter( 'woocommerce_format_log_entry', array( $wc_log_handler, 'add_context_to_logs' ), 10, 2 );
+
+			// TODO: What's the log file name when it's a wc-log?
 
 		} else {
 
@@ -141,18 +140,21 @@ class BH_WP_Logger extends AbstractLogger {
 		}
 
 		/**
-		 * A filter which can be run to find which plugins have a plugin instantiated.
+		 * A filter which can be run to find which plugins have a logger instantiated.
 		 * Added in particular so loggers can be created for arbitrary plugins to capture their PHP errors, i.e.
 		 * we want to know which plugins already have a logger so we don't interfere unnecessarily.
 		 */
 		add_filter(
 			'bh-wp-loggers',
 			function( $loggers ) use ( $settings ) {
-				// TODO: what should be returned?
-				$value           = (array) $settings;
-				$value['logger'] = $this;
+
+				// TODO: Maybe a version number here?
+				$value             = array();
+				$value['settings'] = $settings;
+				$value['logger']   = $this;
 
 				$loggers[ $settings->get_plugin_slug() ] = $value;
+
 				return $loggers;
 			}
 		);
@@ -219,7 +221,7 @@ class BH_WP_Logger extends AbstractLogger {
 			)
 		);
 
-		$debug_backtrace            = debug_backtrace( null, 2 );
+		$debug_backtrace            = $this->api->get_backtrace();
 		$context['debug_backtrace'] = $debug_backtrace;
 
 		global $wp_current_filter;

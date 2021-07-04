@@ -30,4 +30,6 @@ interface API_Interface {
 
 
 	public function determine_plugin_slug_from_backtrace(): ?string;
+
+	public function get_backtrace(): array;
 }

@@ -3,20 +3,27 @@
  * Catches PHP warning, deprecated etc. which are then checked to see if they were raised by the
  * plugin the logger is for, in which case they are logged to its log file.
  *
- * A linked list of error handlers.
+ * Chains and calls previously set_error_handler handlers.
+ *
+ * @package BrianHenryIE\WP_Logger\API
  */
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Spatie\Backtrace\Backtrace;
 use Spatie\Backtrace\Frame;
 
+/**
+ * Class PHP_Error_Handler
+ */
 class PHP_Error_Handler {
 
-	/** @var LoggerInterface */
-	protected $logger;
+	use LoggerAwareTrait;
+
+	protected API $api;
 
 	/** @var Logger_Settings_Interface */
 	protected $settings;
@@ -28,7 +35,8 @@ class PHP_Error_Handler {
 	 */
 	protected $previous_error_handler = null;
 
-	public function __construct( Logger_Settings_Interface $settings, LoggerInterface $logger ) {
+	public function __construct( $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
+		$this->api      = $api;
 		$this->logger   = $logger;
 		$this->settings = $settings;
 	}
@@ -43,12 +51,7 @@ class PHP_Error_Handler {
 	 */
 	public function init() {
 
-		// TODO: Don't subscribe to compiler and parse errors etc?
-		// Is there any practical difference to that.
-
-		// Needs more testing (esp. of multiple) before using in prod.
-		return;
-
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 		$this->previous_error_handler = set_error_handler(
 			array( $this, 'plugin_error_handler' ),
 			E_ALL
@@ -60,16 +63,18 @@ class PHP_Error_Handler {
 	 *
 	 * @see set_error_handler()
 	 *
-	 * @param int    $errno the error code (the level of the error raised, as an integer)
-	 * @param string $errstr a string describing the error
-	 * @param string $errfile the filename in which the error occurred
-	 * @param int    $errline the line number in which the error occurred
+	 * @param int    $errno The error code (the level of the error raised, as an integer).
+	 * @param string $errstr A string describing the error.
+	 * @param string $errfile The filename in which the error occurred.
+	 * @param int    $errline The line number in which the error occurred.
 	 *
 	 * @return bool True if error had been handled and no more handling to do, false to pass the error on.
 	 */
 	public function plugin_error_handler( int $errno, string $errstr, string $errfile, int $errline ) {
 
 		// Check is already logged error here?
+
+		$func_args = func_get_args();
 
 		$plugin_related_error = $this->is_related_error( $errno, $errstr, $errfile, $errline );
 
@@ -80,7 +85,7 @@ class PHP_Error_Handler {
 			// TODO: Maybe need to check the receiving function accepts four arguments.
 
 			// If there is another handler, return its result, otherwise indicate the error was not handled.
-			return $this->return_error_handler_result( false );
+			return $this->return_error_handler_result( false, $func_args );
 		}
 
 		// TODO: maybe don't use transients?
@@ -92,7 +97,7 @@ class PHP_Error_Handler {
 
 		// We've already logged this error recently, don't bother logging it again.
 		if ( ! empty( $transient_value ) ) {
-			return $this->return_error_handler_result( true );
+			return $this->return_error_handler_result( true, $func_args );
 		}
 
 		// TODO: Add regex filters to skip uninteresting errors.
@@ -100,21 +105,10 @@ class PHP_Error_Handler {
 
 		// func_get_args shows extra param ["queue_conn":false,"oauth2_refresh":false].
 		$context          = array();
-		$context['error'] = array_combine( array( 'errno', 'errstr', 'errfile', 'errline' ), array_slice( func_get_args(), 0, 4 ) );
+		$context['error'] = array_combine( array( 'errno', 'errstr', 'errfile', 'errline' ), array_slice( $func_args, 0, 4 ) );
 
-		// Backtrace will contain two entries for each instance of this class that are
-		// looped through until reaching the true handler.
-		// TODO: Look at using ->startingFromFrame( function(){} );
-		$backtrace_frames = Backtrace::create()->frames();
-		/** @var Frame $frame */
-		foreach ( $backtrace_frames as $frame ) {
-			if ( __FUNCTION__ === $frame->method
-				  || 'call_user_func_array' === $frame->method ) {
-				array_shift( $backtrace_frames );
-			} else {
-				break;
-			}
-		}
+		// Skip backtraces that are just part of this file.
+		$backtrace_frames = $this->api->get_backtrace();
 
 		$context['backtrace'] = $backtrace_frames;
 
@@ -122,32 +116,50 @@ class PHP_Error_Handler {
 
 		$this->logger->$log_level( $errstr, $context );
 
-		// TODO: Fitler on expiration time length.
-		set_transient( $transient_key, func_get_args(), WEEK_IN_SECONDS );
+		/**
+		 * TODO: remove closures from sub-arrays. The following code only worked on the first level.
+		 * json_encode() seems to work ok.
+		 *
+		 * PHP Fatal error:  Uncaught Exception: Serialization of 'ReflectionMethod' is not allowed in functions.php:599
+		 *
+		 * @see maybe_serialize()
+		 */
+		// $func_args = array_map(
+		// function( $element ) {
+		// return $element instanceof \Closure ? 'closure' : $element;
+		// },
+		// $func_args
+		// );
+
+		// $func_args = json_encode( $func_args );
+
+		// TODO: Filter on expiration time length.
+		set_transient( $transient_key, json_encode( $func_args ), WEEK_IN_SECONDS );
 
 		// TODO: Add a filter here
 		// e.g. to return false for fatal, i.e so it would log fatal errors to error_log's file and not handle ("surpress" them herer).
 
 		/* Don't execute PHP internal error handler */
-		return $this->return_error_handler_result( true );
+		return $this->return_error_handler_result( true, $func_args );
 	}
 
 	/**
 	 * Call other registered error handlers before returning the result.
 	 *
-	 * @param $result
+	 * @param bool $handled Flag to indicate has the error already been handled.
 	 *
 	 * @return ?bool True if the error has been handled, false if PHP error handler should still run.
 	 */
-	protected function return_error_handler_result( $result ) {
+	protected function return_error_handler_result( bool $handled, array $args ): bool {
 
 		if ( ! is_null( $this->previous_error_handler ) ) {
 
 			// If null is returned from the previous handler, treat that as if the error has not been handled by them.
-			return ( call_user_func_array( $this->previous_error_handler, func_get_args() ) ) ?? true && $result;
+			$handled_in_chain = call_user_func_array( $this->previous_error_handler, $args );
+			return is_null( $handled_in_chain ) ? $handled : $handled_in_chain || $handled;
 		}
 
-		return $result;
+		return $handled;
 	}
 
 	/**
@@ -157,10 +169,10 @@ class PHP_Error_Handler {
 	 * * is the source file path in the plugin directory
 	 * * is the plugin string mentioned in the error message
 	 *
-	 * @param int    $errno the error code (the level of the error raised, as an integer)
-	 * @param string $errstr a string describing the error
-	 * @param string $errfile the filename in which the error occurred
-	 * @param int    $errline the line number in which the error occurred
+	 * @param int    $errno The error code (the level of the error raised, as an integer).
+	 * @param string $errstr A string describing the error.
+	 * @param string $errfile The filename in which the error occurred.
+	 * @param int    $errline The line number in which the error occurred.
 	 *
 	 * @return bool
 	 */
@@ -179,7 +191,7 @@ class PHP_Error_Handler {
 		}
 
 		// e.g. WooCommerce Admin could be the $errfile of a problem caused by another plugin.
-		$backtrace_frames = Backtrace::create()->frames();
+		$backtrace_frames = $this->api->get_backtrace();
 		foreach ( $backtrace_frames as $frame ) {
 			if ( false !== strpos( $frame->file, $plugin_dir ) ) {
 				return true;
@@ -195,14 +207,15 @@ class PHP_Error_Handler {
 	 * Some of these will never occur at runtime.
 	 *
 	 * @see trigger_error()
+	 * @see https://www.php.net/manual/en/errorfunc.constants.php
 	 *
-	 * @param int $errno
+	 * @param int $errno The PHP error type.
 	 *
 	 * @return string
 	 */
 	protected function errno_to_psr3( int $errno ): string {
 
-		$errorType = array(
+		$error_types = array(
 			E_ERROR             => LogLevel::ERROR,
 			E_CORE_ERROR        => LogLevel::ERROR,
 			E_COMPILE_ERROR     => LogLevel::ERROR,
@@ -219,8 +232,8 @@ class PHP_Error_Handler {
 			E_PARSE             => LogLevel::ERROR, // Compile-time parse errors.
 		);
 
-		if ( array_key_exists( $errno, $errorType ) ) {
-			return $errorType[ $errno ];
+		if ( array_key_exists( $errno, $error_types ) ) {
+			return $error_types[ $errno ];
 		} else {
 			return LogLevel::ERROR;
 		}

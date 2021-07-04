@@ -9,33 +9,33 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    BH_WP_GetEnhanced_Shop
- * @subpackage BH_WP_GetEnhanced_Shop/includes
+ * @package    BrianHenryIE\WP_Plugin_Logger
+ * @subpackage BrianHenryIE\WP_Plugin_Logger/includes
  */
 
 namespace BrianHenryIE\WP_Logger\Includes;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 /**
  *
  * @since      1.0.0
- * @package    BH_WP_GetEnhanced_Shop
- * @subpackage BH_WP_GetEnhanced_Shop/includes
+ * @package    BrianHenryIE\WP_Plugin_Logger
+ * @subpackage BrianHenryIE\WP_Plugin_Logger/includes
  * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class Functions {
 
-	/** @var Logger_Settings_Interface */
-	protected $settings;
+	use LoggerAwareTrait;
 
 	/** @var API_Interface */
 	protected $api;
 
-	/** @var LoggerInterface */
-	protected $logger;
+	/** @var Logger_Settings_Interface */
+	protected $settings;
 
 	/**
 	 * Since this class can be instantiated many times (in A-Plugin-Logger, it is instantiated for every plugin), the
@@ -80,7 +80,7 @@ class Functions {
 			self::$debug_backtrace_cache[ $cache_key ] = $plugin_slug;
 		}
 
-		if ( $this->settings->get_plugin_slug() != $plugin_slug ) {
+		if ( $this->settings->get_plugin_slug() !== $plugin_slug ) {
 			return;
 		}
 
@@ -115,7 +115,7 @@ class Functions {
 			self::$debug_backtrace_cache[ $cache_key ] = $plugin_slug;
 		}
 
-		if ( $this->settings->get_plugin_slug() != $plugin_slug ) {
+		if ( $this->settings->get_plugin_slug() !== $plugin_slug ) {
 			return;
 		}
 
@@ -146,7 +146,7 @@ class Functions {
 			self::$debug_backtrace_cache[ $cache_key ] = $plugin_slug;
 		}
 
-		if ( $this->settings->get_plugin_slug() != $plugin_slug ) {
+		if ( $this->settings->get_plugin_slug() !== $plugin_slug ) {
 			return;
 		}
 
@@ -177,7 +177,7 @@ class Functions {
 			self::$debug_backtrace_cache[ $cache_key ] = $plugin_slug;
 		}
 
-		if ( $this->settings->get_plugin_slug() != $plugin_slug ) {
+		if ( $this->settings->get_plugin_slug() !== $plugin_slug ) {
 			return;
 		}
 
@@ -269,7 +269,7 @@ class Functions {
 	//
 	// return "action is a closure bound to {$bound_class_type}";
 	// } catch ( \ReflectionException $e ) {
-	// return "Attempted to find closure's bound class in BH_WP_GetEnhanced_Shop\includes\functions.php – maybe not a closure? {$e->getMessage()}";
+	// return "Attempted to find closure's bound class in BrianHenryIE\WP_Plugin_Logger\includes\functions.php – maybe not a closure? {$e->getMessage()}";
 	//
 	// continue;
 	// }
@@ -283,9 +283,9 @@ class Functions {
 	/**
 	 * Check if the transient exists, log, or return false to WordPress's "should-print" filter.
 	 *
-	 * @param string $message The friendly message to log.
-	 * @param string $transient_name
-	 * @param string $return_false_filter_name  A WordPress filter used to disable further logging by returning false.
+	 * @param string  $message The friendly message to log.
+	 * @param string  $transient_name
+	 * @param ?string $return_false_filter_name  A WordPress filter used to disable further logging by returning false.
 	 */
 	protected function log_and_filter_false( string $message, string $transient_name, string $return_false_filter_name = null ) {
 

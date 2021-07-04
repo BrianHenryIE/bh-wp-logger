@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class Cron {
 
-    use LoggerAwareTrait;
+	use LoggerAwareTrait;
 
 	/** @var Logger_Settings_Interface */
 	protected $settings;
@@ -20,22 +20,22 @@ class Cron {
 	/** @var API_Interface */
 	protected $api;
 
-    /**
-     * @param API_Interface             $api
-     * @param Logger_Settings_Interface $settings
-     * @param LoggerInterface           $logger
-     */
-    public function __construct( $api, $settings, $logger = null ) {
+	/**
+	 * @param API_Interface             $api
+	 * @param Logger_Settings_Interface $settings
+	 * @param LoggerInterface           $logger
+	 */
+	public function __construct( $api, $settings, $logger = null ) {
 
-        $this->logger   = $logger;
-        $this->settings = $settings;
-        $this->api      = $api;
-    }
+		$this->logger   = $logger;
+		$this->settings = $settings;
+		$this->api      = $api;
+	}
 
 	/**
 	 * Schedule a daily cron job just after midnight.
-     *
-     * @hooked plugins_loaded
+	 *
+	 * @hooked plugins_loaded
 	 *
 	 * TODO: Don't enable when WooCommerce is active – it cleans up its logs automatically.
 	 */

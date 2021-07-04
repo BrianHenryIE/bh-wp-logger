@@ -1,20 +1,39 @@
 <?php
+/**
+ * Changes on WordPress plugins.php.
+ *
+ * Adds a Logs link to the plugin's entry.
+ *
+ * @package BrianHenryIE\WP_Logger\Admin
+ */
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
+/**
+ * Class Plugins_Page
+ */
 class Plugins_Page {
 
-	/** @var LoggerInterface */
-	protected $logger;
+	use LoggerAwareTrait;
 
-	/** @var Logger_Settings_Interface  */
+	/**
+	 * Needed for the plugin slug.
+	 *
+	 * @var Logger_Settings_Interface
+	 */
 	protected $settings;
 
-	/** @var API_Interface  */
+	/**
+	 * Needed for the log file path.
+	 *
+	 * @var API_Interface
+	 */
 	protected $api;
 
 	/**
@@ -24,7 +43,7 @@ class Plugins_Page {
 	 */
 	public function __construct( $api, $settings, $logger = null ) {
 
-		$this->logger   = $logger;
+		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
 		$this->api      = $api;
 	}
