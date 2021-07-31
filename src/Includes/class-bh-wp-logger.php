@@ -200,6 +200,10 @@ class BH_WP_Logger extends AbstractLogger {
 			return;
 		}
 
+		if ( $this->settings instanceof WooCommerce_Logger_Interface ) {
+			$context['source'] = $this->settings->get_plugin_slug();
+		}
+
 		$this->logger->log( $level, $message, $context );
 
 		update_option( $this->settings->get_plugin_slug() . '-last-log-time', time() );
