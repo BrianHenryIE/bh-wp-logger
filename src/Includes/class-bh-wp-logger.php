@@ -54,6 +54,8 @@ class BH_WP_Logger extends AbstractLogger {
 
 		$cron = new Cron( $api, $settings );
 		add_action( 'plugins_loaded', array( $cron, 'register_cron_job' ) );
+
+		// TODO: only if not WooCommerce logger (since WC takes care of that itself).
 		add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 
 		$admin = new Admin( $api, $settings );
@@ -86,6 +88,7 @@ class BH_WP_Logger extends AbstractLogger {
 		// woocommerce session...
 
 		// Add the user id to all log contexts.
+		// TODO: distinguish between logged out users and system (e.g. cron) "requests".
 		$current_user_id = get_current_user_id();
 		if ( 0 !== $current_user_id ) {
 			$this->api->set_common_context( 'user_id', $current_user_id );
@@ -208,8 +211,8 @@ class BH_WP_Logger extends AbstractLogger {
 	 *
 	 * TODO: include a link to the log url so the last file with an error will be linked, rather than the most recent log file.
 	 *
-	 * @param string $message
-	 * @param array  $context
+	 * @param string               $message The message to be logged.
+	 * @param array<string, mixed> $context Data to record the system state at the time of the log.
 	 */
 	public function error( $message, $context = array() ) {
 
