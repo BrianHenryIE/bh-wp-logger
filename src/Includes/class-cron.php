@@ -1,6 +1,8 @@
 <?php
 /**
  * Automatically delete old log files.
+ *
+ * @package    BrianHenryIE\WP_Plugin_Logger
  */
 
 namespace BrianHenryIE\WP_Logger\Includes;

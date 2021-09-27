@@ -1,9 +1,12 @@
 <?php
 /**
+ * A standard WordPress table to show the time, severity, message and context of each log entry.
  *
+ * The dream would someday to have complex filtering on this table. e.g. filter all logs to one request, to one user...
  *
- * TODO: Add a class per session and highlight all that session's rows when it's hovered.
  * Time should show (UTC,local and "five hours ago")
+ *
+ * @package    BrianHenryIE\WP_Plugin_Logger
  */
 
 namespace BrianHenryIE\WP_Logger\Admin;
@@ -14,6 +17,11 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WP_List_Table;
 
+/**
+ * Class Logs_Table
+ *
+ * @package BrianHenryIE\WP_Logger\Admin
+ */
 class Logs_Table extends WP_List_Table {
 
 	use LoggerAwareTrait;
@@ -40,6 +48,11 @@ class Logs_Table extends WP_List_Table {
 		$this->api      = $api;
 	}
 
+	/**
+	 * Read the log file and parse the data.
+	 *
+	 * @return array
+	 */
 	public function get_data() {
 
 		$link = $this->api->get_log_file();
@@ -79,10 +92,10 @@ class Logs_Table extends WP_List_Table {
 				// $entry['message'] = trim( $entry['message'], " \t\n\r\0\x0B\x22" );
 				$entry['context'] = '';
 
-				// check for context (which also could be multiline)
+				// check for context (which also could be multiline).
 
 			} else {
-				// A multiline message, so just append it to the previous
+				// A multiline message, so just append it to the previous.
 
 				$entry['context'] .= $input_line;
 
@@ -105,8 +118,15 @@ class Logs_Table extends WP_List_Table {
 	}
 
 
-
-	function get_columns() {
+	/**
+	 * Get the list of columns in this table.
+	 *
+	 * @overrides WP_List_Table::get_columns()
+	 * @see WP_List_Table::get_columns()
+	 *
+	 * @return array<string, string> array<column identifier, column title>
+	 */
+	public function get_columns() {
 		$columns = array(
 			'level'   => '',
 			'time'    => 'Time',
@@ -116,7 +136,7 @@ class Logs_Table extends WP_List_Table {
 		return $columns;
 	}
 
-	function prepare_items() {
+	public function prepare_items() {
 		$columns               = $this->get_columns();
 		$hidden                = array();
 		$sortable              = array();
@@ -130,21 +150,28 @@ class Logs_Table extends WP_List_Table {
 	 *
 	 * @since 3.1.0
 	 *
-	 * @param object $item The current item
+	 * @see WP_List_Table::single_row()
+	 *
+	 * @param array|object $item The current item.
 	 */
 	public function single_row( $item ) {
-		echo '<tr class="level-' . strtolower( $item['level'] ) . '">';
+		echo '<tr class="level-' . esc_attr( strtolower( $item['level'] ) ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
 	}
 
 	/**
+	 * Get the HTML for a column.
+	 *
+	 * @see Logs_Table::get_data()
+	 *
 	 * @param object $item ...whatever type get_data returns.
-	 * @param string $column_name
+	 * @param string $column_name The specified column.
 	 *
 	 * @return string|true|void
 	 */
-	function column_default( $item, $column_name ) {
+	public function column_default( $item, $column_name ) {
+
 		switch ( $column_name ) {
 			case 'level':
 				$output = '';
@@ -169,7 +196,8 @@ class Logs_Table extends WP_List_Table {
 			case 'context':
 				return esc_html( wp_json_encode( $item[ $column_name ], JSON_PRETTY_PRINT ) );
 			default:
-				return esc_html( print_r( $item, true ) ); // Show the whole array for troubleshooting purposes
+				// TODO: Log unexpected column name.
+				return '';
 		}
 	}
 

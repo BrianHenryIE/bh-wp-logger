@@ -41,7 +41,6 @@ class Log_Handler {
 	 * Add context when min log level is Debug, and for Errors and worse.
 	 *
 	 * @hooked woocommerce_format_log_entry
-	 *
 	 * @see \WC_Log_Handler::format_entry()
 	 *
 	 * @param string $entry The log entry already built by WooCommerce.

@@ -12,7 +12,7 @@
 
 namespace BrianHenryIE\WP_Logger;
 
-use BrianHenryIE\WP_Logger\Admin\Admin;
+use BrianHenryIE\WP_Logger\Admin\Admin_Notices;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Logs_Table;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
@@ -31,7 +31,7 @@ use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
 use WP_List_Table;
 
 $autoload_classmap = array(
-	Admin::class                        => __DIR__ . '/Admin/class-admin.php',
+	Admin_Notices::class                => __DIR__ . '/Admin/class-admin-notices.php',
 	API::class                          => __DIR__ . '/API/class-api.php',
 	API_Interface::class                => __DIR__ . '/API/interface-api.php',
 	BH_WP_Logger::class                 => __DIR__ . '/Includes/class-bh-wp-logger.php',

@@ -1,11 +1,13 @@
 <?php
 /**
  *
+ *
+ * @package    BrianHenryIE\WP_Plugin_Logger
  */
 
 namespace BrianHenryIE\WP_Logger\Includes;
 
-use BrianHenryIE\WP_Logger\Admin\Admin;
+use BrianHenryIE\WP_Logger\Admin\Admin_Notices;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API_Interface;
@@ -58,7 +60,7 @@ class BH_WP_Logger extends AbstractLogger {
 		// TODO: only if not WooCommerce logger (since WC takes care of that itself).
 		add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 
-		$admin = new Admin( $api, $settings );
+		$admin = new Admin_Notices( $api, $settings );
 		add_action( 'admin_init', array( $admin, 'admin_notices' ) );
 
 		// TODO: This is not always correct.
@@ -95,8 +97,9 @@ class BH_WP_Logger extends AbstractLogger {
 		}
 
 		// If Settings says this is a WooCommerce plugin, and WooCommerce is active, use WC_Logger.
+		// Does not use `is_plugin_active()` because "Call to undefined function" error.
 		if ( $this->settings instanceof WooCommerce_Logger_Interface
-			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+			 && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 
 			add_action(
 				'plugins_loaded',
@@ -182,6 +185,8 @@ class BH_WP_Logger extends AbstractLogger {
 
 		if ( class_exists( WP_CLI::class ) ) {
 			// TODO WP_CLI::log is "encouraged", but was using an uninitialized logger variable when running in tests.
+			// TODO: Add "debug" etc at the beginning to distinguish from regular CLI output.
+			// maybe colorize it.
 			WP_CLI::line( $message );
 		}
 

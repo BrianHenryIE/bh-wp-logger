@@ -48,28 +48,6 @@ require_once plugin_dir_path( __FILE__ ) . 'autoload.php';
 define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
 
 /**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-activator.php
- */
-function activate_bh_wp_logger_test_plugin() {
-
-	Activator::activate();
-}
-
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-deactivator.php
- */
-function deactivate_bh_wp_logger_test_plugin() {
-
-	Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'BH_WP_Logger_Test_Plugin\activate_bh_wp_logger_test_plugin' );
-register_deactivation_hook( __FILE__, 'BH_WP_Logger_Test_Plugin\deactivate_bh_wp_logger_test_plugin' );
-
-
-/**
  * Begins execution of the plugin.
  *
  * Since everything within the plugin is registered via hooks,

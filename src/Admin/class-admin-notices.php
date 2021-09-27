@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use WPTRT\AdminNotices\Notices;
 
-class Admin {
+class Admin_Notices {
 
 	use LoggerAwareTrait;
 
@@ -52,6 +52,18 @@ class Admin {
 		$this->notices->boot();
 	}
 
+	protected function get_error_detail_option_name(): string {
+		return $this->settings->get_plugin_slug() . '-recent-error-data';
+	}
+
+	/**
+	 * @return ?array{message: string, timestamp: string}
+	 */
+	protected function get_last_error(): ?array {
+		$last_error = get_option( $this->get_error_detail_option_name(), null );
+		return $last_error;
+	}
+
 	/**
 	 * Show a notice for recent errors in the logs.
 	 *
@@ -61,20 +73,18 @@ class Admin {
 	 */
 	public function admin_notices() {
 
-		$error_detail_option_name = $this->settings->get_plugin_slug() . '-recent-error-data';
-
 		// If we're on the logs page, don't show the admin notice linking to the logs page.
 		if ( isset( $_GET['page'] ) && $this->settings->get_plugin_slug() . '-logs' === $_GET['page'] ) {
-			delete_option( $error_detail_option_name );
+			delete_option( $this->get_error_detail_option_name() );
 			return;
 		}
 
-		$last_error = get_option( $error_detail_option_name );
+		$last_error = $this->get_last_error();
 
 		$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
 		$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
 
-		if ( false !== $last_error && ( $last_log_time > $last_logs_view_time ) ) {
+		if ( ! empty( $last_error ) && ( $last_log_time > $last_logs_view_time ) ) {
 
 			$is_dismissed_option_name = "wptrt_notice_dismissed_{$this->settings->get_plugin_slug()}-recent-error";
 
@@ -92,6 +102,9 @@ class Admin {
 
 			if ( ! empty( $error_time ) && is_int( $error_time ) ) {
 				$content .= ' at ' . gmdate( 'Y-m-d\TH:i:s\Z', $error_time ) . ' UTC.';
+
+				// wp_timezone();
+
 				// Link to logs.
 				$log_link = $this->api->get_log_url( gmdate( 'Y-m-d', $error_time ) );
 

@@ -91,8 +91,14 @@ class API implements API_Interface {
 		return $logs_url;
 	}
 
-
-	public function get_log_file( $date = null ) {
+	/**
+	 * Scan the logs files dir for the latest log file, or the log file matching the supplied date.
+	 *
+	 * @param ?string $date In 'Y-m-d' format. e.g. '2021-09-16'.
+	 *
+	 * @return ?string
+	 */
+	public function get_log_file( $date = null ): ?string {
 
 		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && class_exists( WC_Admin_Status::class ) ) {
 
@@ -138,6 +144,10 @@ class API implements API_Interface {
 					$chosen_log_filename = $log_filename;
 				}
 			}
+		}
+
+		if ( empty( $chosen_log_filename ) ) {
+			return null;
 		}
 
 		$logs_file = $log_files_dir . $chosen_log_filename;
