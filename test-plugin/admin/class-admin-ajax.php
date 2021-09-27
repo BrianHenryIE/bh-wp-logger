@@ -53,8 +53,8 @@ class Admin_Ajax {
 		} else {
 			$log_test_action = wp_unslash( $_POST['log-test-action'] );
 
-			$message = null;
-			$context = null;
+			$message = $_POST['message'];
+			$context = explode( ',', $_POST['context'] );
 
 			switch ( $log_test_action ) {
 				case 'debug-message':

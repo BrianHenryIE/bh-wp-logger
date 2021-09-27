@@ -29,8 +29,6 @@ namespace BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\API\Logger_Settings;
 use BrianHenryIE\WP_Logger\Logger;
 
-use BH_WP_Logger_Test_Plugin\includes\Activator;
-use BH_WP_Logger_Test_Plugin\includes\Deactivator;
 use BH_WP_Logger_Test_Plugin\includes\BH_WP_Logger_Test_Plugin;
 
 // If this file is called directly, abort.
@@ -66,7 +64,7 @@ function instantiate_bh_wp_logger_test_plugin() {
 
 	$logger = Logger::instance( $logger_settings );
 
-	$plugin = new BH_WP_Logger_Test_Plugin( $logger );
+	$plugin = new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
 
 }
 instantiate_bh_wp_logger_test_plugin();

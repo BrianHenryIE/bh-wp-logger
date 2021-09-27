@@ -17,7 +17,7 @@ use Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
 
 require __DIR__ . '/vendor/bh-wp-logger/autoload.php';
 
- $class_map_file = __DIR__ . '/autoload-classmap.php';
+$class_map_file = __DIR__ . '/autoload-classmap.php';
 if ( file_exists( $class_map_file ) ) {
 
 	$class_map = include $class_map_file;

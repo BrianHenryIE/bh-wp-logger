@@ -11,6 +11,12 @@
  * @subpackage BH_WP_Logger_Test_Plugin/admin/partials
  */
 
+/** @var string $plugin_log_level The PSR log level, formatted to display. */
+/** @var string $plugin_log_url URL to view the logs.  */
+/** @var string $wp_debug */
+/** @var string $wp_debug_display */
+/** @var string $wp_debug_log */
+
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
@@ -20,11 +26,11 @@
 
 	<div>
 
-		<p>Current log level is:</p>
-		<p>Log UI page:</p>
-		<p>WP_DEBUG:</p>
-		<p>WP_DEBUG_DISPLAY:</p>
-		<p>WP_DEBUG_LOG:</p>
+		<p>Plugin log level is: <code><?php echo $plugin_log_level; ?></code></p>
+        <p>Plugin log file is at: <a href="<?php echo $plugin_log_url; ?>">View logs</a></p>
+		<p>WP_DEBUG: <code><?php echo $wp_debug; ?></code></p>
+		<p>WP_DEBUG_DISPLAY: <code><?php echo $wp_debug_display; ?></code></p>
+		<p>WP_DEBUG_LOG: <code><?php echo $wp_debug_log; ?></code></p>
 	</div>
 	<div>
 		<h3>Log a message</h3>
@@ -33,8 +39,8 @@
 
 		<div>
 			<form>
-				<input type="text" name="message" placeholder="message"/>
-				<input type="text" name="context" placeholder="context"/>
+				<input type="text" name="message" id="log_message" placeholder="message"/>
+				<input type="text" name="context" id="log_context" placeholder="context"/>
 
 				<button type="button" class="button log" name="debug-message">Debug</button>
 				<button type="button" class="button log" name="info-message">Info</button>

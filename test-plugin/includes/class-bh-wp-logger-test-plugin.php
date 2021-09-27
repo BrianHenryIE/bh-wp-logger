@@ -14,8 +14,10 @@
 
 namespace BH_WP_Logger_Test_Plugin\includes;
 
+use BrianHenryIE\WP_Logger\Logger as BH_Logger;
 use BH_WP_Logger_Test_Plugin\admin\Admin;
 use BH_WP_Logger_Test_Plugin\admin\Admin_Ajax;
+use Psr\Log\LoggerInterface;
 
 /**
  * The core plugin class.
@@ -33,7 +35,14 @@ use BH_WP_Logger_Test_Plugin\admin\Admin_Ajax;
  */
 class BH_WP_Logger_Test_Plugin {
 
-	protected $logger;
+	/**
+	 * The logger we're testing!
+	 *
+	 * @var LoggerInterface
+	 */
+	protected BH_Logger $logger;
+
+	protected $settings;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -43,16 +52,13 @@ class BH_WP_Logger_Test_Plugin {
 	 * the frontend-facing side of the site.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @param LoggerInterface $logger A PSR Logger.
 	 */
-	public function __construct( $logger ) {
-		if ( defined( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION' ) ) {
-			$this->version = BH_WP_LOGGER_TEST_PLUGIN_VERSION;
-		} else {
-			$this->version = '1.0.0';
-		}
-		$this->plugin_name = 'bh-wp-logger-test-plugin';
+	public function __construct( $settings, BH_Logger $logger ) {
 
-		$this->logger = $logger;
+		$this->settings = $settings;
+		$this->logger   = $logger;
 
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -85,7 +91,7 @@ class BH_WP_Logger_Test_Plugin {
 	 */
 	protected function define_admin_hooks() {
 
-		$plugin_admin = new Admin();
+		$plugin_admin = new Admin( $this->settings, $this->logger );
 
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );

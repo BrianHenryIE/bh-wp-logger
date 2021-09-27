@@ -1,6 +1,8 @@
 <?php
 /**
  * The UI around the logs table.
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\Admin;
