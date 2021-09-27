@@ -241,4 +241,13 @@ class BH_WP_Logger extends AbstractLogger {
 
 		$this->log( LogLevel::ERROR, $message, $context );
 	}
+
+	/**
+	 * Make the main functions available, e.g. get_log_url().
+	 *
+	 * @return API_Interface
+	 */
+	public function get_api(): API_Interface {
+		return $this->api;
+	}
 }

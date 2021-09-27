@@ -181,7 +181,9 @@ class PHP_Error_Handler {
 		// If the source file has the plugin dir in it.
 		// Prepend the WP_PLUGINS_DIR so a subdir with the same name (e.g. my-plugin/integrations/your-plugin) does not match.
 		$plugin_dir = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . explode( '/', $this->settings->get_plugin_basename() )[0];
-		if ( false !== strpos( $errfile, $plugin_dir ) ) {
+		$plugin_dir_realpath = realpath($plugin_dir);
+
+		if ( false !== strpos( $errfile, $plugin_dir ) || false !== strpos( $errfile, $plugin_dir_realpath ) ) {
 			return true;
 		}
 
@@ -190,10 +192,11 @@ class PHP_Error_Handler {
 			return true;
 		}
 
+
 		// e.g. WooCommerce Admin could be the $errfile of a problem caused by another plugin.
 		$backtrace_frames = $this->api->get_backtrace();
 		foreach ( $backtrace_frames as $frame ) {
-			if ( false !== strpos( $frame->file, $plugin_dir ) ) {
+			if ( 0 === strpos( $frame->file, $plugin_dir ) || 0 === strpos( $frame->file, $plugin_dir_realpath ) ) {
 				return true;
 			}
 		}

@@ -27,30 +27,23 @@ class Plugin_Helper {
 	/**
 	 * Given a slug, searches the get_plugins() array for the plugin details.
 	 *
-	 * TODO: TextDomain is not an essential part of a minimum viable WordPress plugin (only `Plugin Name`).
+	 * TODO: How does this behave if the plugin is in the root WP_PLUGIN_DIR without its own folder? It might work ok!
 	 *
 	 * @used-by Logger_Settings
 	 *
-	 * @param string $slug
+	 * @param string $slug The plugin slug.
 	 *
-	 * @return array|null
+	 * @return array<int|string, string>|null
 	 */
 	public function get_plugin_data_from_slug( $slug ): ?array {
 
 		$plugins = get_plugins();
 
-		$plugin_data = array_filter(
-			$plugins,
-			function( $plugin ) use ( $slug ) {
-				return ( $plugin['TextDomain'] === $slug );
+		foreach ( $plugins as $plugin_basename => $plugin_data ) {
+			if ( 0 === strpos( $plugin_basename, $slug ) ) {
+				$plugin_data['basename'] = $plugin_basename;
+				return $plugin_data;
 			}
-		);
-
-		if ( count( $plugin_data ) === 1 ) {
-			$plugin             = reset( $plugin_data );
-			$basename           = key( $plugin_data );
-			$plugin['basename'] = $basename;
-			return $plugin;
 		}
 
 		return null;
