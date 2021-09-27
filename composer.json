@@ -111,7 +111,7 @@
     "scripts": {
         "post-install-cmd": [
             "vendor/bin/wp core download --path=wordpress --allow-root || true;",
-            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_DEBUG', true ); define( 'WP_DEBUG_LOG', true );\" || true",
+            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_PLUGIN_DIR', '$PWD/wp-content/plugins' );\n\ndefine( 'WP_DEBUG', true );\ndefine( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/php_errors.log' );\" || true",
             "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
             "mkdir -p wordpress/wp-content/uploads",
             "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
@@ -119,7 +119,7 @@
         ],
         "post-update-cmd": [
             "vendor/bin/wp core download --path=wordpress --allow-root || true; wp core update --allow-root || true",
-            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_DEBUG', true ); define( 'WP_DEBUG_LOG', true );\" || true",
+            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_PLUGIN_DIR', '$PWD/wp-content/plugins' );\n\ndefine( 'WP_DEBUG', true );\ndefine( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/php_errors.log' );\" || true",
             "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
             "mkdir -p wordpress/wp-content/uploads",
             "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
