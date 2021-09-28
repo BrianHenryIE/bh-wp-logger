@@ -9,12 +9,14 @@ $logger = Logger::instance();
 Wraps existing [PSR-3](https://www.php-fig.org/psr/psr-3/) loggers and adds some UI.
 
 * [KLogger](https://github.com/katzgrau/KLogger)
-* [~~WC_Logger~~](https://github.com/woocommerce/woocommerce/blob/trunk/includes/class-wc-logger.php) (currently unhooked)
+* [WC_Logger](https://github.com/woocommerce/woocommerce/blob/trunk/includes/class-wc-logger.php)
 * [PSR-3 NullLogger](https://github.com/php-fig/log/blob/master/Psr/Log/NullLogger.php)
 
-Uses KLogger by default, ~~WC_Logger when WooCommerce is active~~, NullLogger when log level is set to "none".
+Uses KLogger by default, WC_Logger when WooCommerce is active, NullLogger when log level is set to "none".
 
-~~Uses PHP's `set_error_handler()` to catch PHP deprecated/warning/notice/errors.~~ (currently unhooked)
+Uses PHP's `set_error_handler()` to catch PHP deprecated/warning/notice/errors.
+
+Hook into WordPress's deprecated function hooks (`deprecated_function_run`) to log those only once per day.
 
 ## UI 
 
@@ -91,7 +93,7 @@ $logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Sett
 		return "my-plugin-name";
 	}
 
-    // This is needed for the plugins.php logs link.
+	// This is needed for the plugins.php logs link.
 	public function get_plugin_basename(): string {
 		return "my-plugin-name/my-plugin-name.php";
 	}
@@ -157,17 +159,19 @@ From my brief experience using this, I find it useful to add a `debug` log at th
 
 ## TODO
 
-* Auto-delete old logs
 * Check log directory is not publicly accessible
 * Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json
 * Paging and filtering
 * Hyperlinks in messages
-* Log notice should dismiss when the log page is visited
-* Record timestamp the logs were last viewed at, make the plugins.php link bold if new logs are present.
+* ~~Record timestamp the logs were last viewed at, make the plugins.php link bold if new logs are present.~~
+* ~~Auto-delete old logs~~
+* ~~Log notice should dismiss when the log page is visited~~
 
 # Status
 
 Very much a v0.1.
+
+I'll start to use Semver once I've caught up with WPCS, PhpStan and PhpUnit.
 
 
 ## Contributing
