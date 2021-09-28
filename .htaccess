@@ -1,6 +1,6 @@
 # Serve the contents of /wordpress/ from the root URL for the project.
 RewriteEngine on
-RewriteCond %{HTTP_HOST} ^.*bh-wp-logger$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^bh-wp-logger$ [NC,OR]
 RewriteCond %{REQUEST_URI} !wordpress/
 RewriteRule (.*) wordpress/$1 [L]
 
@@ -27,3 +27,20 @@ RewriteRule (.*) %{REQUEST_URI}?%1%2 [R=301,L,NE]
 # Is this workin??
 #php_value include_path "%{DOCUMENT_ROOT}/bh-wp-logger"
 #php_value auto_prepend_file "env.php"
+
+# /bh-wp-logger//Users/brianhenry/Sites/bh-wp-logger/src/Admin/js/bh-wp-logger-admin.js
+# /bh-wp-logger/wp-content/plugins/bh-wp-logger-test-plugin/vendor/brianhenryie/bh-wp-logger/Admin/js/bh-wp-logger-admin.js
+#               /Users/brianhenry/Sites/bh-wp-logger/src/
+#               wp-content/plugins/bh-wp-logger-test-plugin/vendor/brianhenryie/bh-wp-logger
+RewriteCond %{HTTP_HOST} ^.*Users/brianhenry/Sites/bh-wp-logger/$ [NC,OR]
+RewriteCond %{REQUEST_URI} .*Users/brianhenry/Sites/bh-wp-logger
+RewriteRule /Users/brianhenry/Sites/bh-wp-logger/src/(.*) wp-content/plugins/bh-wp-logger-test-plugin/vendor/brianhenryie/bh-wp-logger/$1 [L]
+
+# /bh-wp-logger//Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/bh-wp-logger-test-plugin/admin/js/bh-wp-logger-test-plugin-admin.js
+# /bh-wp-logger/wp-content/plugins/bh-wp-logger-test-plugin/admin/js/bh-wp-logger-test-plugin-admin.js
+#               /Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/bh-wp-logger-test-plugin/
+#               wp-content/plugins/bh-wp-logger-test-plugin/
+
+RewriteCond %{HTTP_HOST} ^.*Users/brianhenry/Sites/bh-wp-logger/$ [NC,OR]
+RewriteCond %{REQUEST_URI} .*Users/brianhenry/Sites/bh-wp-logger
+RewriteRule /Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/bh-wp-logger-test-plugin/(.*) wp-content/plugins/bh-wp-logger-test-plugin/$1 [L]
