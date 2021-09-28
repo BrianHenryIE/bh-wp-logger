@@ -34,35 +34,6 @@ class API implements API_Interface {
 		$this->settings = $settings;
 	}
 
-
-	/**
-	 * Deletes log files older than MONTH_IN_SECONDS.
-	 *
-	 * @used-by Cron::delete_old_logs()
-	 */
-	public function delete_old_logs(): void {
-
-		$logs_dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR;
-
-		$existing_logs = glob( "{$logs_dir}{$this->settings->get_plugin_slug()}*.log" );
-
-		// e.g. bh-wc-auto-purchase-easypost-2021-06-01.log
-		foreach ( $existing_logs as $log_filename ) {
-
-			if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2})\.log$/', $log_filename, $output_array ) ) {
-				if ( strtotime( $output_array[1] ) < time() - MONTH_IN_SECONDS ) {
-					$this->logger->debug( 'deleting old log file ' . $logs_dir . $log_filename );
-					unlink( $logs_dir . $log_filename );
-				} elseif ( 0 === filesize( $logs_dir . $log_filename ) ) {
-					$this->logger->debug( 'deleting empty log file ' . $logs_dir . $log_filename );
-					unlink( $logs_dir . $log_filename );
-				}
-			}
-		}
-
-		// TODO: delete the last visited option if it's older than the most recent logs.
-	}
-
 	public function get_common_context(): array {
 		return $this->common_context;
 	}
@@ -91,69 +62,145 @@ class API implements API_Interface {
 		return $logs_url;
 	}
 
+
 	/**
 	 * Scan the logs files dir for the latest log file, or the log file matching the supplied date.
 	 *
+	 * TODO: Test the regex. It seems to be pulling in all files that match a date?
+	 *
 	 * @param ?string $date In 'Y-m-d' format. e.g. '2021-09-16'.
 	 *
-	 * @return ?string
+	 * @return array<string, string> Y-m-d index with path as the value.
 	 */
-	public function get_log_file( $date = null ): ?string {
+	public function get_log_files( ?string $date = null ): array {
 
 		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && class_exists( WC_Admin_Status::class ) ) {
 
-			$logs_files = WC_Admin_Status::scan_log_files();
+			// TODO use this
+//			$logs_files = WC_Admin_Status::scan_log_files();
 
 			$log_files_dir = WC_LOG_DIR;
 
 		} else {
 
 			$log_files_dir = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' );
+		}
 
-			$files      = scandir( $log_files_dir );
-			$logs_files = array();
+		$files      = scandir( $log_files_dir );
+		$logs_files = array();
 
-			if ( ! empty( $files ) ) {
-				foreach ( $files as $key => $value ) {
-					if ( ! in_array( $value, array( '.', '..' ), true ) ) {
-						if ( ! is_dir( $value ) && strstr( $value, '.log' ) ) {
-							$logs_files[ sanitize_title( $value ) ] = $value;
+		if ( ! empty( $files ) ) {
+			foreach ( $files as $filename ) {
+				if ( ! in_array( $filename, array( '.', '..' ), true ) ) {
+
+					if ( ! is_dir( $filename ) && strstr( $filename, '.log' ) ) {
+
+						if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
+							$logs_files[ $regex_matches[1] ] = $log_files_dir . $filename;
+
+							if ( ! is_null( $date ) && $regex_matches[1] === $date ) {
+								return array( $date => realpath( $log_files_dir . $filename ) );
+							}
 						}
 					}
 				}
 			}
+
 		}
 
-		$chosen_log_filename = '';
-		$newest_log_filetime = 0;
+		ksort( $logs_files );
 
-		foreach ( $logs_files as $log_filename ) {
-			$regex_matches = array();
-			if ( 1 === preg_match( '/' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $log_filename, $regex_matches ) ) {
+		return $logs_files;
+	}
 
-				if ( ! is_null( $date ) && $regex_matches[1] === $date ) {
-					$chosen_log_filename = $log_filename;
-					break;
-				}
 
-				$log_datetime = date_create_from_format( 'Y-m-d', $regex_matches[1] );
-				$log_unixtime = $log_datetime->format( 'U' );
+	/**
+	 * Delete a specific date's log file.
+	 *
+	 * @param string $ymd_date The date formatted Y-m-d, e.g. 2021-09-27.
+	 *
+	 * @used-by Logs_Page
+	 *
+	 * @return array{success:bool, message?:string}
+	 */
+	public function delete_log( string $ymd_date ): array {
 
-				if ( $log_unixtime > $newest_log_filetime ) {
-					$newest_log_filetime = $log_unixtime;
-					$chosen_log_filename = $log_filename;
-				}
+		$result = array();
+
+		$log_filepaths_by_date = $this->get_log_files();
+
+		if ( isset( $log_filepaths_by_date[ $ymd_date ] ) ) {
+			unlink( $log_filepaths_by_date[ $ymd_date ] );
+			$result['success'] = true;
+		} else {
+			$result['success'] = false;
+			$result['message'] = 'Log file not found for date: ' . $ymd_date;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Delete all logs for this plugin.
+	 *
+	 * @used-by Logs_Page
+	 *
+	 * @return array{success:bool, message?:string}
+	 */
+	public function delete_all_logs(): array {
+
+		$result = array();
+
+		$deleted_files    = array();
+		$failed_to_delete = array();
+
+		$log_filepaths_by_date = $this->get_log_files();
+
+		foreach ( $log_filepaths_by_date as $date => $log_filepath ) {
+			$deleted = unlink( $log_filepath );
+			if ( $deleted ) {
+				$deleted_files[ $date ] = $log_filepath;
+			} else {
+				$failed_to_delete[ $date ] = $log_filepath;
 			}
 		}
 
-		if ( empty( $chosen_log_filename ) ) {
-			return null;
+		if ( empty( $failed_to_delete ) ) {
+			$result['success']       = true;
+			$result['deleted_files'] = $deleted_files;
+		} else {
+			$result['success']          = false;
+			$result['deleted_files']    = $deleted_files;
+			$result['failed_to_delete'] = $failed_to_delete;
 		}
 
-		$logs_file = $log_files_dir . $chosen_log_filename;
-
-		return $logs_file;
+		return $result;
 	}
+
+	/**
+	 * Deletes log files older than MONTH_IN_SECONDS.
+	 * Deletes empty log files.
+	 *
+	 * @used-by Cron::delete_old_logs()
+	 */
+	public function delete_old_logs(): void {
+
+		$existing_logs = $this->get_log_files();
+
+		foreach ( $existing_logs as $date => $log_filepath ) {
+
+			if ( strtotime( $date ) < time() - MONTH_IN_SECONDS ) {
+				$this->logger->debug( 'deleting old log file ' . $log_filepath );
+				unlink( $log_filepath );
+			} elseif ( 0 === filesize( $log_filepath ) ) {
+				$this->logger->debug( 'deleting empty log file ' . $log_filepath );
+				unlink( $log_filepath );
+			}
+		}
+
+		// TODO: delete the last visited option if it's older than the most recent logs.
+	}
+
 
 	public function set_common_context( $key, $value ): void {
 		$this->common_context[ $key ] = $value;
@@ -212,6 +259,7 @@ class API implements API_Interface {
 		return Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->frames();
 
 	}
+
 
 }
 

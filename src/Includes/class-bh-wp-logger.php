@@ -7,7 +7,9 @@
 
 namespace BrianHenryIE\WP_Logger\Includes;
 
+use BrianHenryIE\WP_Logger\Admin\Admin;
 use BrianHenryIE\WP_Logger\Admin\Admin_Notices;
+use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API_Interface;
@@ -54,19 +56,20 @@ class BH_WP_Logger extends AbstractLogger {
 		add_action( 'admin_menu', array( $logs_page, 'add_page' ) );
 		add_action( 'admin_footer', array( $logs_page, 'print_css' ) );
 
-		$cron = new Cron( $api, $settings );
-		add_action( 'plugins_loaded', array( $cron, 'register_cron_job' ) );
+		$admin = new Admin( $settings );
+		add_action( 'admin_enqueue_scripts', array( $admin, 'enqueue_scripts' ) );
 
-		// TODO: only if not WooCommerce logger (since WC takes care of that itself).
-		add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
+		$ajax = new AJAX( $api, $settings );
+		add_action( 'wp_ajax_bh_wp_logger_logs_delete', array( $ajax, 'delete' ) );
+		add_action( 'wp_ajax_bh_wp_logger_logs_delete_all', array( $ajax, 'delete_all' ) );
 
-		$admin = new Admin_Notices( $api, $settings );
-		add_action( 'admin_init', array( $admin, 'admin_notices' ) );
+		$admin_notices = new Admin_Notices( $api, $settings );
+		add_action( 'admin_init', array( $admin_notices, 'admin_notices' ) );
 
 		// TODO: This is not always correct.
 		$plugins_page = new Plugins_Page( $api, $settings );
 		$hook         = "plugin_action_links_{$this->settings->get_plugin_basename()}";
-		add_filter( $hook, array( $plugins_page, 'display_plugin_action_links' ) );
+		add_filter( $hook, array( $plugins_page, 'display_plugin_action_links' ), 10, 4 );
 
 		$php_error_handler = new PHP_Error_Handler( $api, $settings, $this );
 		add_action( 'plugins_loaded', array( $php_error_handler, 'init' ), 2 );
@@ -101,15 +104,19 @@ class BH_WP_Logger extends AbstractLogger {
 		if ( $this->settings instanceof WooCommerce_Logger_Interface
 			 && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 
-			add_action(
-				'plugins_loaded',
-				function() use ( $settings ) {
-					$this->logger = wc_get_logger();
-					// TODO: Check this is not setting log level to debug for all plugins.
-					// self::$logger->setLogLevelThreshold( $settings->get_log_level() );
-				},
-				1
-			);
+			/**
+			 * `wc_get_logger()` gets a global logger, so instantiate one for this plugin so its log leve can be set
+			 * independently.
+			 *
+			 * PSR log level strings conveniently match WooCommerce log level threshold string.
+			 *
+			 * @see WC_Log_Levels
+			 */
+			$instantiate_wc_logger = function() use ( $settings ): void {
+				$log_level_threshold = $settings->get_log_level();
+				$this->logger        = new \WC_Logger( null, $log_level_threshold );
+			};
+			add_action( 'plugins_loaded', $instantiate_wc_logger, 1 );
 
 			// Add context to WooCommerce logs.
 			$wc_log_handler = new Log_Handler( $api, $settings );
@@ -142,6 +149,11 @@ class BH_WP_Logger extends AbstractLogger {
 			);
 
 			$this->logger = new KLogger( $log_directory, $log_level_threshold, $options );
+
+			// Schedule a job to clean up logs. (WooCommerce would do this automatically).
+			$cron = new Cron( $api, $settings );
+			add_action( 'init', array( $cron, 'register_cron_job' ) );
+			add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 
 		}
 
@@ -181,6 +193,22 @@ class BH_WP_Logger extends AbstractLogger {
 
 	}
 
+	/**
+	 * The last function in this plugin before the actual logging is delegated to KLogger/WC_Logger...
+	 * * If WP_CLI is available, log to console.
+	 * * If logger is not available (presumably WC_Logger not yet initialized), enqueue the log to retry on plugins_loaded.
+	 * * Set WC_Logger 'source'.
+	 * * Execute the actual logging command.
+	 * * Record in wp_options the time of the last log.
+	 *
+	 * TODO: Add a filter on level.
+	 *
+	 * @see LogLevel
+	 *
+	 * @param string                   $level The log severity.
+	 * @param string                   $message The message to log.
+	 * @param array<int|string, mixed> $context Additional information to be logged (not saved at all log levels).
+	 */
 	public function log( $level, $message, $context = array() ) {
 
 		if ( class_exists( WP_CLI::class ) ) {
@@ -236,6 +264,7 @@ class BH_WP_Logger extends AbstractLogger {
 		$debug_backtrace            = $this->api->get_backtrace();
 		$context['debug_backtrace'] = $debug_backtrace;
 
+		// TODO: This could be useful on all logs. And the backtrace of filters rather than just the current one.
 		global $wp_current_filter;
 		$context['filters'] = $wp_current_filter;
 
