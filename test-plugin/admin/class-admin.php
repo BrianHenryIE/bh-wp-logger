@@ -33,7 +33,7 @@ class Admin {
 
 	public function __construct( Logger_Settings_Interface $logger_settings, BH_Logger $logger ) {
 		$this->logger_settings = $logger_settings;
-		$this->logger = $logger;
+		$this->logger          = $logger;
 	}
 
 	/**
@@ -92,10 +92,10 @@ class Admin {
 
 		$plugin_log_url = $plugin_logger_api->get_log_url();
 
-		$wp_debug = defined( 'WP_DEBUG' ) && WP_DEBUG ? 'enabled' : 'disabled';
+		$wp_debug         = defined( 'WP_DEBUG' ) && WP_DEBUG ? 'enabled' : 'disabled';
 		$wp_debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ? 'enabled' : 'disabled';
-		$wp_debug_log = 'disabled';
-		if( defined( 'WP_DEBUG_LOG' ) ) {
+		$wp_debug_log     = 'disabled';
+		if ( defined( 'WP_DEBUG_LOG' ) ) {
 			$wp_debug_log = true === WP_DEBUG_LOG ? 'enabled' : WP_DEBUG_LOG;
 		}
 

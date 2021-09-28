@@ -15,7 +15,7 @@ namespace BH_WP_Logger_Test_Plugin;
 
 use Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
 
-require __DIR__ . '/vendor/bh-wp-logger/autoload.php';
+require __DIR__ . '/vendor/brianhenryie/bh-wp-logger/autoload.php';
 
 $class_map_file = __DIR__ . '/autoload-classmap.php';
 if ( file_exists( $class_map_file ) ) {

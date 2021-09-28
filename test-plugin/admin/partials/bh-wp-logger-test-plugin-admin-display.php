@@ -27,7 +27,7 @@
 	<div>
 
 		<p>Plugin log level is: <code><?php echo $plugin_log_level; ?></code></p>
-        <p>Plugin log file is at: <a href="<?php echo $plugin_log_url; ?>">View logs</a></p>
+		<p>Plugin log file is at: <a href="<?php echo $plugin_log_url; ?>">View logs</a></p>
 		<p>WP_DEBUG: <code><?php echo $wp_debug; ?></code></p>
 		<p>WP_DEBUG_DISPLAY: <code><?php echo $wp_debug_display; ?></code></p>
 		<p>WP_DEBUG_LOG: <code><?php echo $wp_debug_log; ?></code></p>
@@ -42,11 +42,11 @@
 				<input type="text" name="message" id="log_message" placeholder="message"/>
 				<input type="text" name="context" id="log_context" placeholder="context"/>
 
-				<button type="button" class="button log" name="debug-message">Debug</button>
-				<button type="button" class="button log" name="info-message">Info</button>
-				<button type="button" class="button log" name="notice-message">Notice</button>
-				<button type="button" class="button log" name="warning-message">Warning</button>
-				<button type="button" class="button log" name="error-message">Error</button>
+				<button type="button" class="button log log-test" name="debug-message">Debug</button>
+				<button type="button" class="button log log-test" name="info-message">Info</button>
+				<button type="button" class="button log log-test" name="notice-message">Notice</button>
+				<button type="button" class="button log log-test" name="warning-message">Warning</button>
+				<button type="button" class="button log log-test" name="error-message">Error</button>
 			</form>
 		</div>
 	</div>
@@ -57,10 +57,10 @@
 		<pre>trigger_error( 'message', E_USER_NOTICE );</pre>
 
 		<form>
-			<button type="button" class="button log" name="deprecated-php">Deprecated</button>
-			<button type="button" class="button log" name="notice-php">Notice</button>
-			<button type="button" class="button log" name="warning-php">Warning</button>
-			<button type="button" class="button log" name="error-php">Error</button>
+			<button type="button" class="button log log-test" name="deprecated-php">Deprecated</button>
+			<button type="button" class="button log log-test" name="notice-php">Notice</button>
+			<button type="button" class="button log log-test" name="warning-php">Warning</button>
+			<button type="button" class="button log log-test" name="error-php">Error</button>
 
 		</form>
 	</div>

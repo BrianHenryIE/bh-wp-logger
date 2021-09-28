@@ -4,7 +4,7 @@
 
 	$(function() {
 
-		$('.button').on('click', function(event) {
+		$('.button.log-test').on('click', function(event) {
 			event.preventDefault();
 
 			window.console.log("You clicked on: " + event.target.name);
