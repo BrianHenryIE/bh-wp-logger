@@ -6,7 +6,7 @@
  *
  * Time should show (UTC,local and "five hours ago")
  *
- * @package    BrianHenryIE\WP_Plugin_Logger
+ * @package  brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\Admin;
@@ -19,8 +19,6 @@ use WP_List_Table;
 
 /**
  * Class Logs_Table
- *
- * @package BrianHenryIE\WP_Logger\Admin
  */
 class Logs_Table extends WP_List_Table {
 
@@ -51,21 +49,25 @@ class Logs_Table extends WP_List_Table {
 	/**
 	 * Read the log file and parse the data.
 	 *
-	 * @return array
+	 * @return array<array{time:string, level:string, message:string, context:array}>
 	 */
-	public function get_data() {
+	public function get_data(): array {
 
-		$link = $this->api->get_log_file();
+		$log_files = $this->api->get_log_files();
 
-		if ( is_null( $link ) ) {
+		if ( empty( $log_files ) ) {
 			// TODO: "No logs yet." message. Maybe with "current log level is:".
 			return array();
+		} elseif ( ! is_null( $this->selected_date ) && isset( $log_files[ $this->selected_date ] ) ) {
+			$filepath = $log_files[ $this->selected_date ];
+		} else {
+			$filepath = array_pop( $log_files );
 		}
 
 		$data  = array();
 		$entry = null;
 
-		$file_lines = file( $link );
+		$file_lines = file( $filepath );
 
 		// Loop through our array, show HTML source as HTML source; and line numbers too.
 		foreach ( $file_lines as $line_num => $input_line ) {
@@ -124,7 +126,7 @@ class Logs_Table extends WP_List_Table {
 	 * @overrides WP_List_Table::get_columns()
 	 * @see WP_List_Table::get_columns()
 	 *
-	 * @return array<string, string> array<column identifier, column title>
+	 * @return array{level:string, time:string, message:string, context:string} array<column identifier, column title>
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -136,7 +138,19 @@ class Logs_Table extends WP_List_Table {
 		return $columns;
 	}
 
+
+	protected ?string $selected_date = null;
+	public function set_date( string $ymd_date ) {
+		$this->selected_date = $ymd_date;
+	}
+
+
+	/**
+	 * @override parent::prepare_items()
+	 * @see WP_List_Table::prepare_items()
+	 */
 	public function prepare_items() {
+
 		$columns               = $this->get_columns();
 		$hidden                = array();
 		$sortable              = array();
@@ -147,8 +161,6 @@ class Logs_Table extends WP_List_Table {
 
 	/**
 	 * Generates content for a single row of the table.
-	 *
-	 * @since 3.1.0
 	 *
 	 * @see WP_List_Table::single_row()
 	 *
@@ -196,10 +208,8 @@ class Logs_Table extends WP_List_Table {
 			case 'context':
 				return esc_html( wp_json_encode( $item[ $column_name ], JSON_PRETTY_PRINT ) );
 			default:
-				// TODO: Log unexpected column name.
+				// TODO: Log unexpected column name / do_action.
 				return '';
 		}
 	}
-
-
 }

@@ -12,6 +12,8 @@ class Logger_Settings implements Logger_Settings_Interface {
 	/**
 	 * get_plugins() with added `basename` key.
 	 *
+	 * @see get_plugin_data()
+	 *
 	 * @var array|null
 	 */
 	protected $plugin_data;

@@ -9,8 +9,8 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    BrianHenryIE\WP_Plugin_Logger
- * @subpackage BrianHenryIE\WP_Plugin_Logger/includes
+ * @package    brianhenryie/bh-wp-logger
+ * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 
 namespace BrianHenryIE\WP_Logger\Includes;
@@ -20,13 +20,6 @@ use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
-/**
- *
- * @since      1.0.0
- * @package    BrianHenryIE\WP_Plugin_Logger
- * @subpackage BrianHenryIE\WP_Plugin_Logger/includes
- * @author     Brian Henry <BrianHenryIE@gmail.com>
- */
 class Functions {
 
 	use LoggerAwareTrait;
@@ -69,7 +62,7 @@ class Functions {
 	 *
 	 * @see _deprecated_function()
 	 */
-	public function log_deprecated_functions_only_once_per_day( $function, $replacement_function, $version ) {
+	public function log_deprecated_functions_only_once_per_day( $function, $replacement_function, $version ): void {
 
 		$cache_key = md5( __FUNCTION__ . implode( '', func_get_args() ) );
 
@@ -104,7 +97,7 @@ class Functions {
 	 *
 	 * @see _deprecated_argument()
 	 */
-	public function log_deprecated_arguments_only_once_per_day( $function, $message, $version ) {
+	public function log_deprecated_arguments_only_once_per_day( $function, $message, $version ): void {
 
 		$cache_key = md5( __FUNCTION__ . implode( '', func_get_args() ) );
 
@@ -135,7 +128,7 @@ class Functions {
 	 * @param string $message  A message explaining what has been done incorrectly.
 	 * @param string $version  The version of WordPress where the message was added.
 	 */
-	public function log_doing_it_wrong_only_once_per_day( $function, $message, $version ) {
+	public function log_doing_it_wrong_only_once_per_day( $function, $message, $version ): void {
 
 		$cache_key = md5( __FUNCTION__ . implode( '', func_get_args() ) );
 
@@ -166,7 +159,7 @@ class Functions {
 	 * @param string $version     The version of WordPress that deprecated the argument used.
 	 * @param string $message     A message regarding the change.
 	 */
-	public function log_deprecated_hook_only_once_per_day( $hook, $version, $replacement = '', $message = '' ) {
+	public function log_deprecated_hook_only_once_per_day( $hook, $version, $replacement = '', $message = '' ): void {
 
 		$cache_key = md5( __FUNCTION__ . implode( '', func_get_args() ) );
 
@@ -287,7 +280,7 @@ class Functions {
 	 * @param string  $transient_name
 	 * @param ?string $return_false_filter_name  A WordPress filter used to disable further logging by returning false.
 	 */
-	protected function log_and_filter_false( string $message, string $transient_name, string $return_false_filter_name = null ) {
+	protected function log_and_filter_false( string $message, string $transient_name, string $return_false_filter_name = null ): void {
 
 		$recently_logged = get_transient( $transient_name );
 

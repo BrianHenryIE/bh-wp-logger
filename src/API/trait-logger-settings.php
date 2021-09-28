@@ -5,8 +5,18 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use Psr\Log\LogLevel;
+
+/**
+ * @see Logger_Settings_Interface
+ */
 trait Logger_Settings_Trait {
 
+	/**
+	 * @see LogLevel
+	 *
+	 * @var string
+	 */
 	protected string $log_level;
 
 	protected string $plugin_name;

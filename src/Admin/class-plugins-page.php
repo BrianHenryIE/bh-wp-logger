@@ -37,11 +37,13 @@ class Plugins_Page {
 	protected $api;
 
 	/**
-	 * @param API_Interface             $api
-	 * @param Logger_Settings_Interface $settings
-	 * @param LoggerInterface           $logger
+	 * Plugins_Page constructor.
+	 *
+	 * @param API_Interface             $api The logger's main functions.
+	 * @param Logger_Settings_Interface $settings The logger settings.
+	 * @param ?LoggerInterface          $logger The logger itself.
 	 */
-	public function __construct( $api, $settings, $logger = null ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 
 		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
@@ -58,32 +60,41 @@ class Plugins_Page {
 	 * @hooked plugin_action_links_{plugin basename}
 	 * @see \WP_Plugins_List_Table::display_rows()
 	 *
-	 * @param string[] $links The links that will be shown below the plugin name on plugins.php.
+	 * @hooked plugin_action_links_{$basename} via closure. The closure needed to also pass the basename.
 	 *
-	 * @return string[]
+	 * @param array<int|string, string>  $action_links The existing plugin links (usually "Deactivate").
+	 * @param string                     $_plugin_basename The plugin's directory/filename.php.
+	 * @param array<string, string|bool> $_plugin_data Associative array including PluginURI, slug, Author, Version. See `get_plugin_data()`.
+	 * @param string                     $_context     The plugin context. By default this can include 'all', 'active', 'inactive',
+	 *                                                'recently_activated', 'upgrade', 'mustuse', 'dropins', and 'search'.
+	 *
+	 * @return array<int|string, string> The links to display below the plugin name on plugins.php.
 	 */
-	public function display_plugin_action_links( $links ) {
+	public function display_plugin_action_links( array $action_links, string $_plugin_basename, $_plugin_data, $_context ): array {
 
 		// Presumably the deactivate link.
-		$deactivate_link = array_pop( $links );
-
-		$logs_link = $this->api->get_log_url();
-		if ( ! is_null( $logs_link ) ) {
-
-			$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
-			$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
-
-			if ( 0 !== $last_log_time
-				&& $last_log_time > $last_logs_view_time ) {
-				$links[] = '<b><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></b>';
-			} else {
-				$links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
-			}
+		// When a plugin is "required" it does not have a deactivtae link.
+		if( count( $action_links) > 0 ) {
+			$deactivate_link = array_pop( $action_links );
 		}
 
-		$links[] = $deactivate_link;
+		$logs_link = $this->api->get_log_url();
 
-		return $links;
+		$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
+		$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
+
+		if ( 0 !== $last_log_time
+			&& $last_log_time > $last_logs_view_time ) {
+			$action_links[] = '<b><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></b>';
+		} else {
+			$action_links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
+		}
+
+		if( isset( $deactivate_link ) ) {
+			$action_links[] = $deactivate_link;
+		}
+
+		return $action_links;
 	}
 
 }

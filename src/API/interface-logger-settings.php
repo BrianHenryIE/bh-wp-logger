@@ -1,12 +1,26 @@
 <?php
+/**
+ * The required settings to instantiate a logger.
+ *
+ * An implementation is provided that will infer these values (but will be slower):
+ *
+ * @see \BrianHenryIE\WP_Logger\API\Logger_Settings
+ *
+ * @package brianhenryie/bh-wp-logger
+ */
 
 namespace BrianHenryIE\WP_Logger\API;
 
 use Psr\Log\LogLevel;
 
+/**
+ * All strings, all required.
+ */
 interface Logger_Settings_Interface {
 
 	/**
+	 * The minimum severity of logs to record.
+	 *
 	 * @see LogLevel
 	 *
 	 * @return string
