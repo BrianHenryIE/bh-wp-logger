@@ -73,9 +73,11 @@ class Admin_Notices {
 	 */
 	public function admin_notices() {
 
+		$error_detail_option_name = $this->get_error_detail_option_name();
+
 		// If we're on the logs page, don't show the admin notice linking to the logs page.
 		if ( isset( $_GET['page'] ) && $this->settings->get_plugin_slug() . '-logs' === $_GET['page'] ) {
-			delete_option( $this->get_error_detail_option_name() );
+			delete_option( $error_detail_option_name );
 			return;
 		}
 
