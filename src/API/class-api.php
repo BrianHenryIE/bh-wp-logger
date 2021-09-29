@@ -5,6 +5,7 @@ namespace BrianHenryIE\WP_Logger\API;
 use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Spatie\Backtrace\Backtrace;
 use Spatie\Backtrace\Frame;
 use WC_Admin_Status;
@@ -30,7 +31,7 @@ class API implements API_Interface {
 
 
 	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
-		$this->logger   = $logger;
+		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
 	}
 
@@ -77,7 +78,7 @@ class API implements API_Interface {
 		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && class_exists( WC_Admin_Status::class ) ) {
 
 			// TODO use this
-//			$logs_files = WC_Admin_Status::scan_log_files();
+			// $logs_files = WC_Admin_Status::scan_log_files();
 
 			$log_files_dir = WC_LOG_DIR;
 
@@ -105,7 +106,6 @@ class API implements API_Interface {
 					}
 				}
 			}
-
 		}
 
 		ksort( $logs_files );
