@@ -20,7 +20,7 @@ class Admin {
 	/**
 	 * The logger settings,
 	 *
-	 * @use  Logger_Settings_Interface::get_plugin_slug()
+	 * @uses Logger_Settings_Interface::get_plugin_slug()
 	 *
 	 * @var Logger_Settings_Interface
 	 */
@@ -47,13 +47,16 @@ class Admin {
 
 		$slug = $this->settings->get_plugin_slug();
 
-		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== $slug . '-logs' ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || sanitize_key( $_GET['page'] ) !== $slug . '-logs' ) {
 			return;
 		}
 
+		// This is the bh-wp-logger version, not the plugin version.
 		$version = '1.0.0';
 
-		wp_enqueue_script( 'bh-wp-logger-admin-logs-page-' . $slug, plugin_dir_url( __FILE__ ) . 'js/bh-wp-logger-admin.js', array( 'jquery' ), $version, true );
+		$url = plugin_dir_url( __FILE__ ) . 'js/bh-wp-logger-admin.js';
+		wp_enqueue_script( 'bh-wp-logger-admin-logs-page-' . $slug, $url, array( 'jquery' ), $version, true );
 	}
 
 }

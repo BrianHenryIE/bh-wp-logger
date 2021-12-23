@@ -1,6 +1,8 @@
 <?php
 /**
  * For the Settings class to implement.
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
@@ -30,15 +32,15 @@ trait Logger_Settings_Trait {
 	}
 
 	public function get_plugin_name(): string {
-		return $this->get_plugin_name();
+		return $this->plugin_name;
 	}
 
 	public function get_plugin_slug(): string {
-		return $this->get_plugin_slug();
+		return $this->plugin_slug;
 	}
 
 	public function get_plugin_basename(): string {
-		return $this->get_plugin_basename();
+		return $this->plugin_basename;
 	}
 
 }

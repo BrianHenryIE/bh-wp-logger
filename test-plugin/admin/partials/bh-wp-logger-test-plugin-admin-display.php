@@ -12,6 +12,7 @@
  */
 
 /** @var string $plugin_log_level The PSR log level, formatted to display. */
+/** @var string $plugin_log_file Path to the log file.  */
 /** @var string $plugin_log_url URL to view the logs.  */
 /** @var string $wp_debug */
 /** @var string $wp_debug_display */
@@ -27,10 +28,13 @@
 	<div>
 
 		<p>Plugin log level is: <code><?php echo $plugin_log_level; ?></code></p>
-		<p>Plugin log file is at: <a href="<?php echo $plugin_log_url; ?>">View logs</a></p>
+		<p>Plugin log file is at: <code><?php echo $plugin_log_file; ?></code></p>
 		<p>WP_DEBUG: <code><?php echo $wp_debug; ?></code></p>
 		<p>WP_DEBUG_DISPLAY: <code><?php echo $wp_debug_display; ?></code></p>
 		<p>WP_DEBUG_LOG: <code><?php echo $wp_debug_log; ?></code></p>
+	</div>
+	<div>
+		<p><a class="button button-primary" href="<?php echo $plugin_log_url; ?>">View logs</a></p>
 	</div>
 	<div>
 		<h3>Log a message</h3>
@@ -62,6 +66,29 @@
 			<button type="button" class="button log log-test" name="warning-php">Warning</button>
 			<button type="button" class="button log log-test" name="error-php">Error</button>
 
+		</form>
+	</div>
+
+	<div>
+		<h3>Throw an [uncaught] Exception</h3>
+
+		<pre>throw new \Exception( 'log test exception' );</pre>
+
+		<form>
+			<button type="button" class="button log log-test" name="uncaught-exception">Throw</button>
+		</form>
+	</div>
+
+
+	<div>
+		<h3>Delete all transients</h3>
+
+		<p>Transients are used to prevent duplicate logs, in some cases.</p>
+
+		<pre>$wpdb->query('DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"');</pre>
+
+		<form>
+			<button type="button" class="button log log-test" name="delete-transients">Delete Transients</button>
 		</form>
 	</div>
 

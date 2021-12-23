@@ -1,4 +1,9 @@
 <?php
+/**
+ *
+ *
+ * @package brianhenryie/bh-wp-logger
+ */
 
 namespace BrianHenryIE\WP_Logger\API;
 
@@ -15,12 +20,19 @@ class API implements API_Interface {
 
 	use LoggerAwareTrait;
 
-	/** @var Logger_Settings_Interface */
-	protected $settings;
+	/**
+	 * Needed for the plugin slug to link correctly.
+	 *
+	 * @uses Logger_Settings_Interface::get_plugin_slug()
+	 *
+	 * @var Logger_Settings_Interface
+	 */
+	protected Logger_Settings_Interface $settings;
 
 	/**
 	 *
 	 * TODO: IS getmypid() reliable?
+	 * TODO: Add current user id.
 	 *
 	 * @see https://stackoverflow.com/questions/10404979/get-unique-worker-thread-process-request-id-in-php
 	 *
@@ -28,8 +40,10 @@ class API implements API_Interface {
 	 */
 	protected $common_context = array();
 
-
-
+	/**
+	 * @param Logger_Settings_Interface $settings
+	 * @param ?LoggerInterface          $logger A PSR logger.
+	 */
 	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
@@ -39,19 +53,21 @@ class API implements API_Interface {
 		return $this->common_context;
 	}
 
+	public function set_common_context( $key, $value ): void {
+		$this->common_context[ $key ] = $value;
+	}
 
 	/**
 	 * Get the WordPress admin link to the log UI at a date.
 	 *
-	 * @param string|null $date A date string Y-m-d or null to get the most recent.
+	 * @param ?string $date A date string Y-m-d or null to get the most recent.
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public function get_log_url( $date = null ): string {
+	public function get_log_url( ?string $date = null ): string {
 
 		$query_args = array(
 			'page' => $this->settings->get_plugin_slug() . '-logs',
-			// 'tab'  => 'logs',
 		);
 
 		if ( ! empty( $date ) ) {
@@ -62,7 +78,6 @@ class API implements API_Interface {
 
 		return $logs_url;
 	}
-
 
 	/**
 	 * Scan the logs files dir for the latest log file, or the log file matching the supplied date.
@@ -75,10 +90,7 @@ class API implements API_Interface {
 	 */
 	public function get_log_files( ?string $date = null ): array {
 
-		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && class_exists( WC_Admin_Status::class ) ) {
-
-			// TODO use this
-			// $logs_files = WC_Admin_Status::scan_log_files();
+		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && defined( 'WC_LOG_DIR' ) ) {
 
 			$log_files_dir = WC_LOG_DIR;
 
@@ -113,7 +125,6 @@ class API implements API_Interface {
 		return $logs_files;
 	}
 
-
 	/**
 	 * Delete a specific date's log file.
 	 *
@@ -145,7 +156,7 @@ class API implements API_Interface {
 	 *
 	 * @used-by Logs_Page
 	 *
-	 * @return array{success:bool, message?:string}
+	 * @return array{success:bool, message?:string, deleted_files?:string, failed_to_delete?:string}
 	 */
 	public function delete_all_logs(): array {
 
@@ -165,14 +176,9 @@ class API implements API_Interface {
 			}
 		}
 
-		if ( empty( $failed_to_delete ) ) {
-			$result['success']       = true;
-			$result['deleted_files'] = $deleted_files;
-		} else {
-			$result['success']          = false;
-			$result['deleted_files']    = $deleted_files;
-			$result['failed_to_delete'] = $failed_to_delete;
-		}
+		$result['deleted_files']    = $deleted_files;
+		$result['failed_to_delete'] = $failed_to_delete;
+		$result['success']          = empty( $failed_to_delete );
 
 		return $result;
 	}
@@ -201,13 +207,10 @@ class API implements API_Interface {
 		// TODO: delete the last visited option if it's older than the most recent logs.
 	}
 
-
-	public function set_common_context( $key, $value ): void {
-		$this->common_context[ $key ] = $value;
-	}
-
 	/**
 	 * Loops through the debug backtrace until it finds a folder with wp-content/plugins as its parent.
+	 *
+	 * TODO: What about WooCommerce (any plugin-in-plugin...) where WooCommerce maybe raised the issues, but it's due to another plugin's code.
 	 *
 	 * @return ?string
 	 */
@@ -218,7 +221,6 @@ class API implements API_Interface {
 		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
 
 		// TODO: We probably only care about the following couple (after the two skipped).
-		// TODO: What about WooCommerce (any plugin-in-plugin...) where WooCommerce maybe raised the issues, but it's due to another plugin's code.
 		$frames = $backtrace->frames();
 
 		foreach ( $frames as $frame ) {
@@ -248,8 +250,8 @@ class API implements API_Interface {
 		$starting_from_frame_closure = function( Frame $frame ): bool {
 			if ( __FILE__ === $frame->file
 				|| 'call_user_func_array' === $frame->method
-			// || ( substr( $frame->file, -strlen( 'class-php-error-handler.php' ) ) === basename( 'class-php-error-handler.php' ) )
 				|| basename( $frame->file ) === 'class-php-error-handler.php'
+				|| basename( $frame->file ) === 'class-functions.php'
 			) {
 				return false;
 			}
@@ -257,9 +259,46 @@ class API implements API_Interface {
 		};
 
 		return Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->frames();
-
 	}
 
+	/**
+	 * Checks each file in the backtrace and if it contains WP_PLUGINS_DIR/plugin-slug then return true.
+	 *
+	 * @return bool
+	 */
+	public function is_backtrace_contains_plugin(): bool {
 
+		$frames = $this->get_backtrace();
+
+		foreach ( $frames as $frame ) {
+
+			if ( $this->is_file_from_plugin( $frame->file ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public function is_file_from_plugin( string $filepath ): bool {
+
+		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
+
+		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $filepath, $output_array ) ) {
+
+			$slug = $output_array[1];
+
+			if ( $this->settings->get_plugin_slug() === $slug ) {
+				return true;
+			}
+		}
+
+		$plugin_dir_realpath = realpath( WP_PLUGIN_DIR . '/' . explode( '/', $this->settings->get_plugin_basename() )[0] );
+		if ( false !== strpos( $filepath, $plugin_dir_realpath ) ) {
+			return true;
+		}
+
+		return false;
+	}
 }
 

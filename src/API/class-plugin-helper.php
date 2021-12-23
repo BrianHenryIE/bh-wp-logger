@@ -3,6 +3,8 @@
  * Functions for determining the plugin a file is in.
  *
  * Works OK with symlinks, except when there's symlinks in symlinks.
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
@@ -33,9 +35,9 @@ class Plugin_Helper {
 	 *
 	 * @param string $slug The plugin slug.
 	 *
-	 * @return array<int|string, string>|null
+	 * @return ?array<int|string, string>
 	 */
-	public function get_plugin_data_from_slug( $slug ): ?array {
+	public function get_plugin_data_from_slug( string $slug ): ?array {
 
 		$plugins = get_plugins();
 
@@ -58,7 +60,7 @@ class Plugin_Helper {
 	 *
 	 * @return ?string
 	 */
-	public function discover_plugin_relative_directory( $dir = null ): ?string {
+	public function discover_plugin_relative_directory( ?string $dir = null ): ?string {
 
 		// __DIR_ is the directory this file is in. (i.e. NOT the calling directory).
 		$dir = $dir ?? __DIR__;

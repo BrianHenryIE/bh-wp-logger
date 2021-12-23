@@ -1,5 +1,5 @@
 {
-    "name": "brianhenryie/wp-logger",
+    "name": "brianhenryie/bh-wp-logger",
     "description": "This is a short description of what plugin_title does.",
     "type": "library",
     "license": "GPL-2.0+-or-later",
@@ -87,10 +87,31 @@
                 "Add AnyObject matcher": "https://github.com/10up/wp_mock/pull/161.patch"
             }
         },
+        "strauss": {
+            "target_directory": "/test-plugin/vendor/",
+            "packages": [
+                "pablo-sg-pacheco/wp-namespace-autoloader",
+                "katzgrau/klogger",
+                "php",
+                "psr/log",
+                "spatie/backtrace",
+                "wptrt/admin-notices"
+            ],
+            "exclude_from_prefix": {
+                "packages": [
+                    "pablo-sg-pacheco/wp-namespace-autoloader",
+                    "katzgrau/klogger",
+                    "php",
+                    "psr/log",
+                    "spatie/backtrace",
+                    "wptrt/admin-notices"
+                ]
+            }
+        },
         "symlinks": {
             "wp-content": "wordpress/wp-content",
             "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin",
-            "src": "test-plugin/vendor/bh-wp-logger"
+            "src": "test-plugin/vendor/brianhenryie/wp-logger"
         },
         "phpstorm": {
             "exclude_folders": {
@@ -111,14 +132,14 @@
     "scripts": {
         "post-install-cmd": [
             "vendor/bin/wp core download --path=wordpress --allow-root || true;",
-            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_PLUGIN_DIR', '$PWD/wp-content/plugins' );\ndefine( 'WP_PLUGIN_URL', 'http://localhost:8080/bh-wp-logger/' );\n\ndefine( 'WP_DEBUG', true );\ndefine( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/php_errors.log' );\" || true",
+            "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_PLUGIN_DIR', '$PWD/wp-content/plugins' );\ndefine( 'WP_PLUGIN_URL', 'http://localhost:8080/bh-wp-logger/wp-content/plugins' );\n\ndefine( 'WP_DEBUG', true );\ndefine( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/php_errors.log' );\" || true",
             "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
             "mkdir -p wordpress/wp-content/uploads",
             "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
             "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
         ],
         "post-update-cmd": [
-            "vendor/bin/wp core download --path=wordpress --allow-root || true; vendor/bin/wp core update --allow-root || true",
+            "vendor/bin/wp core upgrade --path=wordpress --allow-root || true; vendor/bin/wp core update --allow-root || true",
             "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_PLUGIN_DIR', '$PWD/wp-content/plugins' );\ndefine( 'WP_PLUGIN_URL', 'http://localhost:8080/bh-wp-logger/' );\n\ndefine( 'WP_DEBUG', true );\ndefine( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/php_errors.log' );\" || true",
             "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
             "mkdir -p wordpress/wp-content/uploads",
@@ -135,8 +156,12 @@
             "open tests/_output/html/index.html"
         ],
         "lint": [
-            "vendor/bin/phpcbf | true",
-            "vendor/bin/phpcs"
+            "vendor/bin/phpcbf || true",
+            "vendor/bin/phpcs || true",
+            "vendor/bin/phpstan analyse --memory-limit 1G"
+        ],
+        "lint-changes": [
+            "updated_files=$( git status | grep 'modified:\\s.*.php$' | cut -c14- | awk '{ printf(\"%s \", $0) }' ); vendor/bin/phpcbf $(echo $updated_files); vendor/bin/phpcs $(echo $updated_files); vendor/bin/phpstan analyse $(echo $updated_files) --memory-limit 1G"
         ]
     }
 }

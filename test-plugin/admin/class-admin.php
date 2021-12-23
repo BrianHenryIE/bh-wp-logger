@@ -43,7 +43,11 @@ class Admin {
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style( 'bh-wp-logger-test-plugin', plugin_dir_url( __FILE__ ) . 'css/bh-wp-logger-test-plugin-admin.css', array(), time(), 'all' );
+		$version = time();
+
+		$url = WP_PLUGIN_URL . '/bh-wp-logger-test-plugin/Admin/css/bh-wp-logger-test-plugin-admin.css';
+
+		wp_enqueue_style( 'bh-wp-logger-test-plugin', $url, array(), $version, 'all' );
 
 	}
 
@@ -56,7 +60,9 @@ class Admin {
 
 		$version = time();
 
-		wp_enqueue_script( 'bh-wp-logger-test-plugin', plugin_dir_url( __FILE__ ) . 'js/bh-wp-logger-test-plugin-admin.js', array( 'jquery' ), $version, true );
+		$url = WP_PLUGIN_URL . '/bh-wp-logger-test-plugin/Admin/js/bh-wp-logger-test-plugin-admin.js';
+
+		wp_enqueue_script( 'bh-wp-logger-test-plugin', $url, array( 'jquery' ), $version, true );
 
 	}
 
@@ -89,6 +95,8 @@ class Admin {
 		$plugin_log_level = $this->logger_settings->get_log_level();
 
 		$plugin_logger_api = $this->logger->get_api();
+
+		$plugin_log_file = array_pop( $plugin_logger_api->get_log_files() );
 
 		$plugin_log_url = $plugin_logger_api->get_log_url();
 

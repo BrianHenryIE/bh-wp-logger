@@ -15,7 +15,6 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-
 class Logs_Page {
 
 	use LoggerAwareTrait;
@@ -60,7 +59,7 @@ class Logs_Page {
 		$logs_slug = "{$this->settings->get_plugin_slug()}-logs";
 
 		add_submenu_page(
-			null,
+			'',
 			__( 'Logs', 'bh-wp-logger' ),
 			'logs',
 			'manage_options',
@@ -84,8 +83,17 @@ class Logs_Page {
 		echo '<div class="wrap">';
 
 		echo '<h1>';
-		echo $this->settings->get_plugin_name();
+		echo esc_html( $this->settings->get_plugin_name() );
 		echo '</h1>';
+
+		$log_files = $this->api->get_log_files();
+
+		if ( empty( $log_files ) ) {
+			// This will occur e.g. immediately after deleting all logs.
+			echo '<p>No logs to display.</p>';
+			echo '</div>';
+			return;
+		}
 
 		$logs_table = new Logs_Table( $this->api, $this->settings, $this->logger );
 
@@ -94,23 +102,25 @@ class Logs_Page {
 		// Show a list of date to switch between dates.
 		echo '<label for="log_date">Log date:</label>';
 		echo '<select name="log_date" id="log_date">';
-		$log_files = $this->api->get_log_files();
 
-		$chosen_date = isset( $_GET['log_date'] ) ? $_GET['log_date'] : array_key_last( $log_files );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$chosen_date = isset( $_GET['log_date'] ) ? sanitize_key( $_GET['log_date'] ) : array_key_last( $log_files );
 
 		// TODO: Allow filtering here to add external log files, e.g. from Authorize.net SDK.
 		foreach ( $log_files as $date => $path ) {
 			$date_formatted = $date;
-			echo "<option value=\"{$date}\"";
+			echo '<option value="' . esc_attr( $date ) . '"';
 			if ( $date === $chosen_date ) {
 				echo ' selected';
 			}
-			echo ">{$date_formatted}</option>";
+			echo '>' . esc_html( $date_formatted ) . '</option>';
 		}
 		echo '</select>';
 
-		echo "<button name=\"deleteButton\" id=\"deleteButton\"  data-date=\"{$chosen_date}\" class=\"button logs-page button-primary\">Delete {$chosen_date} logs</button>";
+		echo '<button name="deleteButton" id="deleteButton" data-date="' . esc_attr( $chosen_date ) . '" class="button logs-page button-primary">Delete ' . esc_html( $chosen_date ) . ' logs</button>';
 		echo '<button name="deleteAllButton" id="deleteAllButton" class="button logs-page button-secondary">Delete all logs</button>';
+
+		wp_nonce_field( 'bh-wp-logger-delete', 'delete_logs_wpnonce' );
 
 		// Maybe should use set file?
 		$logs_table->set_date( $chosen_date );
@@ -124,27 +134,24 @@ class Logs_Page {
 	}
 
 	/**
-	 * Output the CSS for the table (colours the rows with the severity of the log message!).
+	 * Register the stylesheets for the logs page.
+	 * (colours the rows with the severity of the log message!).
 	 *
-	 * TODO: Is this the best place and best way to do this?
-	 *
-	 * @hooked admin_footer
+	 * @hooked admin_enqueue_scripts
 	 */
-	public function print_css(): void {
+	public function enqueue_styles(): void {
 
-		if ( ! isset( $_GET['page'] ) || "{$this->settings->get_plugin_slug()}-logs" !== $_GET['page'] ) {
+		$handle = "{$this->settings->get_plugin_slug()}-logs";
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || $handle !== $_GET['page'] ) {
 			return;
 		}
 
-		$css_file = __DIR__ . '/css/bh-wp-logger.css';
+		$css_file = plugin_dir_url( __FILE__ ) . '/css/bh-wp-logger.css';
+		$version  = '1.0.0';
 
-		if ( file_exists( $css_file ) ) {
-
-			echo "\n<style>\n";
-
-			echo file_get_contents( $css_file );
-
-			echo "\n</style>\n";
-		}
+		wp_enqueue_style( $handle, $css_file, array(), $version, 'all' );
 	}
+
 }

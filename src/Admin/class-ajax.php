@@ -10,6 +10,9 @@ namespace BrianHenryIE\WP_Logger\Admin;
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 
+/**
+ * Handle delete and delete-all actions.
+ */
 class AJAX {
 
 	/**
@@ -49,16 +52,17 @@ class AJAX {
 	 */
 	public function delete(): void {
 
+		if ( ! isset( $_POST['_wpnonce'], $_POST['plugin_slug'], $_POST['date_to_delete'] )
+			|| ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'bh-wp-logger-delete' ) ) {
+			return;
+		}
+
 		// bh-wp-logger could be hooked for many plugins.
-		if ( ! isset( $_POST['plugin_slug'] ) || $this->settings->get_plugin_slug() !== $_POST['plugin_slug'] ) {
+		if ( $this->settings->get_plugin_slug() !== sanitize_key( $_POST['plugin_slug'] ) ) {
 			return;
 		}
 
-		if ( ! isset( $_POST['date_to_delete'] ) ) {
-			return;
-		}
-
-		$ymd_date = $_POST['date_to_delete'];
+		$ymd_date = sanitize_key( $_POST['date_to_delete'] );
 
 		$result = $this->api->delete_log( $ymd_date );
 
@@ -77,8 +81,13 @@ class AJAX {
 	 */
 	public function delete_all(): void {
 
+		if ( ! isset( $_POST['_wpnonce'], $_POST['plugin_slug'] )
+			|| ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'bh-wp-logger-delete' ) ) {
+			return;
+		}
+
 		// bh-wp-logger could be hooked for many plugins.
-		if ( ! isset( $_POST['plugin_slug'] ) || $this->settings->get_plugin_slug() !== $_POST['plugin_slug'] ) {
+		if ( $this->settings->get_plugin_slug() !== sanitize_key( $_POST['plugin_slug'] ) ) {
 			return;
 		}
 

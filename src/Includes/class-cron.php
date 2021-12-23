@@ -2,7 +2,7 @@
 /**
  * Automatically delete old log files.
  *
- * @package    BrianHenryIE\WP_Plugin_Logger
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\Includes;
@@ -41,7 +41,7 @@ class Cron {
 	 *
 	 * @param API_Interface             $api The logger's main functions.
 	 * @param Logger_Settings_Interface $settings The logger settings.
-	 * @param LoggerInterface           $logger The logger itself for logging.
+	 * @param ?LoggerInterface          $logger The logger itself for logging.
 	 */
 	public function __construct( $api, $settings, ?LoggerInterface $logger = null ) {
 
@@ -60,7 +60,7 @@ class Cron {
 		$cron_hook = "delete_logs_{$this->settings->get_plugin_slug()}";
 
 		if ( false !== wp_get_scheduled_event( $cron_hook ) ) {
-			$this->logger->debug( "The `{$cron_hook}` cron job was already scheduled" );
+			$this->logger->debug( "The `{$cron_hook}` cron job was already scheduled." );
 			return;
 		}
 
@@ -76,7 +76,7 @@ class Cron {
 	 */
 	public function delete_old_logs(): void {
 		$action = current_action();
-		$this->logger->debug( "Executing {$action} cron job" );
+		$this->logger->debug( "Executing {$action} cron job." );
 
 		$this->api->delete_old_logs();
 	}

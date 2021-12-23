@@ -3,6 +3,8 @@
  * Functions to augment WC_Log_Handler.
  *
  * @see WC_Log_Handler
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\WooCommerce;
@@ -51,7 +53,7 @@ class Log_Handler {
 	public function add_context_to_logs( string $entry, array $log_data_array ): string {
 
 		// Only act on logs for this plugin.
-		if ( ! isset( $log_data_array['context']['source'] ) || $log_data_array['context']['source'] !== $this->settings->get_plugin_slug() ) {
+		if ( ! isset( $log_data_array['context']['source'] ) || $this->settings->get_plugin_slug() !== $log_data_array['context']['source'] ) {
 			return $entry;
 		}
 
@@ -63,9 +65,9 @@ class Log_Handler {
 
 		$context = array_merge( $this->api->get_common_context(), $log_data_array['context'] );
 
+		// The plugin slug.
 		unset( $context['source'] );
 
-		// TODO: regex to replace email addresses with b**********e@gmail.com, credit card numbers etc.
 		return $entry . "\n" . wp_json_encode( $context );
 	}
 

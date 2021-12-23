@@ -8,11 +8,11 @@ use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 
 class Logs_Table_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
-    /**
-     * Given a "file" of sample logs, test the Logs_Table parses it correctly.
-     */
-    public function test_parse_data() {
+	/**
+	 * Given a "file" of sample logs, test the Logs_Table parses it correctly.
+	 */
+	public function test_parse_data() {
 
-    }
+	}
 
 }

@@ -1,10 +1,9 @@
 (function( $ ) {
 	'use strict';
 
-	$(
-		function() {
+	$(function() {
 
-			// When the date is changed, reload the page
+			// When the date is changed, reload the page.
 			$('#log_date').change(function() {
 				var selectedDate = $('#log_date').val();
 
@@ -34,6 +33,7 @@
                     let slug = slug_log.slice(0, -5);
 
                     data.plugin_slug = slug;
+					data._wpnonce = $('#delete_logs_wpnonce').val();
 
 					switch ( buttonName) {
 						case 'deleteButton':

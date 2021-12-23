@@ -4,7 +4,7 @@
  *
  * Adds a Logs link to the plugin's entry.
  *
- * @package BrianHenryIE\WP_Logger\Admin
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\Admin;
@@ -73,8 +73,8 @@ class Plugins_Page {
 	public function display_plugin_action_links( array $action_links, string $_plugin_basename, $_plugin_data, $_context ): array {
 
 		// Presumably the deactivate link.
-		// When a plugin is "required" it does not have a deactivtae link.
-		if( count( $action_links) > 0 ) {
+		// When a plugin is "required" it does not have a deactivate link.
+		if ( count( $action_links ) > 0 ) {
 			$deactivate_link = array_pop( $action_links );
 		}
 
@@ -90,7 +90,7 @@ class Plugins_Page {
 			$action_links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
 		}
 
-		if( isset( $deactivate_link ) ) {
+		if ( isset( $deactivate_link ) ) {
 			$action_links[] = $deactivate_link;
 		}
 

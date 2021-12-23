@@ -53,8 +53,8 @@ class Admin_Ajax {
 		} else {
 			$log_test_action = wp_unslash( $_POST['log-test-action'] );
 
-			$message = $_POST['message'];
-			$context = explode( ',', $_POST['context'] );
+			$message = isset( $_POST['message'] ) ? esc_html( wp_unslash( $_POST['message'] ) ) : null;
+			$context = isset( $_POST['context'] ) ? explode( ',', esc_html( wp_unslash( $_POST['context'] ) ) ) : array();
 
 			switch ( $log_test_action ) {
 				case 'debug-message':
@@ -83,6 +83,13 @@ class Admin_Ajax {
 					break;
 				case 'error-php':
 					trigger_error( 'log test error php', E_USER_ERROR );
+					break;
+				case 'uncaught-exception':
+					throw new \Exception( 'log test exception' );
+				case 'delete-transients':
+					global $wpdb;
+					$result = $wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"' );
+					$result = array();
 					break;
 				default:
 					$result['error']['unknown-log-test-action'] = 'Unknown log-test-action parameter.';

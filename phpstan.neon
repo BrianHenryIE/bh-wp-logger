@@ -4,8 +4,12 @@ parameters:
         - src
     excludePaths:
     bootstrapFiles:
+        - phpstan-bootstrap.php
         - src/autoload.php
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+
     scanDirectories:
         - wp-content/plugins
         - vendor/wp-cli

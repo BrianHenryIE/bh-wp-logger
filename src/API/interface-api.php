@@ -1,9 +1,14 @@
 <?php
+/**
+ *
+ * @package brianhenryie/bh-wp-logger
+ */
 
 namespace BrianHenryIE\WP_Logger\API;
 
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Includes\Cron;
+use Spatie\Backtrace\Frame;
 
 interface API_Interface {
 
@@ -17,7 +22,7 @@ interface API_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_log_url(): string;
+	public function get_log_url( ?string $date = null ): string;
 
 	/**
 	 * Delete a specific date's log file.
@@ -26,7 +31,7 @@ interface API_Interface {
 	 *
 	 * @used-by Logs_Page
 	 *
-	 * @return array
+	 * @return array{success: bool, message: ?string}
 	 */
 	public function delete_log( string $ymd_date ): array;
 
@@ -35,7 +40,7 @@ interface API_Interface {
 	 *
 	 * @used-by Logs_Page
 	 *
-	 * @return array
+	 * @return array{success: bool, deleted_files: array, failed_to_delete: ?array}
 	 */
 	public function delete_all_logs(): array;
 
@@ -56,12 +61,28 @@ interface API_Interface {
 	 */
 	public function set_common_context( $key, $value ): void;
 
+	/**
+	 * @return array<string, mixed>
+	 */
 	public function get_common_context(): array;
 
-
+	/**
+	 * @return string|null
+	 */
 	public function determine_plugin_slug_from_backtrace(): ?string;
 
+	/**
+	 * @return Frame[]
+	 */
 	public function get_backtrace(): array;
 
+	/**
+	 * Checks the current backtrace for any reference to the current plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_backtrace_contains_plugin(): bool;
+
+	public function is_file_from_plugin( string $filepath ): bool;
 
 }

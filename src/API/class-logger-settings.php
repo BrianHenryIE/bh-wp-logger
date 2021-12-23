@@ -1,6 +1,8 @@
 <?php
 /**
  * To provide defaults.
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
@@ -14,11 +16,11 @@ class Logger_Settings implements Logger_Settings_Interface {
 	 *
 	 * @see get_plugin_data()
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $plugin_data;
+	protected array $plugin_data;
 
-	public function __construct( $plugin_slug = null ) {
+	public function __construct( ?string $plugin_slug = null ) {
 
 		if ( ! is_null( $plugin_slug ) ) {
 			$this->plugin_data = ( new Plugin_Helper() )->get_plugin_data_from_slug( $plugin_slug );

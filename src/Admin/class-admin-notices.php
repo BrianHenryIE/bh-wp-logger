@@ -1,6 +1,8 @@
 <?php
 /**
  * Adds a
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\Admin;
@@ -12,7 +14,12 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use WPTRT\AdminNotices\Notices;
 
-class Admin_Notices {
+/**
+ *
+ *
+ * @see https://github.com/WPTT/admin-notices
+ */
+class Admin_Notices extends Notices {
 
 	use LoggerAwareTrait;
 
@@ -32,24 +39,6 @@ class Admin_Notices {
 		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
 		$this->api      = $api;
-
-		$this->boot_notices();
-	}
-
-	protected Notices $notices;
-
-	/**
-	 *
-	 */
-	public function boot_notices() {
-
-		// Don't add this unless we're on an admin screen or handling an ajax request.
-		if ( ! is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
-			return;
-		}
-
-		$this->notices = new Notices();
-		$this->notices->boot();
 	}
 
 	protected function get_error_detail_option_name(): string {
@@ -57,6 +46,10 @@ class Admin_Notices {
 	}
 
 	/**
+	 * The last error is stored in the option `plugin-slug-recent-error-data` as an array with `message` and `timestamp`.
+	 *
+	 * @see Admin_Notices::get_error_detail_option_name()
+	 *
 	 * @return ?array{message: string, timestamp: string}
 	 */
 	protected function get_last_error(): ?array {
@@ -69,14 +62,17 @@ class Admin_Notices {
 	 *
 	 * TODO: Do not show on plugin install page.
 	 *
+	 * hooked earlier than 10 because Notices::boot() also hooks a function on admin_init that needs to run after this.
+	 *
 	 * @hooked admin_init
 	 */
-	public function admin_notices() {
+	public function admin_notices(): void {
 
 		$error_detail_option_name = $this->get_error_detail_option_name();
 
 		// If we're on the logs page, don't show the admin notice linking to the logs page.
-		if ( isset( $_GET['page'] ) && $this->settings->get_plugin_slug() . '-logs' === $_GET['page'] ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['page'] ) && $this->settings->get_plugin_slug() . '-logs' === sanitize_key( $_GET['page'] ) ) {
 			delete_option( $error_detail_option_name );
 			return;
 		}
@@ -93,16 +89,16 @@ class Admin_Notices {
 			// wptrt_notice_dismissed_bh-wp-logger-test-plugin-recent-error
 
 			$error_text = isset( $last_error['message'] ) ? trim( $last_error['message'] ) : '';
-			$error_time = isset( $last_error['timestamp'] ) ? $last_error['timestamp'] : '';
+			$error_time = isset( $last_error['timestamp'] ) ? (int) $last_error['timestamp'] : '';
 
-			$title   = false;
+			$title   = '';
 			$content = "<strong>{$this->settings->get_plugin_name()}</strong>. Error: ";
 
 			if ( ! empty( $error_text ) ) {
 				$content .= "\"{$error_text}\" ";
 			}
 
-			if ( ! empty( $error_time ) && is_int( $error_time ) ) {
+			if ( ! empty( $error_time ) && is_numeric( $error_time ) ) {
 				$content .= ' at ' . gmdate( 'Y-m-d\TH:i:s\Z', $error_time ) . ' UTC.';
 
 				// wp_timezone();
@@ -114,12 +110,12 @@ class Admin_Notices {
 				$log_link = $this->api->get_log_url();
 			}
 
-			if ( ! is_null( $log_link ) ) {
+			if ( ! empty( $log_link ) ) {
 				$content .= ' <a href="' . $log_link . '">View Logs</a>.</p></div>';
 			}
 
 			// ID must be globally unique because it is the css id that will be used.
-			$this->notices->add(
+			$this->add(
 				$this->settings->get_plugin_slug() . '-recent-error',
 				$title,   // The title for this notice.
 				$content, // The content for this notice.
@@ -135,8 +131,7 @@ class Admin_Notices {
 			 *
 			 * @see update_option()
 			 */
-			$on_dismiss = function( $value, $old_value, $option ) use ( $error_detail_option_name, $is_dismissed_option_name ) {
-				error_log( 'Should be deleting ' . $error_detail_option_name );
+			$on_dismiss = function( $value, $old_value, $option ) use ( $error_detail_option_name ) {
 				delete_option( $error_detail_option_name );
 				delete_option( $option );
 				return $old_value; // When new and old match, it short circuits.

@@ -1,3 +1,5 @@
+[![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-emails/) ![PHP 7.4](https://img.shields.io/badge/PHP-7.4-8892BF.svg)
+
 # BH WP Logger
 
 Zero-config logger UI for WordPress plugins.
@@ -12,11 +14,15 @@ Wraps existing [PSR-3](https://www.php-fig.org/psr/psr-3/) loggers and adds some
 * [WC_Logger](https://github.com/woocommerce/woocommerce/blob/trunk/includes/class-wc-logger.php)
 * [PSR-3 NullLogger](https://github.com/php-fig/log/blob/master/Psr/Log/NullLogger.php)
 
-Uses KLogger by default, WC_Logger when WooCommerce is active, NullLogger when log level is set to "none".
+Uses KLogger by default, WC_Logger when specified, NullLogger when log level is set to "none".
 
 Uses PHP's `set_error_handler()` to catch PHP deprecated/warning/notice/errors.
 
-Hook into WordPress's deprecated function hooks (`deprecated_function_run`) to log those only once per day.
+Hook into WordPress's deprecated function hooks (`deprecated_function_run` etc.) to log those only once per day.
+
+Uses PHP's `register_shutdown_function()` to catch Exceptions related to the plugin.
+
+Deletes log files older than 30 days on cron.
 
 ## UI 
 
@@ -24,7 +30,7 @@ Displays logs in `WP_List_Table`.
 
 ![Logs WP_List_Table](./assets/logs-wp-list-table.png "Logs WP_List_Table")
 
-Show a dismissable admin error notice each time there is a new error.
+Shows a dismissable admin error notice each time there is a new error.
 
 ![Admin Error Notice](./assets/admin-error-notice.png "Admin error notice")
 
@@ -46,12 +52,13 @@ This relies on a fork of [WPTT/admin-notices](https://github.com/WPTT/admin-noti
       "type": "git"
     },
     {
-        "url": "https://github.com/BrianHenryIE/admin-notices",
-        "type": "git"
+      "url": "https://github.com/BrianHenryIE/admin-notices",
+      "type": "git"
     },
-},
+  }
+],
 "require": {
-    "brianhenryie/wp-logger": "dev-master"
+    "brianhenryie/bh-wp-logger": "dev-master"
 }
 ```
 
@@ -105,6 +112,13 @@ Then pass around your `$logger` instance; use `NullLogger` in your tests.
 
 After the logger has been instantiated once, subsequent calls to `::instance()` return the existing instance and any `$logger_settings` passed is ignored.
 
+To use WooCommerce's native `WC_Logger`, add the `WooCommerce_Logger_Interface` interface to the settings object. 
+
+```php
+$logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Settings_Interface, BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface {
+    ...
+```
+
 ### WooCommerce Settings
 
 Something like this can be used for WooCommerce Settings API.
@@ -122,12 +136,14 @@ $setting_fields[] = array(
     'label'    => __( 'Enable Logging', 'text-domain' ),
     'type'     => 'select',
     'options'  => $log_levels_option,
-    'desc'     => __( 'Increasingly detailed logging.', 'text-domain' ),
+    'desc'    => __( 'Increasingly detailed levels of logs. ', 'text-domain' ) . '<a href="' . admin_url( 'admin.php?page=plugin-slug-logs' ) . '">View Logs</a>',
     'desc_tip' => true,
     'default'  => 'notice',
     'id'       => 'text-domain-log-level',
 );
 ```
+
+![WooCommerce Settings](./assets/woocommerce-settings.png "WooCommerce Settings")
 
 ## WP_Mock
 
@@ -151,14 +167,32 @@ If using WP_Mock for your tests, and you are instantiating this logger, the foll
         'return_arg' => true
     )
 );
+
+
+\WP_Mock::userFunction(
+    'get_option',
+    array(
+        'args'   => array( 'active_plugins'),
+        'return' => array( 'woocommerce/woocommerce.php' )
+    )
+);
 ```
+
+### Test Plugin
+
+The `test-plugin` folder contains a small plugin with buttons to trigger the types of errors that can be logged.
+
+![Test Plugin](./assets/test-plugin.png "Test Plugin")
 
 ### Best Practice
 
-From my brief experience using this, I find it useful to add a `debug` log at the beginning of every function and an appropriate `info`...`error` as the function returns.
+From my limited logging experience, I find it useful to add a `debug` log at the beginning of every function and an appropriate `info`...`error` as the function returns.
 
 ## TODO
 
+* Option for what level of errors to display as admin notices
+* Option for user capability for displaying admin notices (filter, at least)
+* Zero-config WC_Logger: detect "wc", "woo" in plugin names
 * Check log directory is not publicly accessible
 * Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json
 * Paging and filtering
@@ -169,92 +203,6 @@ From my brief experience using this, I find it useful to add a `debug` log at th
 
 # Status
 
-Very much a v0.1.
+Very much a v0.2.
 
-I'll start to use Semver once I've caught up with WPCS, PhpStan and PhpUnit.
-
-
-## Contributing
-
-Clone this repo, open PhpStorm, then run `composer install` to install the dependencies.
-
-```
-git clone https://github.com/brianhenryie/wp-plugin-logger.git;
-open -a PhpStorm ./;
-composer install;
-```
-
-For integration and acceptance tests, a local webserver must be running with `localhost:8080/wp-plugin-logger/` pointing at the root of the repo. MySQL must also be running locally – with two databases set up with:
-
-```
-mysql_username="root"
-mysql_password="secret"
-
-# export PATH=${PATH}:/usr/local/mysql/bin
-
-# Make .env available 
-# To bash:
-# export $(grep -v '^#' .env.testing | xargs)
-# To zsh:
-# source .env.testing
-
-# Create the database user:
-# MySQL
-# mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED WITH mysql_native_password BY '"$TEST_DB_PASSWORD"';";
-# or MariaDB
-# mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED BY '"$TEST_DB_PASSWORD"';";
-
-# Create the databases:
-mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_SITE_DB_NAME"; USE "$TEST_SITE_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_SITE_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
-mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_DB_NAME"; USE "$TEST_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
-
-mysql -u $mysql_username -p$mysql_password $TEST_SITE_DB_NAME < tests/_data/dump.sql 
-```
-
-### WordPress Coding Standards
-
-See documentation on [WordPress.org](https://make.wordpress.org/core/handbook/best-practices/coding-standards/) and [GitHub.com](https://github.com/WordPress/WordPress-Coding-Standards).
-
-Correct errors where possible and list the remaining with:
-
-```
-vendor/bin/phpcbf; vendor/bin/phpcs
-```
-
-### Tests
-
-Tests use the [Codeception](https://codeception.com/) add-on [WP-Browser](https://github.com/lucatume/wp-browser) and include vanilla PHPUnit tests with [WP_Mock](https://github.com/10up/wp_mock).
-
-Run tests with:
-
-```
-vendor/bin/codecept run unit;
-vendor/bin/codecept run wpunit;
-vendor/bin/codecept run integration;
-vendor/bin/codecept run acceptance;
-```
-
-Show code coverage (unit+wpunit):
-
-```
-XDEBUG_MODE=coverage composer run-script coverage-tests 
-```
-
-Static analysis:
-
-```
-vendor/bin/phpstan analyse --memory-limit 1G
-```
-
-To save changes made to the acceptance database:
-
-```
-export $(grep -v '^#' .env.testing | xargs)
-mysqldump -u $TEST_SITE_DB_USER -p$TEST_SITE_DB_PASSWORD $TEST_SITE_DB_NAME > tests/_data/dump.sql
-```
-
-To clear Codeception cache after moving/removing test files:
-
-```
-vendor/bin/codecept clean
-```
+I'll start at Semver 1.0.0 once I've caught up with WPCS, PhpStan and PhpUnit.

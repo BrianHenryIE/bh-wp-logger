@@ -15,20 +15,21 @@ use BrianHenryIE\WP_Logger\API\API;
 use BrianHenryIE\WP_Logger\API\Logger_Settings;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\API\Plugin_Helper;
-use BrianHenryIE\WP_Logger\Includes\BH_WP_Logger;
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
+use BrianHenryIE\WP_Logger\Includes\Plugin_Logger_Actions;
 use Psr\Log\LoggerInterface;
 
 /**
  * Wraps parent class in a singleton so it only needs to be configured once.
  */
-class Logger extends BH_WP_Logger implements LoggerInterface {
+class Logger extends BH_WP_PSR_Logger implements LoggerInterface {
 
 	/**
 	 * Singleton.
 	 *
 	 * @var Logger
 	 */
-	protected static $instance;
+	protected static Logger $instance;
 
 	/**
 	 * Initialize the logger and store the instance in the singleton variable.
@@ -45,7 +46,7 @@ class Logger extends BH_WP_Logger implements LoggerInterface {
 	 */
 	public static function instance( ?Logger_Settings_Interface $settings = null ): LoggerInterface {
 
-		$configure = function( $settings ): Logger {
+		if ( ! isset( self::$instance ) ) {
 
 			// Zero-config.
 			$settings = $settings ?? new Logger_Settings();
@@ -54,9 +55,11 @@ class Logger extends BH_WP_Logger implements LoggerInterface {
 
 			self::$instance = new self( $api, $settings );
 
-			return self::$instance;
-		};
+			// Add the hooks.
+			new Plugin_Logger_Actions( $api, $settings, self::$instance );
+		}
 
-		return self::$instance ?? $configure( $settings );
+		return self::$instance;
 	}
+
 }

@@ -5,7 +5,7 @@
  *
  * Chains and calls previously set_error_handler handlers.
  *
- * @package BrianHenryIE\WP_Logger\API
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
@@ -23,21 +23,20 @@ class PHP_Error_Handler {
 
 	use LoggerAwareTrait;
 
-	protected API $api;
+	protected API_Interface $api;
 
-	/** @var Logger_Settings_Interface */
-	protected $settings;
+	protected Logger_Settings_Interface $settings;
 
 	/**
 	 * Only one error handler can be added at a time, so we chain them.
 	 *
-	 * @var callable with signature ( int $errno, string $errstr, ?string $errfile, ?int $errline  )
+	 * @var ?callable with signature ( int $errno, string $errstr, ?string $errfile, ?int $errline  )
 	 */
 	protected $previous_error_handler = null;
 
-	public function __construct( $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
+		$this->setLogger( $logger );
 		$this->api      = $api;
-		$this->logger   = $logger;
 		$this->settings = $settings;
 	}
 
@@ -49,7 +48,7 @@ class PHP_Error_Handler {
 	 *
 	 * @hooked plugins_loaded
 	 */
-	public function init() {
+	public function init(): void {
 
         // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 		$this->previous_error_handler = set_error_handler(
@@ -72,7 +71,7 @@ class PHP_Error_Handler {
 	 */
 	public function plugin_error_handler( int $errno, string $errstr, string $errfile, int $errline ) {
 
-		// Check is already logged error here?
+		// Check is already logged error here? (no, that should be done in the logger itself).
 
 		$func_args = func_get_args();
 
@@ -89,6 +88,8 @@ class PHP_Error_Handler {
 		}
 
 		// TODO: maybe don't use transients?
+		// TODO: Add an option in settings.
+		// wp transient delete --all
 
 		// e.g. my-plugin-slug-logged-error-4f6ead5467acd...
 		$transient_key = "{$this->settings->get_plugin_slug()}-logged-{$this->errno_to_psr3( $errno )}-" . md5( $errstr );
@@ -134,7 +135,7 @@ class PHP_Error_Handler {
 		// $func_args = json_encode( $func_args );
 
 		// TODO: Filter on expiration time length.
-		set_transient( $transient_key, json_encode( $func_args ), WEEK_IN_SECONDS );
+		set_transient( $transient_key, wp_json_encode( $func_args ), WEEK_IN_SECONDS );
 
 		// TODO: Add a filter here
 		// e.g. to return false for fatal, i.e so it would log fatal errors to error_log's file and not handle ("surpress" them herer).
@@ -146,20 +147,20 @@ class PHP_Error_Handler {
 	/**
 	 * Call other registered error handlers before returning the result.
 	 *
-	 * @param bool $handled Flag to indicate has the error already been handled.
+	 * @param bool              $handled Flag to indicate has the error already been handled.
+	 * @param array<int|string> $args
 	 *
 	 * @return ?bool True if the error has been handled, false if PHP error handler should still run.
 	 */
 	protected function return_error_handler_result( bool $handled, array $args ): bool {
 
-		if ( ! is_null( $this->previous_error_handler ) ) {
-
-			// If null is returned from the previous handler, treat that as if the error has not been handled by them.
-			$handled_in_chain = call_user_func_array( $this->previous_error_handler, $args );
-			return is_null( $handled_in_chain ) ? $handled : $handled_in_chain || $handled;
+		if ( is_null( $this->previous_error_handler ) ) {
+			return $handled;
 		}
 
-		return $handled;
+		// If null is returned from the previous handler, treat that as if the error has not been handled by them.
+		$handled_in_chain = call_user_func_array( $this->previous_error_handler, $args );
+		return is_null( $handled_in_chain ) ? $handled : $handled_in_chain || $handled;
 	}
 
 	/**
@@ -176,14 +177,14 @@ class PHP_Error_Handler {
 	 *
 	 * @return bool
 	 */
-	protected function is_related_error( int $errno, string $errstr, string $errfile, int $errline ) {
+	protected function is_related_error( int $errno, string $errstr, string $errfile, int $errline ): bool {
 
 		// If the source file has the plugin dir in it.
 		// Prepend the WP_PLUGINS_DIR so a subdir with the same name (e.g. my-plugin/integrations/your-plugin) does not match.
 		$plugin_dir          = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . explode( '/', $this->settings->get_plugin_basename() )[0];
 		$plugin_dir_realpath = realpath( $plugin_dir );
 
-		if ( false !== strpos( $errfile, $plugin_dir ) || false !== strpos( $errfile, $plugin_dir_realpath ) ) {
+		if ( false !== strpos( $errfile, $plugin_dir ) || ( false !== $plugin_dir_realpath && false !== strpos( $errfile, $plugin_dir_realpath ) ) ) {
 			return true;
 		}
 
@@ -195,7 +196,7 @@ class PHP_Error_Handler {
 		// e.g. WooCommerce Admin could be the $errfile of a problem caused by another plugin.
 		$backtrace_frames = $this->api->get_backtrace();
 		foreach ( $backtrace_frames as $frame ) {
-			if ( 0 === strpos( $frame->file, $plugin_dir ) || 0 === strpos( $frame->file, $plugin_dir_realpath ) ) {
+			if ( 0 === strpos( $frame->file, $plugin_dir ) || ( false !== $plugin_dir_realpath && 0 === strpos( $frame->file, $plugin_dir_realpath ) ) ) {
 				return true;
 			}
 		}

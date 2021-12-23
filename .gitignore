@@ -41,9 +41,9 @@ cache
 /vendor/
 
 wordpress
-src/vendor/
-src/dependencies/
+test-plugin/vendor/
 wp-content/
+
 
 scratch
 

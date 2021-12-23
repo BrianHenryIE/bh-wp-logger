@@ -30,13 +30,15 @@ class Logs_Table extends WP_List_Table {
 	/** @var API_Interface  */
 	protected $api;
 
+	protected ?string $selected_date = null;
+
 	/**
 	 * Logs_Table constructor.
 	 *
-	 * @param API_Interface             $api
-	 * @param Logger_Settings_Interface $settings
-	 * @param LoggerInterface           $logger
-	 * @param array                     $args
+	 * @param API_Interface                                                     $api
+	 * @param Logger_Settings_Interface                                         $settings
+	 * @param LoggerInterface                                                   $logger
+	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:bool} $args
 	 */
 	public function __construct( $api, $settings, $logger, $args = array() ) {
 		parent::__construct( $args );
@@ -46,8 +48,14 @@ class Logs_Table extends WP_List_Table {
 		$this->api      = $api;
 	}
 
+	public function set_date( ?string $ymd_date ): void {
+		$this->selected_date = $ymd_date;
+	}
+
 	/**
 	 * Read the log file and parse the data.
+	 *
+	 * TODO: Move out of here. This should be a generic PSR-Log-Data class.
 	 *
 	 * @return array<array{time:string, level:string, message:string, context:array}>
 	 */
@@ -68,6 +76,11 @@ class Logs_Table extends WP_List_Table {
 		$entry = null;
 
 		$file_lines = file( $filepath );
+
+		if ( false === $file_lines ) {
+			// Failed to read file.
+			return array();
+		}
 
 		// Loop through our array, show HTML source as HTML source; and line numbers too.
 		foreach ( $file_lines as $line_num => $input_line ) {
@@ -138,16 +151,10 @@ class Logs_Table extends WP_List_Table {
 		return $columns;
 	}
 
-
-	protected ?string $selected_date = null;
-	public function set_date( string $ymd_date ) {
-		$this->selected_date = $ymd_date;
-	}
-
-
 	/**
 	 * @override parent::prepare_items()
 	 * @see WP_List_Table::prepare_items()
+	 * @return void
 	 */
 	public function prepare_items() {
 
@@ -156,7 +163,6 @@ class Logs_Table extends WP_List_Table {
 		$sortable              = array();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		$this->items           = $this->get_data();
-
 	}
 
 	/**
@@ -164,7 +170,8 @@ class Logs_Table extends WP_List_Table {
 	 *
 	 * @see WP_List_Table::single_row()
 	 *
-	 * @param array|object $item The current item.
+	 * @param array{time:string, level:string, message:string, context:array} $item The current item.
+	 * @return void
 	 */
 	public function single_row( $item ) {
 		echo '<tr class="level-' . esc_attr( strtolower( $item['level'] ) ) . '">';
@@ -176,37 +183,45 @@ class Logs_Table extends WP_List_Table {
 	 * Get the HTML for a column.
 	 *
 	 * @see Logs_Table::get_data()
+	 * @see WP_List_Table::column_default()
 	 *
-	 * @param object $item ...whatever type get_data returns.
-	 * @param string $column_name The specified column.
+	 * @param array{time:string, level:string, message:string, context:array} $item ...whatever type get_data returns.
+	 * @param string                                                          $column_name The specified column.
 	 *
 	 * @return string|true|void
 	 */
 	public function column_default( $item, $column_name ) {
 
+		$output = '';
 		switch ( $column_name ) {
 			case 'level':
-				$output = '';
+				// The "level" column is just a color bar.
 				return $output;
 			case 'time':
-				$time = $item[ $column_name ];
+				$time = $item['time'];
 
-				$datetime = new \DateTime( $time );
+				try {
+					$datetime = new \DateTime( $time );
+					// TODO: Is there a way to know if the site's timezone has never been set properly?
+					// TODO: Is it better to use the user's timezone rather than the server timezone?
+					$datetime->setTimezone( wp_timezone() );
 
-				// TODO: Is there a way to know if the site's timezone has never been set properly?
-				// TODO: Is it better to use the user's timezone rather than the server timezone?
-
-				$datetime->setTimezone( wp_timezone() );
-
-				// Output in format: 20:02, Saturday, 14 November, 2020 (PST).
-				$output  = $datetime->format( 'H:i, l, d F, Y (T)' );
-				$output .= '<br/>' . $time;
+					// Output in format: 20:02, Saturday, 14 November, 2020 (PST).
+					$date_formatted = $datetime->format( 'H:i, l, d F, Y (T)' );
+					$output        .= $date_formatted;
+					$output        .= '<br/>';
+				} catch ( \Exception $e ) {
+					$output .= 'Could not parse date: ';
+				}
+				$output .= $time;
 
 				return $output;
 
 			case 'message':
 			case 'context':
-				return esc_html( wp_json_encode( $item[ $column_name ], JSON_PRETTY_PRINT ) );
+				$context             = $item[ $column_name ];
+				$context_column_text = wp_json_encode( $context, JSON_PRETTY_PRINT );
+				return is_string( $context_column_text ) ? esc_html( $context_column_text ) : '';
 			default:
 				// TODO: Log unexpected column name / do_action.
 				return '';
