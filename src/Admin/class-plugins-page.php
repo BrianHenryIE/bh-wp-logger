@@ -3,6 +3,9 @@
  * Changes on WordPress plugins.php.
  *
  * Adds a Logs link to the plugin's entry.
+ * Formats that link <strong> if there are unviewed logs.
+ *
+ * e.g. /wp-admin/admin.php?page=bh-wp-logger-test-plugin-logs.
  *
  * @package brianhenryie/bh-wp-logger
  */
@@ -27,7 +30,7 @@ class Plugins_Page {
 	 *
 	 * @var Logger_Settings_Interface
 	 */
-	protected $settings;
+	protected Logger_Settings_Interface $settings;
 
 	/**
 	 * Needed for the log file path.
@@ -51,16 +54,11 @@ class Plugins_Page {
 	}
 
 	/**
-	 * Adds 'Logs' link to the most recent logs in the WooCommerce logs page.
+	 * Adds 'Logs' link to under the plugin name on plugins.php.
 	 * Attempts to place it immediately before the deactivate link.
-	 *
-	 * Hooked early presuming other changes will be prepended, i.e.
-	 * Other Links | Logs | Deactivate
 	 *
 	 * @hooked plugin_action_links_{plugin basename}
 	 * @see \WP_Plugins_List_Table::display_rows()
-	 *
-	 * @hooked plugin_action_links_{$basename} via closure. The closure needed to also pass the basename.
 	 *
 	 * @param array<int|string, string>  $action_links The existing plugin links (usually "Deactivate").
 	 * @param string                     $_plugin_basename The plugin's directory/filename.php.
@@ -70,7 +68,7 @@ class Plugins_Page {
 	 *
 	 * @return array<int|string, string> The links to display below the plugin name on plugins.php.
 	 */
-	public function display_plugin_action_links( array $action_links, string $_plugin_basename, $_plugin_data, $_context ): array {
+	public function add_logs_action_link( array $action_links, string $_plugin_basename, $_plugin_data, $_context ): array {
 
 		// Presumably the deactivate link.
 		// When a plugin is "required" it does not have a deactivate link.
@@ -85,7 +83,7 @@ class Plugins_Page {
 
 		if ( 0 !== $last_log_time
 			&& $last_log_time > $last_logs_view_time ) {
-			$action_links[] = '<b><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></b>';
+			$action_links[] = '<strong><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></strong>';
 		} else {
 			$action_links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
 		}

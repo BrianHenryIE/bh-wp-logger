@@ -56,6 +56,7 @@ class Plugin_Logger_Actions {
 		$this->add_admin_ui_logs_page_hooks();
 		$this->add_admin_notices_hooks();
 		$this->add_ajax_hooks();
+		$this->add_plugins_page_hooks();
 	}
 
 	/**
@@ -127,11 +128,10 @@ class Plugin_Logger_Actions {
 	 */
 	protected function add_plugins_page_hooks(): void {
 
-		// TODO: This is not always correct.
 		$plugins_page = new Plugins_Page( $this->api, $this->settings );
 
 		$hook = "plugin_action_links_{$this->settings->get_plugin_basename()}";
-		add_filter( $hook, array( $plugins_page, 'display_plugin_action_links' ), 10, 4 );
+		add_filter( $hook, array( $plugins_page, 'add_logs_action_link' ), 10, 4 );
 	}
 
 }
