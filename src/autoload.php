@@ -18,7 +18,7 @@ use BrianHenryIE\WP_Logger\Admin\Admin;
 use BrianHenryIE\WP_Logger\Admin\Admin_Notices;
 use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
-use BrianHenryIE\WP_Logger\Admin\Logs_Table;
+use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API;
 use BrianHenryIE\WP_Logger\API\API_Interface;
@@ -55,7 +55,7 @@ $autoload_classmap = array(
 	WC_PSR_Logger::class                => __DIR__ . '/WooCommerce/class-wc-psr-logger.php',
 	WooCommerce_Logger_Interface::class => __DIR__ . '/WooCommerce/interface-woocommerce-logger.php',
 	Logs_Page::class                    => __DIR__ . '/Admin/class-logs-page.php',
-	Logs_Table::class                   => __DIR__ . '/Admin/class-logs-table.php',
+	Logs_List_Table::class              => __DIR__ . '/Admin/class-logs-list-table.php',
 	PHP_Error_Handler::class            => __DIR__ . '/API/class-php-error-handler.php',
 	PHP_Shutdown_Handler::class         => __DIR__ . '/API/class-php-shutdown-handler.php',
 	Plugin_Helper::class                => __DIR__ . '/API/class-plugins.php',

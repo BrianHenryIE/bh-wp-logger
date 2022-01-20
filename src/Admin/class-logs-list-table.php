@@ -20,15 +20,13 @@ use WP_List_Table;
 /**
  * Class Logs_Table
  */
-class Logs_Table extends WP_List_Table {
+class Logs_List_Table extends WP_List_Table {
 
 	use LoggerAwareTrait;
 
-	/** @var Logger_Settings_Interface  */
-	protected $settings;
+	protected Logger_Settings_Interface $settings;
 
-	/** @var API_Interface  */
-	protected $api;
+	protected API_Interface $api;
 
 	protected ?string $selected_date = null;
 
@@ -40,7 +38,7 @@ class Logs_Table extends WP_List_Table {
 	 * @param LoggerInterface                                                   $logger
 	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:bool} $args
 	 */
-	public function __construct( $api, $settings, $logger, $args = array() ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger, array $args = array() ) {
 		parent::__construct( $args );
 
 		$this->logger   = $logger;
@@ -182,13 +180,13 @@ class Logs_Table extends WP_List_Table {
 	/**
 	 * Get the HTML for a column.
 	 *
-	 * @see Logs_Table::get_data()
-	 * @see WP_List_Table::column_default()
-	 *
 	 * @param array{time:string, level:string, message:string, context:array} $item ...whatever type get_data returns.
 	 * @param string                                                          $column_name The specified column.
 	 *
 	 * @return string|true|void
+	 * @see WP_List_Table::column_default()
+	 *
+	 * @see Logs_List_Table::get_data()
 	 */
 	public function column_default( $item, $column_name ) {
 
