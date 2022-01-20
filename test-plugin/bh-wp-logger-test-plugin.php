@@ -26,19 +26,21 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
-use BrianHenryIE\WP_Logger\API\Logger_Settings;
+use BH_WP_Logger_Test_Plugin\Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\Logger;
-
-use BH_WP_Logger_Test_Plugin\includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
+use Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-require_once plugin_dir_path( __FILE__ ) . 'autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$wpcs_autoloader = new WP_Namespace_Autoloader();
+$wpcs_autoloader->init();
 
 /**
  * Current plugin version.

@@ -9,11 +9,10 @@
  * @subpackage BH_WP_Logger_Test_Plugin/admin
  */
 
-namespace BH_WP_Logger_Test_Plugin\admin;
+namespace BH_WP_Logger_Test_Plugin\Admin;
 
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
-use Psr\Log\LoggerInterface;
 
 /**
  * The admin-specific functionality of the plugin.

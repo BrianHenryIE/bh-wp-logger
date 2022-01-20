@@ -3,7 +3,7 @@
  * Handle the test errors we'll create.
  */
 
-namespace BH_WP_Logger_Test_Plugin\admin;
+namespace BH_WP_Logger_Test_Plugin\Admin;
 
 use Psr\Log\LoggerInterface;
 

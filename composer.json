@@ -50,7 +50,6 @@
         "10up/wp_mock": "0.4.2",
         "antecedent/patchwork": "^2.1",
         "brianhenryie/composer-phpstorm": "dev-master",
-        "brianhenryie/strauss": "*",
         "codeception/module-asserts": "^1.0",
         "codeception/module-cli": "^1.0",
         "codeception/module-db": "^1.0.0",
@@ -85,27 +84,6 @@
             },
             "10up/wp_mock": {
                 "Add AnyObject matcher": "https://github.com/10up/wp_mock/pull/161.patch"
-            }
-        },
-        "strauss": {
-            "target_directory": "/test-plugin/vendor/",
-            "packages": [
-                "pablo-sg-pacheco/wp-namespace-autoloader",
-                "katzgrau/klogger",
-                "php",
-                "psr/log",
-                "spatie/backtrace",
-                "wptrt/admin-notices"
-            ],
-            "exclude_from_prefix": {
-                "packages": [
-                    "pablo-sg-pacheco/wp-namespace-autoloader",
-                    "katzgrau/klogger",
-                    "php",
-                    "psr/log",
-                    "spatie/backtrace",
-                    "wptrt/admin-notices"
-                ]
             }
         },
         "symlinks": {

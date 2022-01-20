@@ -12,7 +12,7 @@
  * @subpackage BH_WP_Logger_Test_Plugin/includes
  */
 
-namespace BH_WP_Logger_Test_Plugin\includes;
+namespace BH_WP_Logger_Test_Plugin\Includes;
 
 /**
  * Define the internationalization functionality.

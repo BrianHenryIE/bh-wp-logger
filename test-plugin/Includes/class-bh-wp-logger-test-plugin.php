@@ -12,11 +12,11 @@
  * @subpackage BH_WP_Logger_Test_Plugin/includes
  */
 
-namespace BH_WP_Logger_Test_Plugin\includes;
+namespace BH_WP_Logger_Test_Plugin\Includes;
 
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
-use BH_WP_Logger_Test_Plugin\admin\Admin;
-use BH_WP_Logger_Test_Plugin\admin\Admin_Ajax;
+use BH_WP_Logger_Test_Plugin\Admin\Admin;
+use BH_WP_Logger_Test_Plugin\Admin\Admin_Ajax;
 use Psr\Log\LoggerInterface;
 
 /**
