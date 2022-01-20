@@ -1,16 +1,20 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\API;
+namespace BrianHenryIE\WP_Logger\PHP;
 
+use BrianHenryIE\WP_Logger\API\API;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * @coversDefaultClass \BrianHenryIE\WP_Logger\API\PHP_Error_Handler
+ * @coversDefaultClass \BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler
  */
 class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
-	// PHPUnit's error handler was throwing an exception when it wasn't wanted.
+	/**
+	 * PHPUnit's error handler was throwing an exception when it wasn't wanted.
+	 */
 	protected function setUp(): void {
 		parent::setUp();
 

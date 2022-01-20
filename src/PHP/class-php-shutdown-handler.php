@@ -5,8 +5,10 @@
  * @package brianhenryie/bh-wp-logger
  */
 
-namespace BrianHenryIE\WP_Logger\API;
+namespace BrianHenryIE\WP_Logger\PHP;
 
+use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
