@@ -58,7 +58,7 @@ $autoload_classmap = array(
 	Logs_Table::class                   => __DIR__ . '/Admin/class-logs-table.php',
 	PHP_Error_Handler::class            => __DIR__ . '/API/class-php-error-handler.php',
 	PHP_Shutdown_Handler::class         => __DIR__ . '/API/class-php-shutdown-handler.php',
-	Plugin_Helper::class                => __DIR__ . '/API/class-plugin-helper.php',
+	Plugin_Helper::class                => __DIR__ . '/API/class-plugins.php',
 	Plugins_Page::class                 => __DIR__ . '/Admin/class-plugins-page.php',
 );
 

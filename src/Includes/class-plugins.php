@@ -87,7 +87,7 @@ class Plugin_Helper {
 			// If we're in a live plugin in another directory, it's probably symlinked inside WP_PLUGIN_DIR.
 
 			// Find the filename.
-			// class-plugin-helper.php
+			// class-plugins.php
 			preg_match( '/\/([^\/]*$)/', __FILE__, $output_array );
 			$filename = $output_array[1];
 
