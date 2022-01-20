@@ -1,0 +1,5 @@
+{
+  "redefinable-internals": [
+    "error_get_last"
+  ]
+}

@@ -6,6 +6,8 @@ use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler;
+use BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler;
 use WP_Mock\Matcher\AnyInstance;
 
 /**
@@ -56,5 +58,30 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 		);
 		$api      = $this->makeEmpty( API_Interface::class );
 		new Plugin_Logger_Actions( $api, $settings, $logger );
+	}
+
+	/**
+	 * @covers ::add_error_handler_hooks
+	 */
+	public function test_add_error_handler_hooks(): void {
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
+		$logger   = new ColorLogger();
+
+		\WP_Mock::expectActionAdded(
+			'plugins_loaded',
+			array( new AnyInstance( PHP_Error_Handler::class ), 'init' ),
+			2
+		);
+
+		\WP_Mock::expectActionAdded(
+			'plugins_loaded',
+			array( new AnyInstance( PHP_Shutdown_Handler::class ), 'init' ),
+			2
+		);
+
+		new Plugin_Logger_Actions( $api, $settings, $logger );
+
 	}
 }
