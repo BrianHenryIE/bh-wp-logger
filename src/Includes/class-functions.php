@@ -3,6 +3,7 @@
  * Hook into the behaviour of WordPress functions.php.
  *
  * Use transients to log errors only once per day, with more detail than before.
+ * i.e. to prevent logs being flooded with deprecation warnings.
  *
  * Doing this here means we can set the log level per plugin without relying on WP_DEBUG being true.
  *
@@ -20,6 +21,14 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * Intercepts WordPress's logging to prevent duplicate logs and to add detail.
+ *
+ * @see _deprecated_function()
+ * @see _deprecated_argument()
+ * @see _doing_it_wrong()
+ * @see _deprecated_hook()
+ */
 class Functions {
 
 	use LoggerAwareTrait;
@@ -39,8 +48,11 @@ class Functions {
 	protected Logger_Settings_Interface $settings;
 
 	/**
-	 * @param API_Interface             $api
-	 * @param Logger_Settings_Interface $settings
+	 * Constructor.
+	 * No logic, just assignments.
+	 *
+	 * @param API_Interface             $api The logger's utility functions.
+	 * @param Logger_Settings_Interface $settings The logger settings.
 	 * @param ?LoggerInterface          $logger PSR logger.
 	 */
 	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
@@ -170,6 +182,10 @@ class Functions {
 	}
 
 	/**
+	 * `_doing_it_wrong` runs e.g. when a function is called before a required action has run.
+	 * This function limits logging `_doing_it_wrong` errors to once per day.
+	 * Logs more detail than usual.
+	 *
 	 * @hooked doing_it_wrong_run
 	 * @see _doing_it_wrong()
 	 *

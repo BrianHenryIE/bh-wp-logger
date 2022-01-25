@@ -84,4 +84,45 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 		new Plugin_Logger_Actions( $api, $settings, $logger );
 
 	}
+
+	/**
+	 * @covers ::add_wordpress_error_handling_hooks
+	 */
+	public function test_add_wordpress_error_handling_hooks(): void {
+
+		\WP_Mock::expectActionAdded(
+			'deprecated_function_run',
+			array( new AnyInstance( Functions::class ), 'log_deprecated_functions_only_once_per_day' ),
+			10,
+			3
+		);
+
+		\WP_Mock::expectActionAdded(
+			'deprecated_argument_run',
+			array( new AnyInstance( Functions::class ), 'log_deprecated_arguments_only_once_per_day' ),
+			10,
+			3
+		);
+
+		\WP_Mock::expectActionAdded(
+			'doing_it_wrong_run',
+			array( new AnyInstance( Functions::class ), 'log_doing_it_wrong_only_once_per_day' ),
+			10,
+			3
+		);
+
+		\WP_Mock::expectActionAdded(
+			'deprecated_hook_run',
+			array( new AnyInstance( Functions::class ), 'log_deprecated_hook_only_once_per_day' ),
+			10,
+			4
+		);
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
+		$logger   = new ColorLogger();
+
+		new Plugin_Logger_Actions( $api, $settings, $logger );
+	}
+
 }

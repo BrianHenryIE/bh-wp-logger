@@ -103,3 +103,15 @@ function instantiate_bh_wp_logger_test_plugin() {
 
 }
 $GLOBALS['bh_wp_logger_test_plugin'] = instantiate_bh_wp_logger_test_plugin();
+
+/**
+ * Pass in a closure to be executed, so the backtrace will contain the plugin.
+ * For integration tests.
+ *
+ * @param $closure
+ *
+ * @return void
+ */
+function run_closure_in_plugin( $closure ) {
+	$closure();
+}
