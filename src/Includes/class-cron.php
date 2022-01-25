@@ -8,7 +8,9 @@
 namespace BrianHenryIE\WP_Logger\Includes;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -41,21 +43,35 @@ class Cron {
 	 *
 	 * @param API_Interface             $api The logger's main functions.
 	 * @param Logger_Settings_Interface $settings The logger settings.
-	 * @param ?LoggerInterface          $logger The logger itself for logging.
+	 * @param BH_WP_PSR_Logger          $logger The logger itself for logging.
 	 */
-	public function __construct( $api, $settings, ?LoggerInterface $logger = null ) {
+	public function __construct( $api, $settings, BH_WP_PSR_Logger $logger ) {
 
-		$this->setLogger( $logger ?? new NullLogger() );
+		$this->setLogger( $logger );
 		$this->settings = $settings;
 		$this->api      = $api;
 	}
 
 	/**
-	 * Schedule a daily cron job just after midnight.
+	 * Schedule a daily cron job to delete old logs, just after midnight.
+	 *
+	 * Does not schedule the cleanup if it is a WooCommerce logger (since WooCommerce handles that itself).
 	 *
 	 * @hooked init
 	 */
 	public function register_cron_job(): void {
+
+		/**
+		 * Cast the logger to the logger facade so we can access the true logger itself.
+		 *
+		 * @var BH_WP_PSR_Logger $bh_wp_psr_logger
+		 */
+		$bh_wp_psr_logger = $this->logger;
+		$logger           = $bh_wp_psr_logger->get_logger();
+
+		if ( $logger instanceof WC_PSR_Logger ) {
+			return;
+		}
 
 		$cron_hook = "delete_logs_{$this->settings->get_plugin_slug()}";
 

@@ -5,6 +5,7 @@ namespace BrianHenryIE\WP_Logger\Includes;
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler;
@@ -29,7 +30,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_construct(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 		new Plugin_Logger_Actions( $api, $settings, $logger );
@@ -49,7 +50,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 			4
 		);
 
-		$logger   = new ColorLogger();
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
@@ -67,7 +68,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		\WP_Mock::expectActionAdded(
 			'plugins_loaded',
@@ -120,7 +121,33 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		new Plugin_Logger_Actions( $api, $settings, $logger );
+	}
+
+	/**
+	 * @covers ::add_cron_hooks
+	 */
+	public function test_add_cron_hooks(): void {
+
+		\WP_Mock::expectActionAdded(
+			'init',
+			array( new AnyInstance( Cron::class ), 'register_cron_job' )
+		);
+		\WP_Mock::expectActionAdded(
+			'delete_logs_plugin-slug',
+			array( new AnyInstance( Cron::class ), 'delete_old_logs' )
+		);
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+			)
+		);
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		new Plugin_Logger_Actions( $api, $settings, $logger );
 	}
