@@ -2,6 +2,8 @@
 /**
  * The UI around the logs table.
  *
+ * E.g. /wp-admin/admin.php?page=bh-wp-logger-test-plugin-logs.
+ *
  * TODO: Add "send to plugin developer" button.
  *
  * @package brianhenryie/bh-wp-logger
@@ -15,6 +17,9 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * Functions for registering a "hidden menu" item, to add the wp-admin page to display the logs.
+ */
 class Logs_Page {
 
 	use LoggerAwareTrait;
@@ -74,8 +79,6 @@ class Logs_Page {
 	 *
 	 * Registered above.
 	 *
-	 * TODO: Allow filtering the output.
-	 *
 	 * @see add_page()
 	 */
 	public function display_page(): void {
@@ -95,7 +98,7 @@ class Logs_Page {
 			return;
 		}
 
-		$logs_table = new Logs_Table( $this->api, $this->settings, $this->logger );
+		$logs_table = new Logs_List_Table( $this->api, $this->settings, $this->logger );
 
 		// Set date here?
 
@@ -134,6 +137,30 @@ class Logs_Page {
 	}
 
 	/**
+	 * Enqueue the logs page javascript for changing date and deleting logs.
+	 * Checks the plugin slug and only adds the script on the logs page for this plugin.
+	 *
+	 * @hooked admin_enqueue_scripts
+	 */
+	public function enqueue_scripts(): void {
+
+		$slug = $this->settings->get_plugin_slug();
+		$page = "admin_page_{$slug}-logs";
+
+		$current_page = get_current_screen();
+
+		if ( is_null( $current_page ) || $current_page->id !== $page ) {
+			return;
+		}
+
+		// This is the bh-wp-logger JavaScript version, not the plugin version.
+		$version = '1.0.0';
+
+		$js_file_url = plugin_dir_url( __FILE__ ) . 'js/bh-wp-logger-admin.js';
+		wp_enqueue_script( 'bh-wp-logger-admin-logs-page-' . $slug, $js_file_url, array( 'jquery' ), $version, true );
+	}
+
+	/**
 	 * Register the stylesheets for the logs page.
 	 * (colours the rows with the severity of the log message!).
 	 *
@@ -141,17 +168,20 @@ class Logs_Page {
 	 */
 	public function enqueue_styles(): void {
 
-		$handle = "{$this->settings->get_plugin_slug()}-logs";
+		$slug = $this->settings->get_plugin_slug();
+		$page = "admin_page_{$slug}-logs";
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['page'] ) || $handle !== $_GET['page'] ) {
+		$current_page = get_current_screen();
+
+		if ( is_null( $current_page ) || $current_page->id !== $page ) {
 			return;
 		}
 
-		$css_file = plugin_dir_url( __FILE__ ) . '/css/bh-wp-logger.css';
-		$version  = '1.0.0';
+		$handle       = "{$this->settings->get_plugin_slug()}-logs";
+		$css_file_url = plugin_dir_url( __FILE__ ) . 'css/bh-wp-logger.css';
+		$version      = '1.0.0';
 
-		wp_enqueue_style( $handle, $css_file, array(), $version, 'all' );
+		wp_enqueue_style( $handle, $css_file_url, array(), $version, 'all' );
 	}
 
 }
