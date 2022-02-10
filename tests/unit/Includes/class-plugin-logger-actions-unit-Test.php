@@ -9,6 +9,7 @@ use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler;
+use BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public;
 use WP_Mock\Matcher\AnyInstance;
 
 /**
@@ -138,6 +139,31 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 		\WP_Mock::expectActionAdded(
 			'delete_logs_plugin-slug',
 			array( new AnyInstance( Cron::class ), 'delete_old_logs' )
+		);
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+			)
+		);
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		new Plugin_Logger_Actions( $api, $settings, $logger );
+	}
+
+
+	/**
+	 * @covers ::add_private_uploads_hooks
+	 */
+	public function test_add_private_uploads_hooks(): void {
+
+		\WP_Mock::expectFilterAdded(
+			'bh_wp_private_uploads_url_is_public_warning_plugin-slug_logger',
+			array( new AnyInstance( URL_Is_Public::class ), 'change_warning_message' ),
+			10,
+			2
 		);
 
 		$api      = $this->makeEmpty( API_Interface::class );

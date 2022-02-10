@@ -20,6 +20,7 @@ use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\AbstractLogger;
 use BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler;
+use BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
@@ -57,6 +58,7 @@ class Plugin_Logger_Actions {
 		$this->add_admin_notices_hooks();
 		$this->add_ajax_hooks();
 		$this->add_plugins_page_hooks();
+		$this->add_private_uploads_hooks();
 	}
 
 	/**
@@ -134,4 +136,14 @@ class Plugin_Logger_Actions {
 		add_filter( $hook, array( $plugins_page, 'add_logs_action_link' ), 10, 4 );
 	}
 
+	/**
+	 * Add filter to change the admin notice when the logs directory is publicly accessible.
+	 *
+	 * @see \BrianHenryIE\WP_Private_Uploads\Admin\Admin_Notices::admin_notices()
+	 */
+	protected function add_private_uploads_hooks(): void {
+
+		$url_is_public = new URL_Is_Public();
+
+		add_filter( "bh_wp_private_uploads_url_is_public_warning_{$this->settings->get_plugin_slug()}_logger", array( $url_is_public, 'change_warning_message' ), 10, 2 );
 }
