@@ -85,10 +85,6 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 
 			$this->real_logger = new KLogger( $log_directory, $log_level_threshold, $options );
 
-			// Schedule a job to clean up logs. (WooCommerce would do this automatically).
-			$cron = new Cron( $api, $settings );
-			add_action( 'init', array( $cron, 'register_cron_job' ) );
-			add_action( 'delete_logs_' . $settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 		}
 
 	}

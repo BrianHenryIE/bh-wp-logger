@@ -58,6 +58,7 @@ class Plugin_Logger_Actions {
 		$this->add_admin_notices_hooks();
 		$this->add_ajax_hooks();
 		$this->add_plugins_page_hooks();
+		$this->add_cron_hooks();
 		$this->add_private_uploads_hooks();
 	}
 
@@ -134,6 +135,17 @@ class Plugin_Logger_Actions {
 
 		$hook = "plugin_action_links_{$this->settings->get_plugin_basename()}";
 		add_filter( $hook, array( $plugins_page, 'add_logs_action_link' ), 10, 4 );
+	}
+
+	/**
+	 * Schedule a job to clean up logs.
+	 */
+	protected function add_cron_hooks(): void {
+
+		$cron = new Cron( $this->api, $this->settings, $this->wrapped_real_logger );
+
+		add_action( 'init', array( $cron, 'register_cron_job' ) );
+		add_action( 'delete_logs_' . $this->settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 	}
 
 	/**
