@@ -27,6 +27,8 @@ class Log_Handler {
 	 *
 	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_plugin_slug()
 	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_log_level()
+	 *
+	 * @var Logger_Settings_Interface
 	 */
 	protected Logger_Settings_Interface $settings;
 
@@ -34,6 +36,8 @@ class Log_Handler {
 	 * Functions for managing logs and adding context.
 	 *
 	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::get_common_context()
+	 *
+	 * @var API_Interface
 	 */
 	protected API_Interface $api;
 
