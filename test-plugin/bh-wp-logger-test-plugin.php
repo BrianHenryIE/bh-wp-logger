@@ -60,40 +60,20 @@ define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
  */
 function instantiate_bh_wp_logger_test_plugin() {
 
-	if ( ! in_array( 'woocommerce/woocommerce.php', get_option( 'active_plugins' ), true ) ) {
-
-		$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface {
-			public function get_log_level(): string {
-				return 'debug';
-			}
-			public function get_plugin_slug(): string {
-				return 'bh-wp-logger-test-plugin';
-			}
-			public function get_plugin_basename(): string {
-				return 'bh-wp-logger-test-plugin/bh-wp-logger-test-plugin.php';
-			}
-			public function get_plugin_name(): string {
-				return 'BH WP Logger Test Plugin';
-			}
-		};
-
-	} else {
-
-		$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface, WooCommerce_Logger_Interface {
-			public function get_log_level(): string {
-				return 'debug';
-			}
-			public function get_plugin_slug(): string {
-				return 'bh-wp-logger-test-plugin';
-			}
-			public function get_plugin_basename(): string {
-				return 'bh-wp-logger-test-plugin/bh-wp-logger-test-plugin.php';
-			}
-			public function get_plugin_name(): string {
-				return 'BH WP Logger Test Plugin';
-			}
-		};
-	}
+	$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface, WooCommerce_Logger_Interface {
+		public function get_log_level(): string {
+			return 'debug';
+		}
+		public function get_plugin_slug(): string {
+			return 'bh-wp-logger-test-plugin';
+		}
+		public function get_plugin_basename(): string {
+			return 'bh-wp-logger-test-plugin/bh-wp-logger-test-plugin.php';
+		}
+		public function get_plugin_name(): string {
+			return 'BH WP Logger Test Plugin';
+		}
+	};
 
 	$logger = Logger::instance( $logger_settings );
 
