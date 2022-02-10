@@ -13,7 +13,13 @@
     "prefer-stable": true,
     "config": {
         "process-timeout": 0,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true,
+            "composer/installers": true,
+            "cweagans/composer-patches": true
+        }
     },
     "autoload": {
         "classmap": [
@@ -41,9 +47,14 @@
         {
             "type":"composer",
             "url":"https://wpackagist.org"
+        },
+        {
+            "type": "path",
+            "url": "../bh-wp-private-uploads"
         }
     ],
     "require": {
+        "brianhenryie/bh-wp-private-uploads": "dev-master",
         "ext-json": "*",
         "katzgrau/klogger": "dev-master",
         "php": ">=7.4",
@@ -94,7 +105,7 @@
         "symlinks": {
             "wp-content": "wordpress/wp-content",
             "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin",
-            "src": "test-plugin/vendor/brianhenryie/wp-logger"
+            "src": "test-plugin/vendor/brianhenryie/bh-wp-logger/src"
         },
         "phpstorm": {
             "exclude_folders": {
@@ -102,7 +113,7 @@
                     "vendor/php-stubs/woocommerce-stubs",
                     "vendor/wordpress/wordpress/src",
                     "vendor/wordpress/wordpress/build",
-                    "wp-content/plugins/bh-wp-logger",
+                    "wp-content/plugins/bh-wp-logger-test-plugin",
                     "wordpress/wp-content"
                 ],
                 "include_folders": [

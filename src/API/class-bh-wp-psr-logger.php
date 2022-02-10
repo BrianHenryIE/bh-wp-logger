@@ -9,6 +9,10 @@ use BrianHenryIE\WP_Logger\Includes\Cron;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
+use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Interface;
+use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Trait;
+use BrianHenryIE\WP_Private_Uploads\Includes\BH_WP_Private_Uploads;
+use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -84,6 +88,31 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 			);
 
 			$this->real_logger = new KLogger( $log_directory, $log_level_threshold, $options );
+			// Make the logs directory inaccessible to the public.
+			$private_uploads_settings = new class( $settings ) implements Private_Uploads_Settings_Interface {
+				use Private_Uploads_Settings_Trait;
+
+				protected Logger_Settings_Interface $logger_settings;
+
+				public function __construct( Logger_Settings_Interface $logger_settings ) {
+					$this->logger_settings = $logger_settings;
+				}
+
+				public function get_plugin_slug(): string {
+					return $this->logger_settings->get_plugin_slug() . '_logger';
+				}
+
+				/**
+				 * Use wp-content/uploads/logs as the logs directory.
+				 */
+				public function get_uploads_subdirectory_name(): string {
+					return 'logs';
+				}
+			};
+
+			// Don't use the Private_Uploads singleton in case the parent plugin also needs it.
+			$private_uploads = new Private_Uploads( $private_uploads_settings, $this );
+			new BH_WP_Private_Uploads( $private_uploads, $private_uploads_settings, $this );
 
 		}
 
