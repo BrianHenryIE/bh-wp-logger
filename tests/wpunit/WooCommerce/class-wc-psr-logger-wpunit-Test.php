@@ -2,8 +2,10 @@
 
 namespace BrianHenryIE\WP_Logger\WooCommerce;
 
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Codeception\TestCase\WPTestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger
@@ -17,9 +19,15 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 	 */
 	public function test_instantiate_is_logger(): void {
 
-		$plugin_slug = 'plugin-slug';
+		$setttings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
 
-		$sut = new WC_PSR_Logger( $plugin_slug );
+		$sut = new WC_PSR_Logger( $setttings );
 
 		$this->assertInstanceOf( LoggerInterface::class, $sut );
 	}
@@ -31,13 +39,19 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 	 */
 	public function test_instantiate_before_woocommerce_loaded():void {
 
-		$plugin_slug = 'plugin-slug';
-
 		// The tests run after WordPress and plugins have loaded.
 		global $wp_actions;
 		unset( $wp_actions['woocommerce_loaded'] );
 
-		$sut = new WC_PSR_Logger( $plugin_slug );
+		$setttings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
+
+		$sut = new WC_PSR_Logger( $setttings );
 
 		$action_name  = 'woocommerce_loaded';
 		$priority     = 1;
@@ -55,6 +69,7 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 		$bound_to = $reflection->getClosureThis();
 
 		$this->assertInstanceOf( WC_PSR_Logger::class, $bound_to );
+		$this->assertEquals( $sut, $bound_to );
 	}
 
 	/**
@@ -63,10 +78,15 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 	 * @covers ::log
 	 */
 	public function test_log_before_loaded(): void {
+		$setttings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
 
-		$plugin_slug = 'plugin-slug';
-
-		$sut = new WC_PSR_Logger( $plugin_slug );
+		$sut = new WC_PSR_Logger( $setttings );
 
 		$sut->log( 'error', 'Log an error' );
 	}
@@ -76,13 +96,20 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 	 */
 	public function test_log_before_wc_loaded(): void {
 
-		$plugin_slug = 'plugin-slug';
-
 		// The tests run after WordPress and plugins have loaded.
 		global $wp_actions;
 		unset( $wp_actions['woocommerce_loaded'] );
 
-		$sut = new WC_PSR_Logger( $plugin_slug );
+		$setttings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
+
+		$sut = new WC_PSR_Logger( $setttings );
+
 		$sut->log( 'error', 'Log an error' );
 
 		$action_name  = 'woocommerce_loaded';
@@ -113,13 +140,19 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 	 */
 	public function test_woocommerce_logger_log_on_plugins_loaded(): void {
 
-		$plugin_slug = 'plugin-slug';
-
 		// The tests run after WordPress and plugins have loaded.
 		global $wp_actions;
 		unset( $wp_actions['woocommerce_loaded'] );
 
-		$sut = new WC_PSR_Logger( $plugin_slug );
+		$setttings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
+
+		$sut = new WC_PSR_Logger( $setttings );
 
 		assert( is_plugin_active( 'woocommerce/woocommerce.php' ) );
 
@@ -131,7 +164,12 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 
 		$mock_logger = new class() implements \WC_Logger_Interface {
 
-			public $log_message;
+			/**
+			 * The logged message, public to verify in the test.
+			 *
+			 * @var string
+			 */
+			public ?string $log_message = null;
 
 			public function add( $handle, $message, $level = \WC_Log_Levels::NOTICE ) {
 				// TODO: Implement add() method.
@@ -175,7 +213,7 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 		};
 
 		/**
-		 * wc_get_logger has a filter to allow substitution another class. We don't use it in general, because it
+		 * `wc_get_logger` has a filter to allow substitution another class. We don't use it in general, because it
 		 * would apply to every plugin on the site. But we'll use a mock for the tests.
 		 * TODO: This filter is added too late.
 		 */

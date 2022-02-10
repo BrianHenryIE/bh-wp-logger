@@ -15,24 +15,38 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WC_Log_Levels;
 
+/**
+ * Filters `woocommerce_format_log_entry` to print the context.
+ */
 class Log_Handler {
 
 	use LoggerAwareTrait;
 
-	/** @var Logger_Settings_Interface  */
-	protected $settings;
-
-	/** @var API_Interface  */
-	protected $api;
+	/**
+	 * The logger settings.
+	 *
+	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_plugin_slug()
+	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_log_level()
+	 */
+	protected Logger_Settings_Interface $settings;
 
 	/**
-	 * @param API_Interface             $api
-	 * @param Logger_Settings_Interface $settings
-	 * @param LoggerInterface           $logger
+	 * Functions for managing logs and adding context.
+	 *
+	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::get_common_context()
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger = null ) {
+	protected API_Interface $api;
 
-		$this->logger   = $logger;
+	/**
+	 * Constructor
+	 *
+	 * @param API_Interface             $api Functions for additional context.
+	 * @param Logger_Settings_Interface $settings The log level and plugin-slug this logger is for.
+	 * @param LoggerInterface           $logger A PSR logger (not used).
+	 */
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
+
+		$this->setLogger( $logger );
 		$this->settings = $settings;
 		$this->api      = $api;
 	}
@@ -46,7 +60,7 @@ class Log_Handler {
 	 * @see \WC_Log_Handler::format_entry()
 	 *
 	 * @param string                                                            $entry The log entry already built by WooCommerce.
-	 * @param array{timestamp:int, level:string, message:string, context:array} $log_data_array
+	 * @param array{timestamp:int, level:string, message:string, context:array} $log_data_array The log level, message, context and timestamp in an array.
 	 *
 	 * @return string
 	 */
@@ -57,9 +71,11 @@ class Log_Handler {
 			return $entry;
 		}
 
+		$log_level = $this->settings->get_log_level();
+
 		// Always record the context when it's an error, or when loglevel is DEBUG.
-		if ( ! ( WC_Log_Levels::get_level_severity( $log_data_array['level'] ) >= WC_Log_Levels::ERROR
-			|| WC_Log_Levels::DEBUG === $this->settings->get_log_level() ) ) {
+		if ( WC_Log_Levels::get_level_severity( $log_data_array['level'] ) < WC_Log_Levels::get_level_severity( WC_Log_Levels::ERROR )
+			&& WC_Log_Levels::DEBUG !== $log_level ) {
 			return $entry;
 		}
 
