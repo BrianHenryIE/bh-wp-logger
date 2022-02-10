@@ -7,7 +7,6 @@
 
 namespace BrianHenryIE\WP_Logger\Includes;
 
-use BrianHenryIE\WP_Logger\Admin\Admin;
 use BrianHenryIE\WP_Logger\Admin\Admin_Notices;
 use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
@@ -109,10 +108,8 @@ class Plugin_Logger_Actions {
 
 		$logs_page = new Logs_Page( $this->api, $this->settings );
 		add_action( 'admin_menu', array( $logs_page, 'add_page' ) );
+		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_styles' ) );
-
-		$admin = new Admin( $this->settings );
-		add_action( 'admin_enqueue_scripts', array( $admin, 'enqueue_scripts' ) );
 	}
 
 	/**
