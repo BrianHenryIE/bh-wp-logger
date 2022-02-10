@@ -20,6 +20,11 @@
             "src/"
         ]
     },
+    "autoload-dev": {
+        "classmap": [
+            "test-plugin/"
+        ]
+    },
     "repositories": [
         {
             "url": "https://github.com/WordPress/wordpress-develop",
