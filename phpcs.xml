@@ -46,8 +46,20 @@
     <rule ref="Squiz.PHP.DisallowMultipleAssignments.Found">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
-    <rule ref="WordPress.PHP.DevelopmentFunctions">
+    <rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
         <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.EmptyThrows">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
+        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid">
+        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
     </rule>
 
 
