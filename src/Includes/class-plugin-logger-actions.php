@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Add the WordPress hooks and filters.
  *
  * @package brianhenryie/bh-wp-logger
  */
@@ -12,40 +12,49 @@ use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
-use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
-use Katzgrau\KLogger\Logger as KLogger;
-use Psr\Log\AbstractLogger;
 use BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler;
 use BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-use Psr\Log\NullLogger;
-use WC_Logger_Interface;
-use WP_CLI;
 
 /**
+ * Just uses add_action and add_filter.
  *
  * @see WC_Logger
  * @see https://www.php-fig.org/psr/psr-3/
  */
 class Plugin_Logger_Actions {
 
-	protected LoggerInterface $wrapped_real_logger;
+	/**
+	 * The library object that acts as a facade to the true logger.
+	 *
+	 * @var BH_WP_PSR_Logger
+	 */
+	protected BH_WP_PSR_Logger $wrapped_real_logger;
 
+	/**
+	 * Settings object for instantiating classes.
+	 *
+	 * @var Logger_Settings_Interface
+	 */
 	protected Logger_Settings_Interface $settings;
 
+	/**
+	 * API object for instantiating classes.
+	 *
+	 * @var API_Interface
+	 */
 	protected API_Interface $api;
 
 	/**
 	 * Logger constructor.
 	 *
-	 * @param API_Interface             $api
-	 * @param Logger_Settings_Interface $settings
+	 * @param API_Interface             $api The main utility class.
+	 * @param Logger_Settings_Interface $settings The log level etc. for this plugin.
+	 * @param BH_WP_PSR_Logger          $wrapped_real_logger A facade of the real logger.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $wrapped_real_logger ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, BH_WP_PSR_Logger $wrapped_real_logger ) {
 		$this->wrapped_real_logger = $wrapped_real_logger;
 		$this->settings            = $settings;
 		$this->api                 = $api;
@@ -155,4 +164,5 @@ class Plugin_Logger_Actions {
 		$url_is_public = new URL_Is_Public();
 
 		add_filter( "bh_wp_private_uploads_url_is_public_warning_{$this->settings->get_plugin_slug()}_logger", array( $url_is_public, 'change_warning_message' ), 10, 2 );
+	}
 }
