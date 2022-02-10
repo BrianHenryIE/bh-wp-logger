@@ -183,6 +183,6 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 
 		$link_html = $result[0];
 
-		$this->assertStringContainsString( '<strong>', $link_html );
+		$this->assertStringContainsString( '<b>', $link_html );
 	}
 }
