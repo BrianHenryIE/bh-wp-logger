@@ -83,7 +83,7 @@ class Plugins_Page {
 
 		if ( 0 !== $last_log_time
 			&& $last_log_time > $last_logs_view_time ) {
-			$action_links[] = '<strong><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></strong>';
+			$action_links[] = '<b><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></b>';
 		} else {
 			$action_links[] = '<a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a>';
 		}
