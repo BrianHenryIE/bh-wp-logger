@@ -82,7 +82,7 @@ class Cron {
 
 		wp_schedule_event( strtotime( 'tomorrow' ), 'daily', $cron_hook );
 
-		$this->logger->info( "Registered the `{$cron_hook}` cron job." );
+		$this->logger->debug( "Registered the `{$cron_hook}` cron job." );
 	}
 
 	/**
