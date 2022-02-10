@@ -7,6 +7,7 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_Logger\Includes\Plugins;
 use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -207,34 +208,6 @@ class API implements API_Interface {
 		// TODO: delete the last visited option if it's older than the most recent logs.
 	}
 
-	/**
-	 * Loops through the debug backtrace until it finds a folder with wp-content/plugins as its parent.
-	 *
-	 * TODO: What about WooCommerce (any plugin-in-plugin...) where WooCommerce maybe raised the issues, but it's due to another plugin's code.
-	 *
-	 * @return ?string
-	 */
-	public function determine_plugin_slug_from_backtrace(): ?string {
-
-		$backtrace = Backtrace::create()->offset( 2 );
-
-		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
-
-		// TODO: We probably only care about the following couple (after the two skipped).
-		$frames = $backtrace->frames();
-
-		foreach ( $frames as $frame ) {
-
-			if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $frame->file, $output_array ) ) {
-
-				$slug = $output_array[1];
-
-				return $slug;
-			}
-		}
-
-		return null;
-	}
 
 	/**
 	 *
@@ -280,6 +253,18 @@ class API implements API_Interface {
 		return false;
 	}
 
+	/**
+	 * Given a filepath, tries to determine if this file is part of this plugin.
+	 *
+	 * TODO: Be consistent about meanings of plugin-slug and plugin basename.
+	 * TODO: Remove code duplication with Plugins class.
+	 *
+	 * @see Plugins::get_plugin_data_from_slug()
+	 *
+	 * @param string $filepath Path to the file to be checked.
+	 *
+	 * @return bool
+	 */
 	public function is_file_from_plugin( string $filepath ): bool {
 
 		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
@@ -294,7 +279,7 @@ class API implements API_Interface {
 		}
 
 		$plugin_dir_realpath = realpath( WP_PLUGIN_DIR . '/' . explode( '/', $this->settings->get_plugin_basename() )[0] );
-		if ( false !== strpos( $filepath, $plugin_dir_realpath ) ) {
+		if ( false !== $plugin_dir_realpath && false !== strpos( $filepath, $plugin_dir_realpath ) ) {
 			return true;
 		}
 

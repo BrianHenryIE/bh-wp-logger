@@ -7,48 +7,27 @@
  * @package brianhenryie/bh-wp-logger
  */
 
-namespace BrianHenryIE\WP_Logger\API;
+namespace BrianHenryIE\WP_Logger\Includes;
 
-class Plugin_Helper {
+class Plugins {
 
 	/**
 	 *
 	 * @used-by Logger_Settings
 	 *
-	 * @return ?array
+	 * @return ?array<string, mixed>
 	 */
 	public function discover_plugin_data(): ?array {
 
 		$directory = $this->discover_plugin_relative_directory();
 
-		$plugin_data = $this->get_plugin_data_from_plugin_directory( $directory );
-
-		return $plugin_data;
-	}
-
-	/**
-	 * Given a slug, searches the get_plugins() array for the plugin details.
-	 *
-	 * TODO: How does this behave if the plugin is in the root WP_PLUGIN_DIR without its own folder? It might work ok!
-	 *
-	 * @used-by Logger_Settings
-	 *
-	 * @param string $slug The plugin slug.
-	 *
-	 * @return ?array<int|string, string>
-	 */
-	public function get_plugin_data_from_slug( string $slug ): ?array {
-
-		$plugins = get_plugins();
-
-		foreach ( $plugins as $plugin_basename => $plugin_data ) {
-			if ( 0 === strpos( $plugin_basename, $slug ) ) {
-				$plugin_data['basename'] = $plugin_basename;
-				return $plugin_data;
-			}
+		if ( is_null( $directory ) ) {
+			return null;
 		}
 
-		return null;
+		$plugin_data = $this->get_plugin_data_from_slug( $directory );
+
+		return $plugin_data;
 	}
 
 	/**
@@ -65,18 +44,18 @@ class Plugin_Helper {
 		// __DIR_ is the directory this file is in. (i.e. NOT the calling directory).
 		$dir = $dir ?? __DIR__;
 
-		// If the $dir has a file at the end, remove it.
-		// https://www.phpliveregex.com/p/yGC
-		if ( 1 === preg_match( '/(.*)\/[^\/]*$/', $dir, $output_array ) ) {
+		/**
+		 * If the $dir has a file at the end, remove it.
+		 *
+		 * @see https://www.phpliveregex.com/p/yGC
+		 */
+		if ( is_file( $dir ) && 1 === preg_match( '/(.*)\/[^\/]*$/', $dir, $output_array ) ) {
 			$dir = $output_array[1];
 		}
 
-		// $plugins_dir_entry = str_replace( WP_PLUGIN_DIR, '', __DIR__ );
-
 		// Check for a standard WordPress install...
-		// __DIR__ has no trailing slash.
-		$capture_first_string_after_slash_in_plugins_dir = '~' . preg_quote( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)', DIRECTORY_SEPARATOR ) . '~';
-		// $capture_first_string_after_slash_in_plugins_dir = '~' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '~';
+		$capture_first_string_after_slash_in_plugins_dir = '~' . WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' . '~';
+
 		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $dir, $output_array ) ) {
 			$plugin_directory = $output_array[1];
 
@@ -126,22 +105,27 @@ class Plugin_Helper {
 	}
 
 	/**
-	 * @param string $relative_plugin_directory The WP_PLUGIN_DIR subdirectory for the plugin.
+	 * Given a slug, searches the get_plugins() array for the plugin details.
 	 *
-	 * @return ?array
+	 * TODO: How does this behave if the plugin is in the root WP_PLUGIN_DIR without its own folder? It might work ok!
+	 *
+	 * @used-by Logger_Settings
+	 *
+	 * @param string $slug_or_directory The plugin slug aka the WP_PLUGIN_DIR subdirectory for the plugin.
+	 *
+	 * @return ?array<string, mixed>
 	 */
-	public function get_plugin_data_from_plugin_directory( string $relative_plugin_directory ): ?array {
+	public function get_plugin_data_from_slug( string $slug_or_directory ): ?array {
 
 		$plugins = get_plugins();
 
-		foreach ( $plugins as $plugin_file => $plugin_data ) {
-			if ( explode( '/', $plugin_file )[0] === $relative_plugin_directory ) {
-				$plugin_data['basename'] = $plugin_file;
+		foreach ( $plugins as $plugin_basename => $plugin_data ) {
+			if ( 0 === strpos( $plugin_basename, $slug_or_directory ) ) {
+				$plugin_data['basename'] = $plugin_basename;
 				return $plugin_data;
 			}
 		}
 
-		// TODO: something else.
 		return null;
 	}
 

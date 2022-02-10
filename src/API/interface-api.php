@@ -67,11 +67,6 @@ interface API_Interface {
 	public function get_common_context(): array;
 
 	/**
-	 * @return string|null
-	 */
-	public function determine_plugin_slug_from_backtrace(): ?string;
-
-	/**
 	 * @return Frame[]
 	 */
 	public function get_backtrace(): array;
