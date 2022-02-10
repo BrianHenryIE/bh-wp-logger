@@ -95,3 +95,10 @@ $GLOBALS['bh_wp_logger_test_plugin'] = instantiate_bh_wp_logger_test_plugin();
 function run_closure_in_plugin( $closure ) {
 	$closure();
 }
+
+add_filter(
+	'plugins_url',
+	function( $url ) {
+		return str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-test-plugin/vendor/brianhenryie', $url );
+	}
+);
