@@ -1,11 +1,14 @@
 <?php
 /**
+ * Facade over a real PSR logger.
  *
+ * Uses the provided settings to determine which logger to use.
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
 
-use BrianHenryIE\WP_Logger\Includes\Cron;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
@@ -14,6 +17,7 @@ use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Trait;
 use BrianHenryIE\WP_Private_Uploads\Includes\BH_WP_Private_Uploads;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
 use Katzgrau\KLogger\Logger as KLogger;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
@@ -22,9 +26,14 @@ use WP_CLI;
 
 class BH_WP_PSR_Logger implements LoggerInterface {
 	use LoggerTrait;
+	use LoggerAwareTrait; // To allow swapping out the logger at runtime.
 
-	/** @var LoggerInterface The true logger. */
-	protected LoggerInterface $real_logger;
+	/**
+	 * The true logger.
+	 *
+	 * @var LoggerInterface $logger
+	 */
+	protected $logger;
 
 	protected API_Interface $api;
 
@@ -41,7 +50,7 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 
 		// This comes after the links are added, so past logs can be accessed after logging is disabled.
 		if ( 'none' === $this->settings->get_log_level() ) {
-			$this->real_logger = new NullLogger();
+			$this->logger = new NullLogger();
 			return;
 		}
 
@@ -50,7 +59,7 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 		if ( $this->settings instanceof WooCommerce_Logger_Interface
 			 && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 
-			$this->real_logger = new WC_PSR_Logger( $settings->get_plugin_slug() );
+			$this->logger = new WC_PSR_Logger( $settings );
 
 			// Add context to WooCommerce logs.
 			$wc_log_handler = new Log_Handler( $api, $settings );
@@ -87,7 +96,8 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 				'appendContext' => false,
 			);
 
-			$this->real_logger = new KLogger( $log_directory, $log_level_threshold, $options );
+			$this->logger = new KLogger( $log_directory, $log_level_threshold, $options );
+
 			// Make the logs directory inaccessible to the public.
 			$private_uploads_settings = new class( $settings ) implements Private_Uploads_Settings_Interface {
 				use Private_Uploads_Settings_Trait;
@@ -179,7 +189,7 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 
 		// TODO: regex to replace email addresses with b**********e@gmail.com, credit card numbers etc.
 
-		$this->real_logger->$level( $message, $context );
+		$this->logger->$level( $message, $context );
 
 		update_option( $this->settings->get_plugin_slug() . '-last-log-time', time() );
 	}
@@ -193,55 +203,11 @@ class BH_WP_PSR_Logger implements LoggerInterface {
 			return $this->api;
 	}
 
-
-
-	public function asd(): void {
-		// In order to filter the logs to one request.
-		$this->api->set_common_context( 'request', time() );
-
-		// TODO: Does WooCommerce have a session id?
-		if ( isset( $_COOKIE['PHPSESSID'] ) ) {
-			$this->api->set_common_context( 'setssion_id', wp_unslash( $_COOKIE['PHPSESSID'] ) );
-		} else {
-			$this->api->set_common_context( 'setssion_id', time() );
-		}
-		// wp_parse_auth_cookie() ?
-		// woocommerce session...
-
-		// Add the user id to all log contexts.
-		// TODO: distinguish between logged out users and system (e.g. cron) "requests".
-		$current_user_id = get_current_user_id();
-		if ( 0 !== $current_user_id ) {
-			$this->api->set_common_context( 'user_id', $current_user_id );
-		}
-
-		$settings = $this->settings;
-		/**
-		 * A filter which can be run to find which plugins have a logger instantiated.
-		 * Added in particular so loggers can be created for arbitrary plugins to capture their PHP errors, i.e.
-		 * we want to know which plugins already have a logger so we don't interfere unnecessarily.
-		 */
-		add_filter(
-			'bh-wp-loggers',
-			function ( $loggers ) use ( $settings ) {
-
-				// TODO: Maybe a version number here?
-				$value             = array();
-				$value['settings'] = $settings;
-				$value['logger']   = $this;
-
-				$loggers[ $settings->get_plugin_slug() ] = $value;
-
-				return $loggers;
-			}
-		);
-
-		add_filter(
-			"bh-wp-loggers-{$settings->get_plugin_slug()}",
-			function () {
-				return $this;
-			}
-		);
+	/**
+	 * Return the true (proxied) logger.
+	 */
+	public function get_logger(): LoggerInterface {
+		return $this->logger;
 	}
 
 }

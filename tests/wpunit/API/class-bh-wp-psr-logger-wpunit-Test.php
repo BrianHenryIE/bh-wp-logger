@@ -18,6 +18,8 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 	 *
 	 * @see wc_get_logger()
 	 * @see WooCommerce_Logger_Interface
+	 *
+	 * @covers ::__construct
 	 */
 	public function tests_woocommerce_logger() {
 
@@ -49,7 +51,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		// We can't call wc_get_logger() until WooCommerce is loaded.
 		do_action( 'woocommerce_loaded' );
 
-		$property = new \ReflectionProperty( BH_WP_PSR_Logger::class, 'real_logger' );
+		$property = new \ReflectionProperty( BH_WP_PSR_Logger::class, 'logger' );
 		$property->setAccessible( true );
 
 		$logger = $property->getValue( $sut );
@@ -59,6 +61,8 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 	/**
 	 * For a non-WooCommerce logger, Klogger should be used.
+	 *
+	 * @covers ::__construct
 	 */
 	public function tests_regular_logger() {
 
@@ -90,7 +94,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		// We can't call wc_get_logger() until WooCommerce is loaded.
 		do_action( 'plugins_loaded' );
 
-		$property = new \ReflectionProperty( BH_WP_PSR_Logger::class, 'real_logger' );
+		$property = new \ReflectionProperty( BH_WP_PSR_Logger::class, 'logger' );
 		$property->setAccessible( true );
 
 		$logger = $property->getValue( $sut );
@@ -102,6 +106,8 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 	/**
 	 * If a plugin asks to use the WooCommerce logger, but WooCommerce is inactive, use the default KLogger.
+	 *
+	 * @covers ::__construct
 	 */
 	public function tests_woocommerce_inactive_logger() {
 
@@ -147,7 +153,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		// We can't call wc_get_logger() until WooCommerce is loaded.
 		do_action( 'plugins_loaded' );
 
-		$property = new \ReflectionProperty( BH_WP_PSR_Logger::class, 'real_logger' );
+		$property = new \ReflectionProperty( BH_WP_PSR_Logger::class, 'logger' );
 		$property->setAccessible( true );
 
 		$logger = $property->getValue( $sut );
