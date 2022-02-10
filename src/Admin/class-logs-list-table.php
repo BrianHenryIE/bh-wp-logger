@@ -13,8 +13,10 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use DateTime;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use stdClass;
 use WP_List_Table;
 
 /**
@@ -33,10 +35,10 @@ class Logs_List_Table extends WP_List_Table {
 	/**
 	 * Logs_Table constructor.
 	 *
-	 * @param API_Interface                                                     $api
-	 * @param Logger_Settings_Interface                                         $settings
-	 * @param LoggerInterface                                                   $logger
-	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:bool} $args
+	 * @param API_Interface                                                       $api
+	 * @param Logger_Settings_Interface                                           $settings
+	 * @param LoggerInterface                                                     $logger
+	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args
 	 */
 	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger, array $args = array() ) {
 		parent::__construct( $args );
@@ -55,7 +57,7 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * TODO: Move out of here. This should be a generic PSR-Log-Data class.
 	 *
-	 * @return array<array{time:string, level:string, message:string, context:array}>
+	 * @return array<array{time:string,datetime:?DateTime,level:string,message:string,context:?stdClass}>
 	 */
 	public function get_data(): array {
 
@@ -70,9 +72,6 @@ class Logs_List_Table extends WP_List_Table {
 			$filepath = array_pop( $log_files );
 		}
 
-		$data  = array();
-		$entry = null;
-
 		$file_lines = file( $filepath );
 
 		if ( false === $file_lines ) {
@@ -80,54 +79,70 @@ class Logs_List_Table extends WP_List_Table {
 			return array();
 		}
 
-		// Loop through our array, show HTML source as HTML source; and line numbers too.
-		foreach ( $file_lines as $line_num => $input_line ) {
+		$entries = array();
+
+		// This will fail if the first line does not parse.
+		foreach ( $file_lines as $input_line ) {
 
 			$output_array = array();
-
-			// 2020-10-23T17:39:36+00:00 CRITICAL message
 			if ( 1 === preg_match( '/(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s(?P<level>\w*)\s(?P<message>.*)/im', $input_line, $output_array ) ) {
-
-				// Save previous entry?
-				if ( ! is_null( $entry ) ) {
-
-					$context = json_decode( $entry['context'] );
-
-					if ( isset( $context->source ) ) {
-						unset( $context->source );
-					}
-					$entry['context'] = $context;
-					$data[]           = $entry;
-				}
-
-				$entry = $output_array;
-				// TODO: trim the " from each end.
-				// $entry['message'] = trim( $entry['message'], " \t\n\r\0\x0B\x22" );
-				$entry['context'] = '';
-
-				// check for context (which also could be multiline).
-
+				$entries[] = array(
+					'line_one_parsed' => $output_array,
+					'lines'           => array(),
+				);
 			} else {
-				// A multiline message, so just append it to the previous.
-
-				$entry['context'] .= $input_line;
-
+				$entries[ count( $entries ) - 1 ]['lines'][] = $input_line;
 			}
 		}
 
-		// Save previous entry?
-		if ( ! is_null( $entry ) ) {
-
-			$context = json_decode( $entry['context'] );
-
-			if ( isset( $context->source ) ) {
-				unset( $context->source );
-			}
-			$entry['context'] = $context;
-			$data[]           = $entry;
-		}
+		$data = array_map( array( $this, 'log_lines_to_entry' ), $entries );
 
 		return $data;
+	}
+
+	/**
+	 * @param array{line_one_parsed:array{time:string,level:string,message:string}, lines:string[]} $input_lines
+	 *
+	 * @return array{time:string,datetime:?DateTime,level:string,message:string,context:?stdClass}
+	 */
+	protected function log_lines_to_entry( array $input_lines ): array {
+
+		$entry = array();
+
+		$time_string = $input_lines['line_one_parsed']['time'];
+		$str_time    = strtotime( $time_string );
+		// 2020-10-23T17:39:36+00:00
+		$datetime = DateTime::createFromFormat( 'U', "{$str_time}" );
+		if ( false === $datetime ) {
+			$datetime = null; }
+
+		$level = $input_lines['line_one_parsed']['level'];
+
+		$message = $input_lines['line_one_parsed']['message'];
+
+		$context = null;
+
+		foreach ( $input_lines['lines'] as $input_line ) {
+			$context = json_decode( $input_line );
+			if ( is_null( $context ) ) {
+				$message .= $input_line;
+			}
+		}
+
+		if ( ! is_null( $context ) && isset( $context->source ) ) {
+			unset( $context->source );
+		}
+
+		// TODO: trim the " from each end.
+		// $entry['message'] = trim( $entry['message'], " \t\n\r\0\x0B\x22" );
+
+		$entry['time']     = $time_string;
+		$entry['datetime'] = $datetime;
+		$entry['level']    = $level;
+		$entry['message']  = $message;
+		$entry['context']  = $context;
+
+		return $entry;
 	}
 
 
@@ -199,7 +214,7 @@ class Logs_List_Table extends WP_List_Table {
 				$time = $item['time'];
 
 				try {
-					$datetime = new \DateTime( $time );
+					$datetime = new DateTime( $time );
 					// TODO: Is there a way to know if the site's timezone has never been set properly?
 					// TODO: Is it better to use the user's timezone rather than the server timezone?
 					$datetime->setTimezone( wp_timezone() );
