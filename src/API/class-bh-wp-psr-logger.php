@@ -9,19 +9,10 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
-use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
-use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
-use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
-use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Interface;
-use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Trait;
-use BrianHenryIE\WP_Private_Uploads\WP_Includes\BH_WP_Private_Uploads;
-use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
-use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use Psr\Log\NullLogger;
 use WP_CLI;
 
 class BH_WP_PSR_Logger extends API implements LoggerInterface {
