@@ -6,11 +6,10 @@
  * @author  Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Logger\includes;
+namespace BH_WP_Logger\Includes;
 
 /**
- * Class BH_WP_Logger_Test
- *
+ * @coversNothing
  * @see I18n
  */
 class BH_WP_Logger_I18n_Test extends \Codeception\TestCase\WPTestCase {

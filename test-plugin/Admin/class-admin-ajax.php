@@ -1,6 +1,8 @@
 <?php
 /**
  * Handle the test errors we'll create.
+ *
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BH_WP_Logger_Test_Plugin\Admin;
@@ -44,8 +46,6 @@ class Admin_Ajax {
 		// }
 
 		// Validate input.
-
-		$test_address = '';
 
 		if ( ! isset( $_POST['log-test-action'] ) || empty( $_POST['log-test-action'] ) ) {
 			$result['error']['missing-log-test-action'] = 'Missing log-test-action parameter.';

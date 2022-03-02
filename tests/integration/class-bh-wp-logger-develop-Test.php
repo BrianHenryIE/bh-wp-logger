@@ -12,6 +12,8 @@ use BH_WP_Logger_Test_Plugin\includes\BH_WP_Logger_Test_Plugin;
 
 /**
  * Verifies the plugin has been instantiated and added to PHP's $GLOBALS variable.
+ *
+ * @coversNothing
  */
 class Plugin_Develop_Test extends \Codeception\TestCase\WPTestCase {
 

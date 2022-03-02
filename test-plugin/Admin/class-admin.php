@@ -11,18 +11,16 @@
 
 namespace BH_WP_Logger_Test_Plugin\Admin;
 
+use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
+use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface;
 
 /**
  * The admin-specific functionality of the plugin.
  *
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    BH_WP_Logger_Test_Plugin
- * @subpackage BH_WP_Logger_Test_Plugin/admin
- * @author     Brian Henry <BrianHenryIE@gmail.com>
  */
 class Admin {
 
@@ -65,11 +63,10 @@ class Admin {
 
 	}
 
-
 	/**
-	 * @hooked admin_menu
+	 * Register the callback to the new page, adding the link in the admin menu.
 	 *
-	 * Add a WordPress admin UI page, but without any menu linking to it.
+	 * @hooked admin_menu
 	 */
 	public function add_page() {
 
@@ -81,7 +78,8 @@ class Admin {
 			'manage_options',
 			'logs-test',
 			array( $this, 'display_page' ),
-			$icon_url
+			$icon_url,
+			2
 		);
 
 	}
@@ -93,9 +91,13 @@ class Admin {
 
 		$plugin_log_level = $this->logger_settings->get_log_level();
 
-		$plugin_logger_api = $this->logger->get_api();
+		$is_woocommerce_logger = $this->logger_settings instanceof WooCommerce_Logger_Settings_Interface ? 'yes' : 'no';
 
-		$plugin_log_file = array_pop( $plugin_logger_api->get_log_files() );
+		/** @var API_Interface $plugin_logger_api */
+		$plugin_logger_api = $this->logger;
+
+		$log_files       = $plugin_logger_api->get_log_files();
+		$plugin_log_file = array_pop( $log_files );
 
 		$plugin_log_url = $plugin_logger_api->get_log_url();
 
@@ -108,7 +110,5 @@ class Admin {
 
 		include wp_normalize_path( __DIR__ . '/partials/bh-wp-logger-test-plugin-admin-display.php' );
 	}
-
-
 
 }

@@ -12,6 +12,7 @@
  */
 
 /** @var string $plugin_log_level The PSR log level, formatted to display. */
+/** @var string $is_woocommerce_logger Is the logger logging via wc_logger(). */
 /** @var string $plugin_log_file Path to the log file.  */
 /** @var string $plugin_log_url URL to view the logs.  */
 /** @var string $wp_debug */
@@ -27,11 +28,12 @@
 
 	<div>
 
-		<p>Plugin log level is: <code><?php echo $plugin_log_level; ?></code></p>
-		<p>Plugin log file is at: <code><?php echo $plugin_log_file; ?></code></p>
-		<p>WP_DEBUG: <code><?php echo $wp_debug; ?></code></p>
-		<p>WP_DEBUG_DISPLAY: <code><?php echo $wp_debug_display; ?></code></p>
-		<p>WP_DEBUG_LOG: <code><?php echo $wp_debug_log; ?></code></p>
+		<p>Plugin log level is: <code><?php echo esc_html( $plugin_log_level ); ?></code></p>
+		<p>Plugin is using <code>wc_logger()</code>: <code><?php echo esc_html( $is_woocommerce_logger ); ?></code></p>
+		<p>Plugin log file is at: <code><?php echo esc_html( $plugin_log_file ); ?></code></p>
+		<p>WP_DEBUG: <code><?php echo esc_html( $wp_debug ); ?></code></p>
+		<p>WP_DEBUG_DISPLAY: <code><?php echo esc_html( $wp_debug_display ); ?></code></p>
+		<p>WP_DEBUG_LOG: <code><?php echo esc_html( $wp_debug_log ); ?></code></p>
 	</div>
 	<div>
 		<p><a class="button button-primary" href="<?php echo $plugin_log_url; ?>">View logs</a></p>

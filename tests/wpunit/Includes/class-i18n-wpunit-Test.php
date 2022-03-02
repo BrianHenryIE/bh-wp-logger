@@ -11,14 +11,12 @@ namespace BH_WP_Logger_Test_Plugin\Includes;
 /**
  * Class I18n_Test
  *
- * @coversDefaultClass \BH_WP_Logger_Test_Plugin\includes\I18n
+ * @coversNothing
  */
 class I18n_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 	/**
 	 * Checks if the filter run by WordPress in the load_plugin_textdomain() function is called.
-	 *
-	 * @covers ::load_plugin_textdomain
 	 */
 	public function test_load_plugin_textdomain_function() {
 
