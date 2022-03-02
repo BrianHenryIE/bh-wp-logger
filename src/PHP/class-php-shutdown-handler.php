@@ -77,6 +77,9 @@ class PHP_Shutdown_Handler {
 			return;
 		}
 
+		// "Clears the most recent errors, making it unable to be retrieved with error_get_last().".
+		error_clear_last();
+
 		$this->logger->error( $error['message'], $error );
 	}
 }
