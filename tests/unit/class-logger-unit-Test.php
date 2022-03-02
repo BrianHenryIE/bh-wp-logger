@@ -4,9 +4,10 @@ namespace BrianHenryIE\WP_Logger;
 
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings;
-use BrianHenryIE\WP_Logger\API\Plugins;
 use BrianHenryIE\WP_Logger\Includes\Plugin_Logger_Actions;
+use BrianHenryIE\WP_Logger\Includes\Plugins;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Logger
@@ -30,6 +31,12 @@ class Logger_Unit_Test extends \Codeception\Test\Unit {
 		\Patchwork\redefine(
 			array( Logger_Settings::class, '__construct' ),
 			function() {}
+		);
+		\Patchwork\redefine(
+			array( Logger_Settings::class, 'get_log_level' ),
+			function() {
+				return 'none';
+			}
 		);
 
 		\Patchwork\redefine(
