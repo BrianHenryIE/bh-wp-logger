@@ -83,7 +83,7 @@ class Log_Handler {
 			return $entry;
 		}
 
-		$context = array_merge( $this->api->get_common_context(), $log_data_array['context'] );
+		$context = $log_data_array['context'];
 
 		// The plugin slug.
 		unset( $context['source'] );
