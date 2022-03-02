@@ -1,51 +1,38 @@
 <?php
 /**
- * To provide defaults.
+ * Helper class to provide defaults.
+ * Instantiate this with the plugin slug and plugin data will be found from WordPress code functions.
+ * Instantiate this without the slug and the current filepath will be used to determine what the slug is.
  *
  * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_Logger\Includes\Plugins;
 use Psr\Log\LogLevel;
 
 class Logger_Settings implements Logger_Settings_Interface {
-
-	/**
-	 * get_plugins() with added `basename` key.
-	 *
-	 * @see get_plugin_data()
-	 *
-	 * @var array
-	 */
-	protected array $plugin_data;
+	use Logger_Settings_Trait;
 
 	public function __construct( ?string $plugin_slug = null ) {
 
+		$plugin_helper = new Plugins();
+
 		if ( ! is_null( $plugin_slug ) ) {
-			$this->plugin_data = ( new Plugin_Helper() )->get_plugin_data_from_slug( $plugin_slug );
+			$plugin_data = $plugin_helper->get_plugin_data_from_slug( $plugin_slug );
 		} else {
-			$this->plugin_data = ( new Plugin_Helper() )->discover_plugin_data();
+			$plugin_data = $plugin_helper->discover_plugin_data();
 		}
-	}
 
-	public function get_log_level(): string {
-		return LogLevel::NOTICE;
-	}
-
-	public function get_plugin_slug(): string {
-		if ( is_null( $this->plugin_data ) ) {
-			$this->plugin_data = ( new Plugin_Helper() )->discover_plugin_data();
+		if ( is_null( $plugin_data ) ) {
+			throw new \Exception( 'Could not determine which plugin the logger is related to.' );
 		}
-		return $this->plugin_data['TextDomain'];
-	}
 
-	public function get_plugin_name(): string {
-		return $this->plugin_data['Name'];
-	}
-
-	public function get_plugin_basename(): string {
-		return $this->plugin_data['basename'];
+		$this->log_level       = LogLevel::NOTICE;
+		$this->plugin_name     = $plugin_data['Name'];
+		$this->plugin_slug     = $plugin_slug ?? $plugin_data['TextDomain']; // TODO: TextDomain might be empty.
+		$this->plugin_basename = $plugin_data['basename'];
 	}
 
 }
