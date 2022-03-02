@@ -76,7 +76,6 @@ class Cron {
 		$cron_hook = "delete_logs_{$this->settings->get_plugin_slug()}";
 
 		if ( false !== wp_get_scheduled_event( $cron_hook ) ) {
-			$this->logger->debug( "The `{$cron_hook}` cron job was already scheduled." );
 			return;
 		}
 
