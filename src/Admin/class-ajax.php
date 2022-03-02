@@ -1,6 +1,6 @@
 <?php
 /**
- * Handle AJAX requests from the log table page.
+ * Handle AJAX requests from the log table page (or custom settings page).
  *
  * @package brianhenryie/bh-wp-logger
  */
@@ -48,7 +48,18 @@ class AJAX {
 	/**
 	 * Delete a single log file.
 	 *
+	 * Request body should contain:
+	 * * `action` "bh_wp_logger_logs_delete_all".
+	 * * `date_to_delete` in `Y-m-d` format, e.g. 2022-03-02.
+	 * * `plugin_slug` containing the slug used in settings.
+	 * * `_wpnonce` with action `bh-wp-logger-delete`.
+	 *
+	 * Response format will be:
+	 * array{success: bool, message: ?string}.
+	 *
 	 * @hooked wp_ajax_bh_wp_logger_logs_delete
+	 *
+	 * @uses API_Interface::delete_log()
 	 */
 	public function delete(): void {
 
@@ -77,7 +88,17 @@ class AJAX {
 	/**
 	 * Delete all log files for this plugin.
 	 *
+	 * Request body should contain:
+	 * * `action` "bh_wp_logger_logs_delete".
+	 * * `plugin_slug` containing the slug used in settings.
+	 * * `_wpnonce` with action "bh-wp-logger-delete".
+	 *
+	 * Response format will be:
+	 * array{success: bool, message: ?string}.
+	 *
 	 * @hooked wp_ajax_bh_wp_logger_logs_delete_all
+	 *
+	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::delete_all_logs()
 	 */
 	public function delete_all(): void {
 
