@@ -129,7 +129,7 @@ class Logs_Page {
 		$logs_table->set_date( $chosen_date );
 		$logs_table->prepare_items();
 
-		update_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', time() );
+		$this->api->set_last_logs_view_time();
 
 		$logs_table->display();
 

@@ -5,6 +5,7 @@ namespace BrianHenryIE\WP_Logger\Admin;
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use DateTime;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Plugins_Page
@@ -149,7 +150,9 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 		$api = $this->makeEmpty(
 			API_Interface::class,
 			array(
-				'get_log_url' => 'admin.php?page=bh-wp-logger-test-plugin-logs',
+				// NB: the order here matters because the milliseconds difference make the test pass/fail.
+				'get_last_logs_view_time' => new DateTime(),
+				'get_last_log_time'       => new DateTime(),
 			)
 		);
 

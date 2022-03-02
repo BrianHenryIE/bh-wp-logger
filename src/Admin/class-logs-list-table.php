@@ -72,79 +72,8 @@ class Logs_List_Table extends WP_List_Table {
 			$filepath = array_pop( $log_files );
 		}
 
-		$file_lines = file( $filepath );
-
-		if ( false === $file_lines ) {
-			// Failed to read file.
-			return array();
-		}
-
-		$entries = array();
-
-		// This will fail if the first line does not parse.
-		foreach ( $file_lines as $input_line ) {
-
-			$output_array = array();
-			if ( 1 === preg_match( '/(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s(?P<level>\w*)\s(?P<message>.*)/im', $input_line, $output_array ) ) {
-				$entries[] = array(
-					'line_one_parsed' => $output_array,
-					'lines'           => array(),
-				);
-			} else {
-				$entries[ count( $entries ) - 1 ]['lines'][] = $input_line;
-			}
-		}
-
-		$data = array_map( array( $this, 'log_lines_to_entry' ), $entries );
-
-		return $data;
+		return $this->api->parse_log( $filepath );
 	}
-
-	/**
-	 * @param array{line_one_parsed:array{time:string,level:string,message:string}, lines:string[]} $input_lines
-	 *
-	 * @return array{time:string,datetime:?DateTime,level:string,message:string,context:?stdClass}
-	 */
-	protected function log_lines_to_entry( array $input_lines ): array {
-
-		$entry = array();
-
-		$time_string = $input_lines['line_one_parsed']['time'];
-		$str_time    = strtotime( $time_string );
-		// 2020-10-23T17:39:36+00:00
-		$datetime = DateTime::createFromFormat( 'U', "{$str_time}" );
-		if ( false === $datetime ) {
-			$datetime = null; }
-
-		$level = $input_lines['line_one_parsed']['level'];
-
-		$message = $input_lines['line_one_parsed']['message'];
-
-		$context = null;
-
-		foreach ( $input_lines['lines'] as $input_line ) {
-			$context = json_decode( $input_line );
-			if ( is_null( $context ) ) {
-				$message .= $input_line;
-			}
-		}
-
-		if ( ! is_null( $context ) && isset( $context->source ) ) {
-			unset( $context->source );
-		}
-
-		// TODO: trim the " from each end.
-		// $entry['message'] = trim( $entry['message'], " \t\n\r\0\x0B\x22" );
-
-		$entry['time']     = $time_string;
-		$entry['datetime'] = $datetime;
-		$entry['level']    = $level;
-		$entry['message']  = $message;
-		$entry['context']  = $context;
-
-		return $entry;
-	}
-
 
 	/**
 	 * Get the list of columns in this table.
@@ -232,8 +161,8 @@ class Logs_List_Table extends WP_List_Table {
 
 			case 'message':
 			case 'context':
-				$context             = $item[ $column_name ];
-				$context_column_text = wp_json_encode( $context, JSON_PRETTY_PRINT );
+				$context             = $item[ $column_name ] ?? '';
+				$context_column_text = trim( wp_json_encode( $context, JSON_PRETTY_PRINT ), "'\"" );
 				return is_string( $context_column_text ) ? esc_html( $context_column_text ) : '';
 			default:
 				// TODO: Log unexpected column name / do_action.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Adds a
+ * Add an admin notice for new errors.
  *
  * @package brianhenryie/bh-wp-logger
  */
@@ -79,10 +79,11 @@ class Admin_Notices extends Notices {
 
 		$last_error = $this->get_last_error();
 
-		$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
-		$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
+		$last_log_time       = $this->api->get_last_log_time();
+		$last_logs_view_time = $this->api->get_last_logs_view_time();
 
-		if ( ! empty( $last_error ) && ( $last_log_time > $last_logs_view_time ) ) {
+		// TODO: This should be comparing $last_error time?
+		if ( ! empty( $last_error ) && ( is_null( $last_logs_view_time ) || $last_log_time > $last_logs_view_time ) ) {
 
 			$is_dismissed_option_name = "wptrt_notice_dismissed_{$this->settings->get_plugin_slug()}-recent-error";
 

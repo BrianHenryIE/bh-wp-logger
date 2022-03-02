@@ -78,10 +78,10 @@ class Plugins_Page {
 
 		$logs_link = $this->api->get_log_url();
 
-		$last_log_time       = get_option( $this->settings->get_plugin_slug() . '-last-log-time', 0 );
-		$last_logs_view_time = get_option( $this->settings->get_plugin_slug() . '-last-logs-view-time', 0 );
+		$last_log_time       = $this->api->get_last_log_time();
+		$last_logs_view_time = $this->api->get_last_logs_view_time();
 
-		if ( 0 !== $last_log_time
+		if ( ! is_null( $last_log_time ) && ! is_null( $last_logs_view_time )
 			&& $last_log_time > $last_logs_view_time ) {
 			$action_links[] = '<b><a href="' . $logs_link . '">' . __( 'Logs', 'bh-wp-logger' ) . '</a></b>';
 		} else {

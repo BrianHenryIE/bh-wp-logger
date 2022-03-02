@@ -1,22 +1,33 @@
 <?php
 /**
- *
+ * The main functions of the logger.
  *
  * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
+use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Includes\Plugins;
-use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface;
+use BrianHenryIE\WP_Logger\Logger;
+use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface;
+use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Spatie\Backtrace\Backtrace;
 use Spatie\Backtrace\Frame;
-use WC_Admin_Status;
+use stdClass;
 
-
+/**
+ * BH_WP_PSR_Logger extends this, then Logger extends that.
+ *
+ * @see BH_WP_PSR_Logger
+ * @see Logger
+ */
 class API implements API_Interface {
 
 	use LoggerAwareTrait;
@@ -42,19 +53,38 @@ class API implements API_Interface {
 	protected $common_context = array();
 
 	/**
-	 * @param Logger_Settings_Interface $settings
-	 * @param ?LoggerInterface          $logger A PSR logger.
+	 * Instantiate the API class with settings provided by the plugin.
+	 *
+	 * BH_WP_PSR_Logger needs and API instance and API needs a PSR logger instance if it is to log. LoggerAwareTrait
+	 * allows setting the logger after instantiation.
+	 *
+	 * @param Logger_Settings_Interface $settings The settings provided by the plugin to instantiate the logger.
+	 * @param ?LoggerInterface          $logger A PSR logger, presumably later a BH_WP_PSR_Logger.
 	 */
 	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
 	}
 
+	/**
+	 * Array of data to add to every log entry.
+	 * Resets on each new pageload (request).
+	 *
+	 * @return string[]
+	 */
 	public function get_common_context(): array {
 		return $this->common_context;
 	}
 
-	public function set_common_context( $key, $value ): void {
+	/**
+	 * Set a value in the common context.
+	 *
+	 * @param string $key Descriptive key.
+	 * @param mixed  $value Will be parsed to JSON later.
+	 *
+	 * @return void
+	 */
+	public function set_common_context( string $key, $value ): void {
 		$this->common_context[ $key ] = $value;
 	}
 
@@ -91,7 +121,8 @@ class API implements API_Interface {
 	 */
 	public function get_log_files( ?string $date = null ): array {
 
-		if ( ( $this->settings instanceof WooCommerce_Logger_Interface ) && defined( 'WC_LOG_DIR' ) ) {
+		// TODO: Replace WC_LOG_DIR check with the plugin_active check that is used overall.
+		if ( ( $this->settings instanceof WooCommerce_Logger_Settings_Interface ) && defined( 'WC_LOG_DIR' ) ) {
 
 			$log_files_dir = WC_LOG_DIR;
 
@@ -110,10 +141,12 @@ class API implements API_Interface {
 					if ( ! is_dir( $filename ) && strstr( $filename, '.log' ) ) {
 
 						if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
-							$logs_files[ $regex_matches[1] ] = $log_files_dir . $filename;
+							$logs_files[ "{$regex_matches[1]}" ] = $log_files_dir . $filename;
 
 							if ( ! is_null( $date ) && $regex_matches[1] === $date ) {
-								return array( $date => realpath( $log_files_dir . $filename ) );
+								$path     = $log_files_dir . $filename;
+								$realpath = realpath( $path );
+								return array( $date => false === $realpath ? $path : $realpath );
 							}
 						}
 					}
@@ -141,13 +174,19 @@ class API implements API_Interface {
 
 		$log_filepaths_by_date = $this->get_log_files();
 
-		if ( isset( $log_filepaths_by_date[ $ymd_date ] ) ) {
-			unlink( $log_filepaths_by_date[ $ymd_date ] );
-			$result['success'] = true;
-		} else {
+		if ( ! isset( $log_filepaths_by_date[ $ymd_date ] ) ) {
 			$result['success'] = false;
-			$result['message'] = 'Log file not found for date: ' . $ymd_date;
+			$message           = 'Log file not found for date: ' . $ymd_date;
+			$result['message'] = $message;
+			$this->logger->warning( $message );
+			return $result;
 		}
+
+		unlink( $log_filepaths_by_date[ $ymd_date ] );
+		$result['success'] = true;
+		$message           = 'Logfile deleted at ' . $log_filepaths_by_date[ $ymd_date ];
+		$result['message'] = $message;
+		$this->logger->info( $message, array( 'logfile' => $log_filepaths_by_date[ $ymd_date ] ) );
 
 		return $result;
 	}
@@ -157,7 +196,7 @@ class API implements API_Interface {
 	 *
 	 * @used-by Logs_Page
 	 *
-	 * @return array{success:bool, message?:string, deleted_files?:string, failed_to_delete?:string}
+	 * @return array{success:bool, message?:string, deleted_files?:array<string>, failed_to_delete?:array<string>}
 	 */
 	public function delete_all_logs(): array {
 
@@ -210,28 +249,32 @@ class API implements API_Interface {
 
 
 	/**
-	 *
 	 * Get the backtrace and skips:
 	 * * function calls from inside this file
 	 * * call_user_func_array()
 	 * * function calls from other plugins using this same library (using filename).
 	 *
+	 * TODO: Check is WordPress's own backtrace a good replacement for Spatie.
+	 *
+	 * @param ?int $steps The number of backtrace entries to return. e.g. with debug enabled, we don't need the full backtrace for every log entry.
+	 *
 	 * @return Frame[]
 	 */
-	public function get_backtrace(): array {
+	public function get_backtrace( ?int $steps = null ): array {
 
 		$starting_from_frame_closure = function( Frame $frame ): bool {
 			if ( __FILE__ === $frame->file
 				|| 'call_user_func_array' === $frame->method
 				|| basename( $frame->file ) === 'class-php-error-handler.php'
 				|| basename( $frame->file ) === 'class-functions.php'
+				|| false !== strpos( $frame->file, 'bh-wp-logger/src/API' )
 			) {
 				return false;
 			}
 			return true;
 		};
 
-		return Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->frames();
+		return Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->limit( $steps ?? 0 )->frames();
 	}
 
 	/**
@@ -285,5 +328,172 @@ class API implements API_Interface {
 
 		return false;
 	}
+
+	/**
+	 * Used on plugins.php to highlight the logs link if there are new logs since they were last viewed.
+	 *
+	 * TODO: Add transient.
+	 *
+	 * @return ?DateTimeInterface
+	 */
+	public function get_last_log_time(): ?DateTimeInterface {
+
+		$log_files = $this->get_log_files();
+		if ( empty( $log_files ) ) {
+			return null;
+		}
+		// TODO: Loop backwards? We could have an empty log file.
+		$last_log_file_path = array_pop( $log_files );
+
+		$parsed_log = $this->parse_log( $last_log_file_path );
+
+		$last_log = array_pop( $parsed_log );
+
+		if ( is_null( $last_log ) ) {
+			return null;
+		}
+
+		$last_log_datetime = $last_log['datetime'];
+
+		// TODO: Set transient.
+
+		return $last_log_datetime;
+
+	}
+
+	/**
+	 * Used on plugins.php to highlight the logs link if there are new logs since they were last viewed.
+	 *
+	 * @return ?DateTimeInterface
+	 */
+	public function get_last_logs_view_time(): ?DateTimeInterface {
+
+		$option_name                    = $this->settings->get_plugin_slug() . '-last-logs-view-time';
+		$last_log_view_time_atom_string = get_option( $option_name );
+		$last_log_view_time_datetime    = \DateTimeImmutable::createFromFormat( DateTimeInterface::ATOM, $last_log_view_time_atom_string, new DateTimeZone( 'UTC' ) );
+
+		if ( false === $last_log_view_time_datetime ) {
+			delete_option( $option_name );
+			return null;
+		}
+
+		return $last_log_view_time_datetime;
+	}
+
+	/**
+	 * Record the last time the logs were viewed in order to determine if admin notices should or should not be displayed.
+	 * i.e. "mark read".
+	 *
+	 * @used-by Logs_Page
+	 *
+	 * @param ?DateTimeInterface $date_time A time to set, defaults to "now".
+	 *
+	 * @return void
+	 */
+	public function set_last_logs_view_time( ?DateTimeInterface $date_time ): void {
+		$option_name = $this->settings->get_plugin_slug() . '-last-logs-view-time';
+
+		if ( is_null( $date_time ) ) {
+			try {
+				$date_time = new \DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
+			} catch ( \Exception $exception ) {
+				// This will never happen.
+				return;
+			}
+		}
+
+		$atom_time_string = $date_time->format( DateTimeInterface::ATOM );
+
+		update_option( $option_name, $atom_time_string );
+
+	}
+
+	/**
+	 * Given the path to a log file, this returns an array of arrays – an array of log entries, each of which is an
+	 * array containing the time, level, message and context.
+	 *
+	 * @used-by API::get_last_log_time()
+	 * @used-by Logs_List_Table::get_data()
+	 *
+	 * @param string $filepath Path to the log file to read.
+	 *
+	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}>
+	 */
+	public function parse_log( string $filepath ): array {
+
+		$file_lines = file( $filepath );
+
+		if ( false === $file_lines ) {
+			// Failed to read file.
+			return array();
+		}
+
+		$entries = array();
+
+		// TODO: This will fail if the first line does not parse.
+		foreach ( $file_lines as $input_line ) {
+
+			$output_array = array();
+			if ( 1 === preg_match( '/(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s(?P<level>\w*)\s(?P<message>.*)/im', $input_line, $output_array ) ) {
+				$entries[] = array(
+					'line_one_parsed' => $output_array,
+					'lines'           => array(),
+				);
+			} else {
+				$entries[ count( $entries ) - 1 ]['lines'][] = $input_line;
+			}
+		}
+
+		$data = array_map( array( $this, 'log_lines_to_entry' ), $entries );
+
+		return $data;
+	}
+
+	/**
+	 * Given the set of lines that constitutes a single log entry, this parses them into the array of time, level, message, context.
+	 *
+	 * @used-by API::parse_log()
+	 *
+	 * @param array{line_one_parsed:array{time:string,level:string,message:string}, lines:string[]} $input_lines A single log entries as a set of lines.
+	 *
+	 * @return array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}
+	 */
+	protected function log_lines_to_entry( array $input_lines ): array {
+
+		$entry = array();
+
+		$time_string = $input_lines['line_one_parsed']['time'];
+		$str_time    = strtotime( $time_string );
+		// E.g. "2020-10-23T17:39:36+00:00".
+		$datetime = DateTime::createFromFormat( 'U', "{$str_time}" );
+		if ( false === $datetime ) {
+			$datetime = null; }
+
+		$level = $input_lines['line_one_parsed']['level'];
+
+		$message = $input_lines['line_one_parsed']['message'];
+
+		$context = null;
+
+		foreach ( $input_lines['lines'] as $input_line ) {
+			$context = json_decode( $input_line );
+			if ( is_null( $context ) ) {
+				$message .= $input_line;
+			}
+		}
+
+		if ( ! is_null( $context ) && isset( $context->source ) ) {
+			unset( $context->source );
+		}
+
+		$entry['time']     = $time_string;
+		$entry['datetime'] = $datetime;
+		$entry['level']    = $level;
+		$entry['message']  = $message;
+		$entry['context']  = $context;
+
+		return $entry;
+	}
+
 }
 
