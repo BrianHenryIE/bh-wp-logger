@@ -7,4 +7,6 @@
 
 namespace BrianHenryIE\WP_Logger\WooCommerce;
 
-interface WooCommerce_Logger_Interface {}
+use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+
+interface WooCommerce_Logger_Settings_Interface extends Logger_Settings_Interface {}
