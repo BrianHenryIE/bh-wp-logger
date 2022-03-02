@@ -4,6 +4,7 @@ namespace BrianHenryIE\WP_Logger\API;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * @coversDefaultClass  \BrianHenryIE\WP_Logger\API\API

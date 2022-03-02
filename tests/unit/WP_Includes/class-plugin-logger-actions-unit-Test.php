@@ -1,20 +1,20 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\Includes;
+namespace BrianHenryIE\WP_Logger\WP_Includes;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
-use BrianHenryIE\WP_Logger\API\API_Interface;
+use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler;
 use BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler;
 use BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public;
 use WP_Mock\Matcher\AnyInstance;
 
 /**
- * @coversDefaultClass \BrianHenryIE\WP_Logger\Includes\Plugin_Logger_Actions
+ * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions
  */
 class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 

@@ -2,7 +2,7 @@
 
 namespace BrianHenryIE\WP_Logger\WooCommerce;
 
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Codeception\TestCase\WPTestCase;
 use Psr\Log\LoggerInterface;
 

@@ -7,7 +7,7 @@
  * @package brianhenryie/bh-wp-logger
  */
 
-namespace BrianHenryIE\WP_Logger\Includes;
+namespace BrianHenryIE\WP_Logger\WP_Includes;
 
 class Plugins {
 

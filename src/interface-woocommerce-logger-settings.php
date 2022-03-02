@@ -5,8 +5,6 @@
  * @package brianhenryie/bh-wp-logger
  */
 
-namespace BrianHenryIE\WP_Logger\WooCommerce;
-
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+namespace BrianHenryIE\WP_Logger;
 
 interface WooCommerce_Logger_Settings_Interface extends Logger_Settings_Interface {}

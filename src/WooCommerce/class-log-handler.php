@@ -9,8 +9,8 @@
 
 namespace BrianHenryIE\WP_Logger\WooCommerce;
 
-use BrianHenryIE\WP_Logger\API\API_Interface;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WC_Log_Levels;
@@ -25,8 +25,8 @@ class Log_Handler {
 	/**
 	 * The logger settings.
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_plugin_slug()
-	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_log_level()
+	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
+	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_log_level()
 	 *
 	 * @var Logger_Settings_Interface
 	 */
@@ -35,7 +35,7 @@ class Log_Handler {
 	/**
 	 * Functions for managing logs and adding context.
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::get_common_context()
+	 * @uses \BrianHenryIE\WP_Logger\API_Interface::get_common_context()
 	 *
 	 * @var API_Interface
 	 */

@@ -6,7 +6,7 @@
  * @author  Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Logger\Includes;
+namespace BH_WP_Logger\WP_Includes;
 
 /**
  * @coversNothing

@@ -13,7 +13,7 @@
 
 namespace BrianHenryIE\WP_Logger\WooCommerce;
 
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use WC_Log_Levels;
@@ -31,7 +31,7 @@ class WC_PSR_Logger implements LoggerInterface {
 	/**
 	 * The entire settings object is preserved so a filter can be added to change the log level during runtime.
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_log_level()
+	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_log_level()
 	 *
 	 * @var Logger_Settings_Interface
 	 */

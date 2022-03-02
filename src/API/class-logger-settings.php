@@ -9,7 +9,9 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
-use BrianHenryIE\WP_Logger\Includes\Plugins;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use Psr\Log\LogLevel;
 
 class Logger_Settings implements Logger_Settings_Interface {

@@ -6,7 +6,7 @@
  * @author  Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Logger_Test_Plugin\Includes;
+namespace BH_WP_Logger_Test_Plugin\WP_Includes;
 
 use BH_WP_Logger_Test_Plugin\Admin\Admin;
 

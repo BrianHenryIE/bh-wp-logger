@@ -3,7 +3,7 @@
 namespace BrianHenryIE\WP_Logger\PHP;
 
 use BrianHenryIE\WP_Logger\API\API;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 

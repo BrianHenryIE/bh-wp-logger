@@ -11,8 +11,8 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\WP_Logger\API\API_Interface;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -27,7 +27,7 @@ class Logs_Page {
 	/**
 	 * The logger settings. i.e. what is the plugin slug this logger is for?
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface::get_plugin_slug()
+	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
 	 * @var Logger_Settings_Interface
 	 */
 	protected Logger_Settings_Interface $settings;

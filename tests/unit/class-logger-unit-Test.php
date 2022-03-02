@@ -4,8 +4,8 @@ namespace BrianHenryIE\WP_Logger;
 
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings;
-use BrianHenryIE\WP_Logger\Includes\Plugin_Logger_Actions;
-use BrianHenryIE\WP_Logger\Includes\Plugins;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 

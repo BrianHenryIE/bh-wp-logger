@@ -11,10 +11,10 @@
 
 namespace BH_WP_Logger_Test_Plugin\Admin;
 
-use BrianHenryIE\WP_Logger\API\API_Interface;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
-use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 
 /**
  * The admin-specific functionality of the plugin.

@@ -5,12 +5,12 @@
  * @package brianhenryie/bh-wp-logger
  */
 
-namespace BrianHenryIE\WP_Logger\API;
+namespace BrianHenryIE\WP_Logger;
 
 use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
-use BrianHenryIE\WP_Logger\Includes\Cron;
+use BrianHenryIE\WP_Logger\WP_Includes\Cron;
 use DateTime;
 use DateTimeInterface;
 use Spatie\Backtrace\Frame;
@@ -136,7 +136,7 @@ interface API_Interface {
 	 *
 	 * @param ?DateTimeInterface $date_time A time to set, defaults to "now".
 	 */
-	public function set_last_logs_view_time( ?DateTimeInterface $date_time ): void;
+	public function set_last_logs_view_time( ?DateTimeInterface $date_time = null ): void;
 
 	/**
 	 * Given the path to a log text file, parse its lines into an array of individual log entries parsed into

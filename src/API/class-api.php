@@ -9,9 +9,11 @@ namespace BrianHenryIE\WP_Logger\API;
 
 use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
-use BrianHenryIE\WP_Logger\Includes\Plugins;
+use BrianHenryIE\WP_Logger\API_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use BrianHenryIE\WP_Logger\Logger;
-use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -390,7 +392,7 @@ class API implements API_Interface {
 	 *
 	 * @return void
 	 */
-	public function set_last_logs_view_time( ?DateTimeInterface $date_time ): void {
+	public function set_last_logs_view_time( ?DateTimeInterface $date_time = null ): void {
 		$option_name = $this->settings->get_plugin_slug() . '-last-logs-view-time';
 
 		if ( is_null( $date_time ) ) {

@@ -7,8 +7,8 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\WP_Logger\API\API_Interface;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * Handle delete and delete-all actions.
@@ -27,8 +27,8 @@ class AJAX {
 	/**
 	 * The plugin's main functions.
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::delete_log()
-	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::delete_all_logs()
+	 * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_log()
+	 * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_all_logs()
 	 *
 	 * @var API_Interface
 	 */
@@ -98,7 +98,7 @@ class AJAX {
 	 *
 	 * @hooked wp_ajax_bh_wp_logger_logs_delete_all
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API\API_Interface::delete_all_logs()
+	 * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_all_logs()
 	 */
 	public function delete_all(): void {
 

@@ -2,7 +2,7 @@
 
 namespace BrianHenryIE\WP_Logger\Private_Uploads;
 
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public

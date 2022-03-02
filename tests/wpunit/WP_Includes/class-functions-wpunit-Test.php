@@ -1,15 +1,15 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\Includes;
+namespace BrianHenryIE\WP_Logger\WP_Includes;
 
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\NullLogger;
 use BrianHenryIE\ColorLogger\ColorLogger;
-use BrianHenryIE\WP_Logger\API\API_Interface;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\API_Interface;
 use Codeception\TestCase\WPTestCase;
 
 /**
- * @coversDefaultClass \BrianHenryIE\WP_Logger\Includes\Functions
+ * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Functions
  */
 class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 

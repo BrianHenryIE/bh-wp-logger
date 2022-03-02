@@ -9,7 +9,7 @@
  * @package brianhenryie/bh-wp-logger
  */
 
-namespace BrianHenryIE\WP_Logger\API;
+namespace BrianHenryIE\WP_Logger;
 
 use Psr\Log\LogLevel;
 

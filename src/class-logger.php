@@ -6,27 +6,24 @@
  * better:
  * `$logger = \BrianHenryIE\WP_Logger\Logger::instance( $settings )`
  *
- * @see \BrianHenryIE\WP_Logger\API\Logger_Settings_Interface
- * @see \BrianHenryIE\WP_Logger\API\Logger_Settings_Trait
- * @see \BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface
+ * @see \BrianHenryIE\WP_Logger\Logger_Settings_Interface
+ * @see \BrianHenryIE\WP_Logger\Logger_Settings_Trait
+ * @see \BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface
  *
  * @package brianhenryie/bh-wp-logger
  */
 
 namespace BrianHenryIE\WP_Logger;
 
-use BrianHenryIE\WP_Logger\API\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\Logger_Settings;
-use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\Includes\Plugins;
-use BrianHenryIE\WP_Logger\Includes\Plugin_Logger_Actions;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
-use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface;
 use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Interface;
 use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Trait;
-use BrianHenryIE\WP_Private_Uploads\Includes\BH_WP_Private_Uploads;
+use BrianHenryIE\WP_Private_Uploads\WP_Includes\BH_WP_Private_Uploads;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LoggerInterface;

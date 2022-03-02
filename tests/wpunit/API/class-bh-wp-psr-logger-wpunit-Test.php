@@ -3,8 +3,9 @@
 namespace BrianHenryIE\WP_Logger\API;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
-use BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use Codeception\Stub\Expected;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LogLevel;

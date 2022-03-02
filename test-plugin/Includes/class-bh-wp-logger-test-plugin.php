@@ -12,7 +12,7 @@
  * @subpackage BH_WP_Logger_Test_Plugin/includes
  */
 
-namespace BH_WP_Logger_Test_Plugin\Includes;
+namespace BH_WP_Logger_Test_Plugin\WP_Includes;
 
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
 use BH_WP_Logger_Test_Plugin\Admin\Admin;

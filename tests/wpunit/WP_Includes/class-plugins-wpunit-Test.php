@@ -1,9 +1,9 @@
 <?php
 
-namespace BrianHenryIE\WP_Logger\Includes;
+namespace BrianHenryIE\WP_Logger\WP_Includes;
 
 /**
- * @coversDefaultClass \BrianHenryIE\WP_Logger\Includes\Plugins
+ * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Plugins
  */
 class Plugins_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
@@ -68,7 +68,7 @@ class Plugins_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 	/**
 	 * PhpStan is insisting it returns array always.
-	 * "Method BrianHenryIE\WP_Logger\Includes\Plugins::get_plugin_data_from_slug() should return array<string, mixed>|null but returns array."
+	 * "Method BrianHenryIE\WP_Logger\WP_Includes\Plugins::get_plugin_data_from_slug() should return array<string, mixed>|null but returns array."
 	 *
 	 * @covers ::get_plugin_data_from_slug
 	 */

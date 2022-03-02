@@ -6,7 +6,7 @@
  * @author  Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Logger_Test_Plugin\Includes;
+namespace BH_WP_Logger_Test_Plugin\WP_Includes;
 
 /**
  * Class I18n_Test

@@ -8,7 +8,7 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
-use BH_WP_Logger_Test_Plugin\Includes\BH_WP_Logger_Test_Plugin;
+use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 
 /**
  * Class Plugin_WP_Mock_Test
