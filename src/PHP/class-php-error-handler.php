@@ -6,6 +6,8 @@
  * Chains and calls previously set_error_handler handlers.
  *
  * @package brianhenryie/bh-wp-logger
+ *
+ * phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
  */
 
 namespace BrianHenryIE\WP_Logger\PHP;
@@ -16,7 +18,6 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-
 /**
  * Class PHP_Error_Handler
  */
@@ -24,8 +25,18 @@ class PHP_Error_Handler {
 
 	use LoggerAwareTrait;
 
+	/**
+	 * Used here for backtrace functions.
+	 *
+	 * @var API_Interface
+	 */
 	protected API_Interface $api;
 
+	/**
+	 * Used here for slug and basename to name and to compare data.
+	 *
+	 * @var Logger_Settings_Interface
+	 */
 	protected Logger_Settings_Interface $settings;
 
 	/**
@@ -35,6 +46,13 @@ class PHP_Error_Handler {
 	 */
 	protected $previous_error_handler = null;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param API_Interface             $api The class that determines if the errors are relevant.
+	 * @param Logger_Settings_Interface $settings The settings, used here for identifiers (slug,basename).
+	 * @param LoggerInterface           $logger The logger for actually recording the errors as we wish.
+	 */
 	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
 		$this->setLogger( $logger );
 		$this->api      = $api;
@@ -72,25 +90,14 @@ class PHP_Error_Handler {
 	 */
 	public function plugin_error_handler( int $errno, string $errstr, string $errfile, int $errline ) {
 
-		// Check is already logged error here? (no, that should be done in the logger itself).
-
 		$func_args = func_get_args();
 
 		$plugin_related_error = $this->is_related_error( $errno, $errstr, $errfile, $errline );
 
 		if ( ! $plugin_related_error ) {
-
-			// Too few arguments to function PHPUnit\Util\ErrorHandler::__invoke(), 3 passed and exactly 4 expected
-
-			// TODO: Maybe need to check the receiving function accepts four arguments.
-
 			// If there is another handler, return its result, otherwise indicate the error was not handled.
 			return $this->return_error_handler_result( false, $func_args );
 		}
-
-		// TODO: maybe don't use transients?
-		// TODO: Add an option in settings.
-		// wp transient delete --all
 
 		// e.g. my-plugin-slug-logged-error-4f6ead5467acd...
 		$transient_key = "{$this->settings->get_plugin_slug()}-logged-{$this->errno_to_psr3( $errno )}-" . md5( $errstr );
@@ -102,56 +109,31 @@ class PHP_Error_Handler {
 			return $this->return_error_handler_result( true, $func_args );
 		}
 
-		// TODO: Add regex filters to skip uninteresting errors.
-		// e.g. after an error has been reported, don't log it ever again.
-
-		// func_get_args shows extra param ["queue_conn":false,"oauth2_refresh":false].
+		// func_get_args shows extra parameters: `["queue_conn":false,"oauth2_refresh":false]`.
 		$context          = array();
 		$context['error'] = array_combine( array( 'errno', 'errstr', 'errfile', 'errline' ), array_slice( $func_args, 0, 4 ) );
 
-		// Skip backtraces that are just part of this file.
-		$backtrace_frames = $this->api->get_backtrace();
-
-		$context['backtrace'] = $backtrace_frames;
+		// This would be added anyway in some cases, but for PHP errors, let's always have a little backtrace.
+		$backtrace_frames           = $this->api->get_backtrace( 2 );
+		$context['debug_backtrace'] = $backtrace_frames;
 
 		$log_level = $this->errno_to_psr3( $errno );
 
 		$this->logger->$log_level( $errstr, $context );
 
-		/**
-		 * TODO: remove closures from sub-arrays. The following code only worked on the first level.
-		 * json_encode() seems to work ok.
-		 *
-		 * PHP Fatal error:  Uncaught Exception: Serialization of 'ReflectionMethod' is not allowed in functions.php:599
-		 *
-		 * @see maybe_serialize()
-		 */
-		// $func_args = array_map(
-		// function( $element ) {
-		// return $element instanceof \Closure ? 'closure' : $element;
-		// },
-		// $func_args
-		// );
-
-		// $func_args = json_encode( $func_args );
-
-		// TODO: Filter on expiration time length.
-		set_transient( $transient_key, wp_json_encode( $func_args ), WEEK_IN_SECONDS );
-
-		// TODO: Add a filter here
-		// e.g. to return false for fatal, i.e so it would log fatal errors to error_log's file and not handle ("surpress" them herer).
+		set_transient( $transient_key, wp_json_encode( $func_args ), DAY_IN_SECONDS );
 
 		/* Don't execute PHP internal error handler */
 		return $this->return_error_handler_result( true, $func_args );
 	}
 
 	/**
-	 * Call other registered error handlers before returning the result.
+	 * Call the chain of other registered error handlers before returning the result.
 	 *
 	 * @param bool              $handled Flag to indicate has the error already been handled.
-	 * @param array<int|string> $args
+	 * @param array<int|string> $args    The arguments passed by PHP to our own registered error handler.
 	 *
-	 * @return ?bool True if the error has been handled, false if PHP error handler should still run.
+	 * @return bool True if the error has been handled, false if PHP error handler should still run.
 	 */
 	protected function return_error_handler_result( bool $handled, array $args ): bool {
 
@@ -160,8 +142,8 @@ class PHP_Error_Handler {
 		}
 
 		// If null is returned from the previous handler, treat that as if the error has not been handled by them.
-		$handled_in_chain = call_user_func_array( $this->previous_error_handler, $args );
-		return is_null( $handled_in_chain ) ? $handled : $handled_in_chain || $handled;
+		$handled_in_chain = call_user_func_array( $this->previous_error_handler, $args ) ?? false;
+		return $handled_in_chain || $handled;
 	}
 
 	/**
@@ -170,6 +152,7 @@ class PHP_Error_Handler {
 	 * Check:
 	 * * is the source file path in the plugin directory
 	 * * is the plugin string mentioned in the error message
+	 * * is any file in the backtrace part of this plugin
 	 *
 	 * @param int    $errno The error code (the level of the error raised, as an integer).
 	 * @param string $errstr A string describing the error.
@@ -194,15 +177,8 @@ class PHP_Error_Handler {
 			return true;
 		}
 
-		// e.g. WooCommerce Admin could be the $errfile of a problem caused by another plugin.
-		$backtrace_frames = $this->api->get_backtrace();
-		foreach ( $backtrace_frames as $frame ) {
-			if ( 0 === strpos( $frame->file, $plugin_dir ) || ( false !== $plugin_dir_realpath && 0 === strpos( $frame->file, $plugin_dir_realpath ) ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		// e.g. WooCommerce Admin could be the $errfile of a problem caused by another plugin, so we need to... trace back.
+		return $this->api->is_backtrace_contains_plugin();
 	}
 
 	/**
@@ -231,7 +207,7 @@ class PHP_Error_Handler {
 			E_USER_WARNING      => LogLevel::WARNING, // User-generated warning message – trigger_error().
 			E_NOTICE            => LogLevel::NOTICE,
 			E_USER_NOTICE       => LogLevel::NOTICE,
-			E_DEPRECATED        => LogLevel::DEBUG,
+			E_DEPRECATED        => LogLevel::NOTICE,
 			E_USER_DEPRECATED   => LogLevel::DEBUG, // User-generated warning message – trigger_error().
 			E_PARSE             => LogLevel::ERROR, // Compile-time parse errors.
 		);
