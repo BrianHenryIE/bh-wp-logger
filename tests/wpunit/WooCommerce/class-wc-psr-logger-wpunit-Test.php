@@ -5,7 +5,6 @@ namespace BrianHenryIE\WP_Logger\WooCommerce;
 use BrianHenryIE\WP_Logger\API\Logger_Settings_Interface;
 use Codeception\TestCase\WPTestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger
