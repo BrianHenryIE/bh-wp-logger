@@ -61,6 +61,7 @@ class Admin_Notices extends Notices {
 	 * Show a notice for recent errors in the logs.
 	 *
 	 * TODO: Do not show on plugin install page.
+	 * TODO: Check file exists before linking to it.
 	 *
 	 * hooked earlier than 10 because Notices::boot() also hooks a function on admin_init that needs to run after this.
 	 *

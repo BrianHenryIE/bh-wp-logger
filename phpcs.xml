@@ -25,11 +25,17 @@
     <exclude-pattern>/wp-content/</exclude-pattern>
 
     <!-- Enforce fewer rules on tests -->
-    <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+    <rule ref="Generic.Commenting.DocComment.MissingShort">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
-    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+    <rule ref="Internal.NoCodeFound">
         <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
     </rule>
     <rule ref="Squiz.Commenting.ClassComment.Missing">
         <exclude-pattern>*/tests/*</exclude-pattern>
@@ -40,32 +46,32 @@
     <rule ref="Squiz.Commenting.FunctionComment.Missing">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
-    <rule ref="Generic.Commenting.DocComment.MissingShort">
+    <rule ref="Squiz.Commenting.FunctionComment.EmptyThrows">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
     <rule ref="Squiz.PHP.DisallowMultipleAssignments.Found">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
-    <rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+    <rule ref="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
-    <rule ref="Squiz.Commenting.FunctionComment.EmptyThrows">
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
         <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid">
+        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
+        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
     </rule>
     <rule ref="WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
     <rule ref="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents">
         <exclude-pattern>*/tests/*</exclude-pattern>
-    </rule>
-    <rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
-        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
-    </rule>
-    <rule ref="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid">
-        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
-    </rule>
-    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
-        <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
     </rule>
 
 </ruleset>

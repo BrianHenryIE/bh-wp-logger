@@ -29,6 +29,7 @@ namespace BH_WP_Logger_Test_Plugin;
 use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
 use Psr\Log\LogLevel;
@@ -62,6 +63,7 @@ define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
 function instantiate_bh_wp_logger_test_plugin() {
 
 	$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface, WooCommerce_Logger_Settings_Interface {
+		use Logger_Settings_Trait;
 		public function get_log_level(): string {
 			return LogLevel::DEBUG;
 		}

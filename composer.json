@@ -105,7 +105,8 @@
         "symlinks": {
             "wp-content": "wordpress/wp-content",
             "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin",
-            "src": "test-plugin/vendor/brianhenryie/bh-wp-logger/src"
+            "src": "test-plugin/vendor/brianhenryie/bh-wp-logger/src",
+            "vendor/brianhenryie/bh-wp-private-uploads/src": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/src"
         },
         "phpstorm": {
             "exclude_folders": {

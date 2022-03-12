@@ -24,6 +24,8 @@ Uses PHP's `register_shutdown_function()` to catch Exceptions related to the plu
 
 Deletes log files older than 30 days on cron.
 
+Records a full backtrace on errors. Records two steps of backtrace on every log when the level is Debug.
+
 ## UI 
 
 Displays logs in `WP_List_Table`.
@@ -45,6 +47,8 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 This relies on a fork of [WPTT/admin-notices](https://github.com/WPTT/admin-notices/issues/14) due to issue [#14 "Dismiss" button not persistently dismissing notices](https://github.com/WPTT/admin-notices/issues/14) which I've fixed but maybe not in the best way.
 
+It uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible. 
+
 ```json
 "repositories": [
     {
@@ -53,6 +57,10 @@ This relies on a fork of [WPTT/admin-notices](https://github.com/WPTT/admin-noti
     },
     {
       "url": "https://github.com/BrianHenryIE/admin-notices",
+      "type": "git"
+    },
+    {
+      "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads",
       "type": "git"
     },
   }
@@ -85,7 +93,8 @@ Provide the settings:
 
 ```php
 $logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Settings_Interface {
-
+    use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+    
 	public function get_log_level(): string {
 		return LogLevel::INFO;
 	}
@@ -112,10 +121,10 @@ Then pass around your `$logger` instance; use `NullLogger` in your tests.
 
 After the logger has been instantiated once, subsequent calls to `::instance()` return the existing instance and any `$logger_settings` passed is ignored.
 
-To use WooCommerce's native `WC_Logger`, add the `WooCommerce_Logger_Interface` interface to the settings object. 
+To use WooCommerce's native `WC_Logger`, use the `WooCommerce_Logger_Interface` interface (which just extends `Logger_Settings_Interface`) on the settings object.
 
 ```php
-$logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Settings_Interface, BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Interface {
+$logger_settings = new class() implements BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface {
     ...
 ```
 
@@ -137,7 +146,7 @@ $setting_fields[] = array(
     'type'     => 'select',
     'options'  => $log_levels_option,
     'desc'    => __( 'Increasingly detailed levels of logs. ', 'text-domain' ) . '<a href="' . admin_url( 'admin.php?page=plugin-slug-logs' ) . '">View Logs</a>',
-    'desc_tip' => true,
+    'desc_tip' => false,
     'default'  => 'notice',
     'id'       => 'text-domain-log-level',
 );
@@ -153,7 +162,7 @@ If using WP_Mock for your tests, and you are instantiating this logger, the foll
 \WP_Mock::userFunction(
     'is_admin',
     array(
-        'return_arg' => false
+        'return' => false
     )
 );
 
@@ -176,6 +185,19 @@ If using WP_Mock for your tests, and you are instantiating this logger, the foll
         'return' => array( 'woocommerce/woocommerce.php' )
     )
 );
+\WP_Mock::userFunction(
+    'did_action',
+    array(
+        'args'   => array( 'woocommerce_loaded' ),
+        'return' => false,
+    )
+);
+\WP_Mock::userFunction(
+    'add_action',
+    array(
+        'args' => array( 'woocommerce_loaded', \WP_Mock\Functions::type( '*' ), 1 ),
+    )
+);
 ```
 
 ### Test Plugin
@@ -186,23 +208,27 @@ The `test-plugin` folder contains a small plugin with buttons to trigger the typ
 
 ### Best Practice
 
-From my limited logging experience, I find it useful to add a `debug` log at the beginning of every function and an appropriate `info`...`error` as the function returns.
+From my limited logging experience, I find it useful to add a `debug` log at the beginning of functions and an appropriate `info`...`error` as the function returns.
 
 ## TODO
 
+* ~~Check log directory is not publicly accessible~~
+* Check uploads dir chmod (is writable).
+* Add current user to context
+* Don't log empty context (WC)
 * Option for what level of errors to display as admin notices
 * Option for user capability for displaying admin notices (filter, at least)
 * Zero-config WC_Logger: detect "wc", "woo" in plugin names
-* Check log directory is not publicly accessible
 * Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json
 * Paging and filtering
 * Hyperlinks in messages
 * ~~Record timestamp the logs were last viewed at, make the plugins.php link bold if new logs are present.~~
 * ~~Auto-delete old logs~~
 * ~~Log notice should dismiss when the log page is visited~~
+* Redact sensitive data. e.g. use `userid:123` in the saved logs and replace it with richer data when displaying them
 
 # Status
 
-Very much a v0.2.
+Very much a v0.x.
 
-I'll start at Semver 1.0.0 once I've caught up with WPCS, PhpStan and PhpUnit.
+I'll start at Semver 1.0.0 once I've caught up with WPCS, PhpStan and PhpUnit. There's about 65 tests and 43% coverage. WPCS + PHPStan are both pretty good.
