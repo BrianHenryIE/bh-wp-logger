@@ -8,6 +8,7 @@ use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use Codeception\Stub\Expected;
 use Katzgrau\KLogger\Logger as KLogger;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -47,6 +48,52 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 	}
 
+	/**
+	 * E.g. a library might often report "Trying to access array offset on value of type bool", which is a known
+	 * upstream issue that does not need to be reported/recorded.
+	 *
+	 * @covers ::log
+	 */
+	public function test_cancel_log_filter(): void {
 
+		$logger = $this->makeEmpty(
+			LoggerInterface::class,
+			array(
+				'error' => Expected::never(),
+			)
+		);
+
+		$setttings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
+
+		$sut = new BH_WP_PSR_Logger( $setttings );
+
+		$sut->setLogger( $logger );
+		$context = json_decode( '{ "type": 2, "message": "Trying to access array offset on value of type bool", "file": "\/Users\/brianhenry\/Sites\/bh-wc-shipment-tracking-updates\/src\/strauss\/jamiemadden\/licenseserver\/src\/class-slswc-client.php", "line": 296, "debug_backtrace": [ { "file": "\/Users\/brianhenry\/Sites\/bh-wc-shipment-tracking-updates\/src\/strauss\/brianhenryie\/bh-wp-logger\/src\/PHP\/class-php-shutdown-handler.php", "lineNumber": 87, "arguments": [], "applicationFrame": true, "method": "handle" }, { "file": "unknown", "lineNumber": 0, "arguments": [], "applicationFrame": false, "method": "[top]", "class": null } ], "filters": [] }', true );
+
+		/**
+		 * Return null to cancel logging.
+		 *
+		 * @pararm array{level:string,message:string,context:array} $log_data
+		 * @param Logger_Settings_Interface $settings
+		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
+		 */
+		add_filter(
+			'plugin-slug_bh_wp_logger_log',
+			function( array $log_data, $settings, $bh_wp_psr_logger ) {
+				return null;
+			},
+			10,
+			3
+		);
+
+		$sut->log( LogLevel::ERROR, 'Trying to access array offset on value of type bool', $context );
+
+	}
 
 }

@@ -9,12 +9,16 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use WP_CLI;
 
+/**
+ * Functions to add context to logs and to record the time of logs.
+ */
 class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	use LoggerTrait;
 	use LoggerAwareTrait; // To allow swapping out the logger at runtime.
@@ -109,15 +113,38 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		 * @see https://wiki.php.net/rfc/redact_parameters_in_back_traces
 		 */
 
+		$log_data         = array(
+			'level'   => $level,
+			'message' => $message,
+			'context' => $context,
+		);
+		$settings         = $this->settings;
+		$bh_wp_psr_logger = $this;
+
+		/**
+		 * Filter to modify the log data.
+		 * Return null to cancel logging this message.
+		 *
+		 * @pararm array{level:string,message:string,context:array} $log_data
+		 * @param Logger_Settings_Interface $settings
+		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
+		 */
+		$log_data = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_log', $log_data, $settings, $bh_wp_psr_logger );
+
+		if ( empty( $log_data ) ) {
+			return;
+		}
+
+		list( $level, $message, $context ) = array_values( $log_data );
+
 		$this->logger->$level( $message, $context );
 
 		// When plugins.php is loaded, the logs are parsed to determine the time of the last log
 		// and compared to the saved wp_option that says the last time the logs were viewed, then
 		// the logs link is <b> if it is sooner. The time of the last log is saved in a transient
-		// to avoid parsing the files on each load of plugins.php. When a log is written, this
+		// to avoid parsing the files on each load of plugins.php. TODO When a log is written, this
 		// transient is deleted. Hopefully this is the most efficient way.
-		// TODO:
-		// delete_transient( 'last-log-time ')
+		// TODO: `delete_transient( 'last-log-time ')`.
 	}
 
 }
