@@ -21,8 +21,8 @@ use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
-use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Interface;
-use BrianHenryIE\WP_Private_Uploads\API\Private_Uploads_Settings_Trait;
+use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Interface;
+use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Trait;
 use BrianHenryIE\WP_Private_Uploads\WP_Includes\BH_WP_Private_Uploads;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
 use Katzgrau\KLogger\Logger as KLogger;
@@ -74,7 +74,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 	/**
 	 * If log level is 'none', use NullLogger.
-	 * If Settings is WooCommerce_Logger_Interface use WC_Logger.
+	 * If Settings is WooCommerce_Logger_Settings_Interface use WC_Logger.
 	 * Otherwise use KLogger.
 	 *
 	 * @param Logger_Settings_Interface $settings Basic settings required for the logger.
