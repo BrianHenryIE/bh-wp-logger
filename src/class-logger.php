@@ -81,12 +81,11 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 */
 	public function __construct( Logger_Settings_Interface $settings ) {
 
-		// This comes after the links are added, so past logs can be accessed after logging is disabled.
 		if ( 'none' === $settings->get_log_level() ) {
 			$logger = new NullLogger();
 
 		} elseif ( $settings instanceof WooCommerce_Logger_Settings_Interface
-			 && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 			// Does not use `is_plugin_active()` here because "Call to undefined function" error (maybe an admin function).
 
 			$logger = new WC_PSR_Logger( $settings );
@@ -129,8 +128,18 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			$private_uploads_settings = new class( $settings ) implements Private_Uploads_Settings_Interface {
 				use Private_Uploads_Settings_Trait;
 
+				/**
+				 * The settings provided for the logger. We need the plugin slug as a uid for the private uploads instance.
+				 *
+				 * @var Logger_Settings_Interface
+				 */
 				protected Logger_Settings_Interface $logger_settings;
 
+				/**
+				 * Constructor.
+				 *
+				 * @param Logger_Settings_Interface $logger_settings The plugin logger settings, whose plugin slug we need.
+				 */
 				public function __construct( Logger_Settings_Interface $logger_settings ) {
 					$this->logger_settings = $logger_settings;
 				}
