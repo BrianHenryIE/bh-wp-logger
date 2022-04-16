@@ -13,3 +13,4 @@ parameters:
         - vendor/wp-cli
     ignoreErrors:
         - '#LoggerInterface\|null#'
+        - '#Function apply_filters invoked with \d+ parameters, \d+ required.#'
