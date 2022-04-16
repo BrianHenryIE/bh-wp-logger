@@ -73,16 +73,13 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	public function log( $level, $message, $context = array() ) {
 
 		/**
-		 * TODO: Consider a WP CLI flag ~`--verbose` to turn on console logging.
+		 * When WP CLI commands are appended with `--debug` or more specifically `--debug=plugin-slug` all messages will be output.
 		 *
 		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
 		 */
-		if ( false && defined( 'WP_CLI' ) && WP_CLI ) {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 
-			// TODO WP_CLI::log is "encouraged", but was using an uninitialized logger variable when running in tests.
-			// TODO: Add "debug" etc at the beginning to distinguish from regular CLI output.
-			// maybe colorize it.
-			WP_CLI::line( $message );
+			WP_CLI::debug( $message, $this->settings->get_plugin_slug() );
 		}
 
 		$context = array_merge( $context, $this->get_common_context() );
