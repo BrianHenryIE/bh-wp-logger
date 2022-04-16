@@ -98,7 +98,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			global $wp_current_filter;
 			$context['filters'] = $wp_current_filter;
 
-		} elseif ( LogLevel::DEBUG === $settings_log_level ) {
+		} elseif ( LogLevel::WARNING === $level || LogLevel::DEBUG === $settings_log_level ) {
 			$debug_backtrace            = $this->get_backtrace( 2 );
 			$context['debug_backtrace'] = $debug_backtrace;
 
