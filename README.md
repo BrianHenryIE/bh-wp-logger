@@ -45,30 +45,21 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 ### Composer
 
-This relies on a fork of [WPTT/admin-notices](https://github.com/WPTT/admin-notices/issues/14) due to issue [#14 "Dismiss" button not persistently dismissing notices](https://github.com/WPTT/admin-notices/issues/14) which I've fixed but maybe not in the best way.
+This library is not on Packagist yet, so first add this repo:
 
-It uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible. 
+`composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger`
 
-```json
-"repositories": [
-    {
-      "url": "https://github.com/BrianHenryIE/bh-wp-logger",
-      "type": "git"
-    },
-    {
-      "url": "https://github.com/BrianHenryIE/admin-notices",
-      "type": "git"
-    },
-    {
-      "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads",
-      "type": "git"
-    },
-  }
-],
-"require": {
-    "brianhenryie/bh-wp-logger": "dev-master"
-}
-```
+The reason being it is using a fork of [wptrt/admin-notices](https://github.com/WPTT/admin-notices) because of [a race condition in Firefox](https://github.com/WPTT/admin-notices/issues/14). So also add that repo:
+
+`composer config repositories.wptrt/admin-notices git https://github.com/brianhenryie/admin-notices`
+
+It uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible, so add that repo:
+
+`composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads`
+
+Then require as normal:
+
+`composer require brianhenryie/bh-wp-logger`
 
 ### Instantiate
 
@@ -159,44 +150,9 @@ $setting_fields[] = array(
 If using WP_Mock for your tests, and you are instantiating this logger, the following should help:
 
 ```php
-\WP_Mock::userFunction(
-    'is_admin',
-    array(
-        'return' => false
-    )
-);
-
-\WP_Mock::userFunction(
-    'get_current_user_id'
-);
-
-\WP_Mock::userFunction(
-    'wp_normalize_path',
-    array(
-        'return_arg' => true
-    )
-);
-
-
-\WP_Mock::userFunction(
-    'get_option',
-    array(
-        'args'   => array( 'active_plugins'),
-        'return' => array( 'woocommerce/woocommerce.php' )
-    )
-);
-\WP_Mock::userFunction(
-    'did_action',
-    array(
-        'args'   => array( 'woocommerce_loaded' ),
-        'return' => false,
-    )
-);
-\WP_Mock::userFunction(
-    'add_action',
-    array(
-        'args' => array( 'woocommerce_loaded', \WP_Mock\Functions::type( '*' ), 1 ),
-    )
+\Patchwork\redefine(
+    array( Logger::class, '__construct' ),
+    function( $settings ) {}
 );
 ```
 
@@ -213,7 +169,7 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 ## TODO
 
 * ~~Check log directory is not publicly accessible~~
-* Check uploads dir chmod (is writable).
+* Check uploads dir chmod (is writable). => see [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads)
 * Add current user to context
 * Don't log empty context (WC)
 * Option for what level of errors to display as admin notices
