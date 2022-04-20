@@ -49,8 +49,8 @@
             "url":"https://wpackagist.org"
         },
         {
-            "type": "path",
-            "url": "../bh-wp-private-uploads"
+            "type": "git",
+            "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads"
         }
     ],
     "require": {
@@ -60,7 +60,7 @@
         "php": ">=7.4",
         "psr/log": "^1.0.0",
         "spatie/backtrace": "^1.0.0",
-        "wptrt/admin-notices": "dev-merged"
+        "wptrt/admin-notices": "dev-master"
     },
     "require-dev": {
         "10up/wp_mock": "0.4.2",
@@ -100,6 +100,9 @@
             },
             "10up/wp_mock": {
                 "Add AnyObject matcher": "https://github.com/10up/wp_mock/pull/161.patch"
+            },
+            "wptrt/admin-notices":{
+                "dev-merged": "https://github.com/BrianHenryIE/admin-notices/pull/1.patch"
             }
         },
         "symlinks": {
