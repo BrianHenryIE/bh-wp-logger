@@ -72,16 +72,6 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 */
 	public function log( $level, $message, $context = array() ) {
 
-		/**
-		 * When WP CLI commands are appended with `--debug` or more specifically `--debug=plugin-slug` all messages will be output.
-		 *
-		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
-		 */
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-
-			WP_CLI::debug( $message, $this->settings->get_plugin_slug() );
-		}
-
 		$context = array_merge( $context, $this->get_common_context() );
 
 		$settings_log_level = $this->settings->get_log_level();
@@ -133,6 +123,16 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		}
 
 		list( $level, $message, $context ) = array_values( $log_data );
+
+		/**
+		 * When WP CLI commands are appended with `--debug` or more specifically `--debug=plugin-slug` all messages will be output.
+		 *
+		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
+		 */
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+
+			WP_CLI::debug( $message, $this->settings->get_plugin_slug() );
+		}
 
 		$this->logger->$level( $message, $context );
 
