@@ -125,6 +125,9 @@ class Logs_Page {
 
 		wp_nonce_field( 'bh-wp-logger-delete', 'delete_logs_wpnonce' );
 
+		// TODO: Add a download link to this (which bypasses .htaccess etc.).
+		echo '<p>Displaying log file at <code>'. esc_html( $log_files[$chosen_date] ) .'</code></p>';
+
 		// Maybe should use set file?
 		$logs_table->set_date( $chosen_date );
 		$logs_table->prepare_items();
