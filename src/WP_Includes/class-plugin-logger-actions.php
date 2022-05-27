@@ -68,6 +68,7 @@ class Plugin_Logger_Actions {
 		$this->add_plugins_page_hooks();
 		$this->add_cron_hooks();
 		$this->add_private_uploads_hooks();
+		$this->define_init_hooks();
 	}
 
 	/**
@@ -164,5 +165,15 @@ class Plugin_Logger_Actions {
 		$url_is_public = new URL_Is_Public();
 
 		add_filter( "bh_wp_private_uploads_url_is_public_warning_{$this->settings->get_plugin_slug()}_logger", array( $url_is_public, 'change_warning_message' ), 10, 2 );
+	}
+
+	/**
+	 * Hook in to init to download log files.
+	 */
+	protected function define_init_hooks(): void {
+
+		$init = new Init( $this->api, $this->settings, $this->wrapped_real_logger );
+
+		add_action( 'init', array( $init, 'maybe_download_log' ) );
 	}
 }

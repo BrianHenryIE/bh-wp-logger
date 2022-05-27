@@ -125,8 +125,11 @@ class Logs_Page {
 
 		wp_nonce_field( 'bh-wp-logger-delete', 'delete_logs_wpnonce' );
 
-		// TODO: Add a download link to this (which bypasses .htaccess etc.).
-		echo '<p>Displaying log file at <code>'. esc_html( $log_files[$chosen_date] ) .'</code></p>';
+		// If this is in the logger's private-uploads directory, then it already should be accessible, but if it's in the wc-logs folder, it will not be.
+		$download_url = wp_nonce_url( admin_url( 'admin.php?page=' . $this->settings->get_plugin_slug() . '&date=' . $date . '&download-log=true' ), 'bh-wp-logger-download' );
+		$filepath     = $log_files[ $chosen_date ];
+		$filename     = basename( $filepath );
+		echo '<p>Displaying log file at <a href="' . esc_url( $download_url ) . '" download="' . esc_attr( $filename ) . '"><code>' . esc_html( $filepath ) . '</code></a></p>';
 
 		// Maybe should use set file?
 		$logs_table->set_date( $chosen_date );

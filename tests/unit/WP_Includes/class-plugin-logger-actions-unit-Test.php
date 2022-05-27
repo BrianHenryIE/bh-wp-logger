@@ -181,18 +181,13 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 
 	/**
-	 * @covers ::add_ajax_hooks
+	 * @covers ::define_init_hooks
 	 */
-	public function test_ajax_hooks(): void {
+	public function test_init_hooks(): void {
 
 		\WP_Mock::expectActionAdded(
-			'wp_ajax_bh_wp_logger_logs_delete',
-			array( new AnyInstance( AJAX::class ), 'delete' )
-		);
-
-		\WP_Mock::expectActionAdded(
-			'wp_ajax_bh_wp_logger_logs_delete_all',
-			array( new AnyInstance( AJAX::class ), 'delete_all' )
+			'init',
+			array( new AnyInstance( Init::class ), 'maybe_download_log' )
 		);
 
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
