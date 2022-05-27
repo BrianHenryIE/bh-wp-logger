@@ -93,6 +93,17 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			$context['filters'] = $wp_current_filter;
 		}
 
+		if ( isset( $context['exception'] ) && $context['exception'] instanceof \Exception ) {
+			$exception                    = $context['exception'];
+			$exception_details            = array();
+			$exception_details['class']   = get_class( $exception );
+			$exception_details['message'] = $exception->getMessage();
+
+			// TODO: Use reflection to log properties of Exception subclasses.
+
+			$context['exception'] = $exception_details;
+		}
+
 		/**
 		 * TODO: regex to replace email addresses with b**********e@gmail.com, credit card numbers etc.
 		 * There's a PHP proposal for omitting info from logs.
