@@ -69,6 +69,11 @@ class Admin_Notices extends Notices {
 	 */
 	public function admin_notices(): void {
 
+		// We don't need to register the admin notice except to display it and to handle the dismiss button.
+		if ( ! is_admin() && ! wp_doing_ajax() ) {
+			return;
+		}
+
 		$error_detail_option_name = $this->get_error_detail_option_name();
 
 		// If we're on the logs page, don't show the admin notice linking to the logs page.
