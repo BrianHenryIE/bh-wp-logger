@@ -38,6 +38,10 @@ class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
 			'update_option'
 		);
 
+		\WP_Mock::userFunction(
+			'delete_transient'
+		);
+
 		$sut->error( 'Error', array( 'exception' => $exception ) );
 
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase

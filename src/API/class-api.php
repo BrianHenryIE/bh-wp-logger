@@ -15,6 +15,7 @@ use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use BrianHenryIE\WP_Logger\Logger;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Psr\Log\LoggerAwareTrait;
@@ -229,6 +230,8 @@ class API implements API_Interface {
 	 * Deletes log files older than MONTH_IN_SECONDS.
 	 * Deletes empty log files.
 	 *
+	 * TODO: Do not use for WooCommerce_Logger_Interface, because WooCommerce handles deleting logs itself.
+	 *
 	 * @used-by Cron::delete_old_logs()
 	 */
 	public function delete_old_logs(): void {
@@ -333,36 +336,61 @@ class API implements API_Interface {
 		return false;
 	}
 
+	public function get_last_log_time_transient_name(): string {
+		return $this->settings->get_plugin_slug() . '-last-log-time';
+	}
+
 	/**
 	 * Used on plugins.php to highlight the logs link if there are new logs since they were last viewed.
 	 *
-	 * TODO: Add transient.
+	 * Read the log file backwards from the last character. Each time a newline character is found, check the buffer
+	 * to see was there a data at the beginning of the line. Return the first date found.
+	 *
+	 * @see https://stackoverflow.com/a/15017711/336146
+	 * TODO: NB Add transient.
 	 *
 	 * @return ?DateTimeInterface
 	 */
 	public function get_last_log_time(): ?DateTimeInterface {
 
+		$transient_name = $this->get_last_log_time_transient_name();
+
+		$transient_value = get_transient( $transient_name );
+
+		if ( ! empty( $transient_value ) ) {
+			return new DateTimeImmutable( $transient_value, new DateTimeZone( 'UTC' ) );
+		}
+
 		$log_files = $this->get_log_files();
-		if ( empty( $log_files ) ) {
-			return null;
+
+		$reverse_chronological_log_files = array_reverse( $log_files );
+
+		foreach ( $reverse_chronological_log_files as $last_log_file_path ) {
+
+			$file_pointer = fopen( $last_log_file_path, 'r' );
+
+			$offset_position = - 2;
+
+			$current_line = '';
+
+			while ( - 1 !== fseek( $file_pointer, $offset_position, SEEK_END ) ) {
+				$character = fgetc( $file_pointer );
+				if ( PHP_EOL === $character ) {
+
+					if ( 1 === preg_match( '/^(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s/im', $current_line, $output_array ) ) {
+						set_transient( $transient_name, $output_array['time'], DAY_IN_SECONDS );
+						return new DateTimeImmutable( $output_array['time'], new DateTimeZone( 'UTC' ) );
+					}
+
+					$current_line = '';
+				} else {
+					$current_line = $character . $current_line;
+				}
+				$offset_position --;
+			}
 		}
-		// TODO: Loop backwards? We could have an empty log file.
-		$last_log_file_path = array_pop( $log_files );
 
-		$parsed_log = $this->parse_log( $last_log_file_path );
-
-		$last_log = array_pop( $parsed_log );
-
-		if ( is_null( $last_log ) ) {
-			return null;
-		}
-
-		$last_log_datetime = $last_log['datetime'];
-
-		// TODO: Set transient.
-
-		return $last_log_datetime;
-
+		return null;
 	}
 
 	/**
@@ -374,7 +402,7 @@ class API implements API_Interface {
 
 		$option_name                    = $this->settings->get_plugin_slug() . '-last-logs-view-time';
 		$last_log_view_time_atom_string = get_option( $option_name );
-		$last_log_view_time_datetime    = \DateTimeImmutable::createFromFormat( DateTimeInterface::ATOM, $last_log_view_time_atom_string, new DateTimeZone( 'UTC' ) );
+		$last_log_view_time_datetime    = DateTimeImmutable::createFromFormat( DateTimeInterface::ATOM, $last_log_view_time_atom_string, new DateTimeZone( 'UTC' ) );
 
 		if ( false === $last_log_view_time_datetime ) {
 			delete_option( $option_name );
@@ -399,7 +427,7 @@ class API implements API_Interface {
 
 		if ( is_null( $date_time ) ) {
 			try {
-				$date_time = new \DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
+				$date_time = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
 			} catch ( \Exception $exception ) {
 				// This will never happen.
 				return;

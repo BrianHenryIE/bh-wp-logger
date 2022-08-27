@@ -147,12 +147,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 
 		$this->logger->$level( $message, $context );
 
-		// When plugins.php is loaded, the logs are parsed to determine the time of the last log
-		// and compared to the saved wp_option that says the last time the logs were viewed, then
-		// the logs link is <b> if it is sooner. The time of the last log is saved in a transient
-		// to avoid parsing the files on each load of plugins.php. TODO When a log is written, this
-		// transient is deleted. Hopefully this is the most efficient way.
-		// TODO: `delete_transient( 'last-log-time ')`.
+		// We store the last log time in a transient to avoid reading the file from disk. When a new log is written,
+		// that transient is expired. TODO: We're deleting here on the assumption deleting is more performant than writing
+		// the new value. This could also be run only in WordPress's 'shutdown' action.
+		delete_transient( $this->get_last_log_time_transient_name() );
 	}
 
 }
