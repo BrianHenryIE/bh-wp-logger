@@ -38,9 +38,9 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 	}
 
 	/**
-	 * @covers ::register_cron_job
+	 * @covers ::register_delete_logs_cron_job
 	 */
-	public function test_register_cron_job(): void {
+	public function test_register_delete_logs_cron_job(): void {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty(
@@ -72,11 +72,11 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 
-		$cron->register_cron_job();
+		$cron->register_delete_logs_cron_job();
 	}
 
 	/**
-	 * @covers ::register_cron_job
+	 * @covers ::register_delete_logs_cron_job
 	 */
 	public function test_do_not_schedule_if_already_scheduled(): void {
 		$api      = $this->makeEmpty( API_Interface::class );
@@ -108,11 +108,11 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 
-		$cron->register_cron_job();
+		$cron->register_delete_logs_cron_job();
 	}
 
 	/**
-	 * @covers ::register_cron_job
+	 * @covers ::register_delete_logs_cron_job
 	 */
 	public function test_do_not_schedule_for_woocommerce_logger(): void {
 		$api      = $this->makeEmpty( API_Interface::class );
@@ -149,7 +149,7 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 
-		$cron->register_cron_job();
+		$cron->register_delete_logs_cron_job();
 	}
 
 	/**

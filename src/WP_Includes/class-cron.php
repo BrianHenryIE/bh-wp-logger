@@ -59,7 +59,7 @@ class Cron {
 	 *
 	 * @hooked init
 	 */
-	public function register_cron_job(): void {
+	public function register_delete_logs_cron_job(): void {
 
 		/**
 		 * Cast the logger to the logger facade so we can access the true logger itself.

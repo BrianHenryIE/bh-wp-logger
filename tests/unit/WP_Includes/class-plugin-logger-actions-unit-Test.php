@@ -135,7 +135,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectActionAdded(
 			'init',
-			array( new AnyInstance( Cron::class ), 'register_cron_job' )
+			array( new AnyInstance( Cron::class ), 'register_delete_logs_cron_job' )
 		);
 		\WP_Mock::expectActionAdded(
 			'delete_logs_plugin-slug',

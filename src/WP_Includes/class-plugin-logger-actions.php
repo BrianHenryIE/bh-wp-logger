@@ -151,7 +151,7 @@ class Plugin_Logger_Actions {
 
 		$cron = new Cron( $this->api, $this->settings, $this->wrapped_real_logger );
 
-		add_action( 'init', array( $cron, 'register_cron_job' ) );
+		add_action( 'init', array( $cron, 'register_delete_logs_cron_job' ) );
 		add_action( 'delete_logs_' . $this->settings->get_plugin_slug(), array( $cron, 'delete_old_logs' ) );
 	}
 
