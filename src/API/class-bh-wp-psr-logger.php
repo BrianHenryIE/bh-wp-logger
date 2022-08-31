@@ -143,6 +143,26 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 
 			WP_CLI::debug( $message, $this->settings->get_plugin_slug() );
+
+			switch ( $level ) {
+				case LogLevel::DEBUG:
+					// Addressed above. Allow WP_CLI to decide if it is printed.
+					break;
+				case LogLevel::INFO:
+					WP_CLI::line( $message );
+					break;
+				case LogLevel::NOTICE:
+					WP_CLI::line( WP_CLI::colorize( '%bNotice:%n  ' . $message ) );
+					break;
+				case LogLevel::WARNING:
+					WP_CLI::line( WP_CLI::colorize( '%yWarning:%n ' . $message ) );
+					break;
+				case LogLevel::ERROR:
+					WP_CLI::line( WP_CLI::colorize( '%rError:%n   ' . $message ) );
+					break;
+				default:
+					WP_CLI::error_multi_line( array( ucfirst( $level ) . ': ' . $message ) );
+			}
 		}
 
 		$this->logger->$level( $message, $context );
