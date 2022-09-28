@@ -11,19 +11,18 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use DateTime;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use stdClass;
 use WP_List_Table;
 
 /**
  * Class Logs_Table
  */
 class Logs_List_Table extends WP_List_Table {
-
 	use LoggerAwareTrait;
 
 	protected Logger_Settings_Interface $settings;
@@ -35,10 +34,12 @@ class Logs_List_Table extends WP_List_Table {
 	/**
 	 * Logs_Table constructor.
 	 *
-	 * @param API_Interface                                                       $api
-	 * @param Logger_Settings_Interface                                           $settings
-	 * @param LoggerInterface                                                     $logger
-	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args
+	 * @see WP_List_Table::__construct()
+	 *
+	 * @param API_Interface                                                       $api The logger API.
+	 * @param Logger_Settings_Interface                                           $settings The logger settings.
+	 * @param LoggerInterface                                                     $logger The logger itself, to use for actual logging.
+	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args Arguments array from parent class.
 	 */
 	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger, array $args = array() ) {
 		parent::__construct( $args );
@@ -48,6 +49,13 @@ class Logs_List_Table extends WP_List_Table {
 		$this->api      = $api;
 	}
 
+	/**
+	 * Called before prepare_items() to set for which date logs should be displayed.
+	 *
+	 * @used-by Logs_Page::display_page()
+	 *
+	 * @param ?string $ymd_date Date in format 2022-09-28.
+	 */
 	public function set_date( ?string $ymd_date ): void {
 		$this->selected_date = $ymd_date;
 	}
@@ -134,11 +142,8 @@ class Logs_List_Table extends WP_List_Table {
 	 */
 	public function column_default( $item, $column_name ) {
 
-		$output = '';
+		$column_output = '';
 		switch ( $column_name ) {
-			case 'level':
-				// The "level" column is just a color bar.
-				return $output;
 			case 'time':
 				$time = $item['time'];
 
@@ -150,23 +155,75 @@ class Logs_List_Table extends WP_List_Table {
 
 					// Output in format: 20:02, Saturday, 14 November, 2020 (PST).
 					$date_formatted = $datetime->format( 'H:i, l, d F, Y (T)' );
-					$output        .= $date_formatted;
-					$output        .= '<br/>';
+					$column_output .= $date_formatted;
+					$column_output .= '<br/>';
 				} catch ( \Exception $e ) {
-					$output .= 'Could not parse date: ';
+					$column_output .= 'Could not parse date: ';
 				}
-				$output .= $time;
-
-				return $output;
-
-			case 'message':
+				$column_output .= $time;
+				break;
 			case 'context':
-				$context             = $item[ $column_name ] ?? '';
+				$context             = $item['context'] ?? '';
 				$context_column_text = trim( wp_json_encode( $context, JSON_PRETTY_PRINT ), "'\"" );
-				return is_string( $context_column_text ) ? esc_html( $context_column_text ) : '';
+				$column_output       = is_string( $context_column_text ) ? esc_html( $context_column_text ) : '';
+				break;
+			case 'message':
+				// The "message" is just text.
+				$column_output = $item['message'];
+				$column_output = $this->replace_wp_user_id_with_link( $column_output );
+				break;
+			case 'level':
+				// The "level" column is just a color bar.
 			default:
-				// TODO: Log unexpected column name / do_action.
-				return '';
+				// TODO: Log unexpected column name.
+				break;
 		}
+
+		$logger_settings = $this->settings;
+		$logger          = $this->logger;
+
+		/**
+		 * Filter to modify what is printed for the column.
+		 * e.g. find and replace wc_order:123 with a link to the order.
+		 *
+		 * @pararm string $column_output
+		 * @param array{time:string, level:string, message:string, context:array} $item The log entry row.
+		 * @param string $column_name
+		 * @param Logger_Settings_Interface $settings
+		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
+		 */
+		$column_output = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_column', $column_output, $item, $column_name, $logger_settings, $logger );
+
+		return $column_output;
+	}
+
+	/**
+	 * Update `wp_user:123` with links to the user profile.
+	 *
+	 * Public for now. Maybe should be in another class.
+	 *
+	 * @param string $message The log text to search and replace in.
+	 *
+	 * @return string
+	 */
+	public function replace_wp_user_id_with_link( string $message ): string {
+
+		$callback = function( array $matches ): string {
+
+			$user = get_user_by( 'ID', $matches[1] );
+
+			if ( $user instanceof \WP_User ) {
+				// TODO: wpcs.
+				$url  = admin_url( "user-edit.php?user_id={$matches[1]}" );
+				$link = "<a href=\"{$url}\">{$user->user_nicename}</a>";
+				return $link;
+			}
+
+			return $matches[0];
+		};
+
+		$message = preg_replace_callback( '/wp_user:(\d+)/', $callback, $message );
+
+		return $message;
 	}
 }
