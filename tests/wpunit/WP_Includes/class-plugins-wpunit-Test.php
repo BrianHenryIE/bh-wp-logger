@@ -120,13 +120,81 @@ class Plugins_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 	 */
 	public function test_discover_plugin_relative_directory(): void {
 
+		global $wp_plugin_paths;
+		$wp_plugin_paths = array(
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/admin-menu-editor' => '/Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/admin-menu-editor',
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger' => '/Users/brianhenry/Sites/bh-wp-logger',
+		);
+
 		$sut = new Plugins();
 
-		$normal_plugin_file = WP_PLUGIN_DIR . '/my-plugin-slug/subdir/file.php';
+		$normal_plugin_file = WP_PLUGIN_DIR . '/bh-wp-logger/subdir/file.php';
 
 		$result = $sut->discover_plugin_relative_directory( $normal_plugin_file );
 
-		$this->assertEquals( 'my-plugin-slug', $result );
+		$this->assertEquals( 'bh-wp-logger', $result );
 
+	}
+
+	/**
+	 * @covers ::discover_plugin_relative_directory
+	 */
+	public function test_discover_symlinked_plugin_relative_directory(): void {
+
+		global $wp_plugin_paths;
+		$wp_plugin_paths = array(
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/admin-menu-editor' => '/Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/admin-menu-editor',
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger' => '/Users/brianhenry/Sites/bh-wp-logger',
+		);
+
+		$sut = new Plugins();
+
+		$normal_plugin_file = '/Users/brianhenry/Sites/bh-wp-logger/subdir/file.php';
+
+		$result = $sut->discover_plugin_relative_directory( $normal_plugin_file );
+
+		$this->assertEquals( 'bh-wp-logger', $result );
+
+	}
+
+	/**
+	 * @covers ::discover_plugin_data
+	 */
+	public function test_discover_plugin_data_simple_null(): void {
+
+		$sut = new Plugins();
+
+		// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/src/WP_Includes.
+		// And $wp_plugin_paths is empty.
+
+		$result = $sut->discover_plugin_data();
+
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * @covers ::discover_plugin_data
+	 */
+	public function test_discover_plugin_data_not_found_null(): void {
+
+		global $wp_plugin_paths;
+		$wp_plugin_paths = array(
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/admin-menu-editor' => '/Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/admin-menu-editor',
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger' => '/Users/brianhenry/Sites/bh-wp-logger',
+		);
+
+		$sut = new Plugins();
+
+		// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/src/WP_Includes.
+
+		$cache_plugins = array(
+			'bh-wp-logger' => array(),
+		);
+
+		wp_cache_set( 'plugins', $cache_plugins, 'plugins' );
+
+		$result = $sut->discover_plugin_data();
+
+		$this->assertNull( $result );
 	}
 }
