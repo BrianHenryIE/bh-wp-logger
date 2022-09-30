@@ -47,32 +47,19 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 This library is not on Packagist yet, so first add this repo:
 
-`composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger`
+```
+composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger
+composer config repositories.wptrt/admin-notices git https://github.com/brianhenryie/admin-notices
+composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads
+composer require brianhenryie/bh-wp-logger
+```
 
-The reason being it is using a fork of [wptrt/admin-notices](https://github.com/WPTT/admin-notices) because of [a race condition in Firefox](https://github.com/WPTT/admin-notices/issues/14). So also add that repo:
+It is using a fork of [wptrt/admin-notices](https://github.com/WPTT/admin-notices) because of [a race condition in Firefox](https://github.com/WPTT/admin-notices/issues/14). And it uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible.
 
-`composer config repositories.wptrt/admin-notices git https://github.com/brianhenryie/admin-notices`
-
-It uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible, so add that repo:
-
-`composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads`
-
-Then require as normal:
-
-`composer require brianhenryie/bh-wp-logger`
 
 ### Instantiate
 
-You should use [brianhenryie/strauss](https://github.com/BrianHenryIE/strauss) to prefix the library's namespace. Then Strauss's autoloader will include the files for you. Otherwise:
-
-Include the files:
-
-```php
-// Use a PSR-4 autoloader for the bh-wp-logger dependencies.
-
-// Use this for its own files.
-require_once '/path/to/bh-wp-logger/autoload.php';
-```
+You should use [brianhenryie/strauss](https://github.com/BrianHenryIE/strauss) to prefix the library's namespace. Then Strauss's autoloader will include the files for you.
 
 The following will work, but it will be faster and more reliable to provide the settings:
 
@@ -108,7 +95,7 @@ $logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Sett
 $logger = Logger::instance( $logger_settings );
 ```
 
-Then pass around your `$logger` instance; use `NullLogger` in your tests.
+Then pass around your `$logger` instance.
 
 After the logger has been instantiated once, subsequent calls to `::instance()` return the existing instance and any `$logger_settings` passed is ignored.
 
@@ -144,6 +131,72 @@ $setting_fields[] = array(
 ```
 
 ![WooCommerce Settings](./assets/woocommerce-settings.png "WooCommerce Settings")
+
+## Filters
+
+Two filter are present, to modify the log data as it is being saved, and to modify the log data as it is being presented.
+
+E.g. change the log level for specific log messages:
+
+```php
+/**
+ * Modify the log data array or return null to cancel logging this entry.
+ * The library php-http/logger-plugin is using INFO for detailed logging, let's change that to DEBUG.
+ *
+ * @hooked {$plugin_slug}_bh_wp_logger_log
+ * 
+ * @pararm array{level:string,message:string,context:array} $log_data
+ * @param Logger_Settings_Interface $settings
+ * @param BH_WP_PSR_Logger $bh_wp_psr_logger
+ */
+function modify_log_data( array $log_data, \BrianHenryIE\WP_Logger\Logger_Settings_Interface $settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger): ?array {
+    
+    if ( 0 === strpos( $log_data['message'], 'Sending request' ) ) {
+        $log_data['level'] = LogLevel::DEBUG;
+    }
+
+    return $log_data;
+}
+add_filter( "{$plugin_slug}_bh_wp_logger_log", 'modify_log_data', 10, 3 );
+```
+
+E.g. turn text in logs into hyperlinks as it is being displayed in the logs table:
+
+```php
+/**
+ * Update `wc_order:123` with links to the order.
+ * Use preg_replace_callback to find and replace all instances in the string.
+ *
+ * @hooked {$plugin_slug}_bh_wp_logger_column
+ *
+ * @param string                                                          $column_output The column output so far.
+ * @param array{time:string, level:string, message:string, context:array} $item The log entry row.
+ * @param string                                                          $column_name The current column name.
+ * @param Logger_Settings_Interface                                       $logger_settings The logger settings.
+ * @param BH_WP_PSR_Logger                                                $logger The logger API instance.
+ *
+ * @return string
+ */
+function replace_wc_order_id_with_link( string $column_output, array $item, string $column_name,\BrianHenryIE\WP_Logger\Logger_Settings_Interface $settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger ): string {
+
+    if ( 'message' !== $column_name ) {
+        return $column_output;
+    }
+
+    $callback = function( array $matches ): string {
+
+        $url  = admin_url( "post.php?post={$matches[1]}&action=edit" );
+        $link = "<a href=\"{$url}\">Order {$matches[1]}</a>";
+
+        return $link;
+    };
+
+    $message = preg_replace_callback( '/wc_order:(\d+)/', $callback, $column_output ) ?? $column_output;
+
+    return $message;
+}
+add_filter( "{$plugin_slug}_bh_wp_logger_column", 'replace_wc_order_id_with_link', 10, 5 );
+```
 
 ## WP_Mock
 

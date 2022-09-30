@@ -16,6 +16,8 @@ class Admin_Notices_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 	 */
 	public function test_date_in_notice() {
 
+		$this->markTestIncomplete();
+
 		// 2021-09-13T22:05:11Z UTC
 
 		$api      = $this->makeEmpty( API_Interface::class );

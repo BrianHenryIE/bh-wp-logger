@@ -38,10 +38,10 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * @param API_Interface                                                       $api The logger API.
 	 * @param Logger_Settings_Interface                                           $settings The logger settings.
-	 * @param LoggerInterface                                                     $logger The logger itself, to use for actual logging.
+	 * @param BH_WP_PSR_Logger                                                    $logger The logger itself, to use for actual logging.
 	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args Arguments array from parent class.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger, array $args = array() ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, BH_WP_PSR_Logger $logger, array $args = array() ) {
 		parent::__construct( $args );
 
 		$this->logger   = $logger;

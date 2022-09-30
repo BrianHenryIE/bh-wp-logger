@@ -4,6 +4,7 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\API\API;
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
@@ -23,7 +24,8 @@ class Logs_List_Table_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$api      = $this->makeEmpty( API::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		// TODO: It would be nice to use ColorLogger here with this.
+		$logger = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		global $hook_suffix;
 		$hook_suffix = '';

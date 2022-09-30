@@ -3,6 +3,7 @@
 namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
@@ -37,7 +38,8 @@ class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
 				'get_plugin_slug' => 'test-enqueue-styles',
 			)
 		);
-		$logger   = new ColorLogger();
+		// TODO: It would be nice to use ColorLogger here with this.
+		$logger = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		$screen     = new \stdClass();
 		$screen->id = 'admin_page_test-enqueue-styles-logs';
@@ -95,7 +97,8 @@ class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
 				'get_plugin_slug' => 'test-enqueue-styles',
 			)
 		);
-		$logger   = new ColorLogger();
+		// TODO: It would be nice to use ColorLogger here with this.
+		$logger = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		$screen     = new \stdClass();
 		$screen->id = 'admin_page_test-enqueue-styles-logs';
