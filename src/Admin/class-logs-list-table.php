@@ -163,13 +163,14 @@ class Logs_List_Table extends WP_List_Table {
 				$column_output .= $time;
 				break;
 			case 'context':
-				$context             = $item['context'] ?? '';
-				$context_column_text = trim( wp_json_encode( $context, JSON_PRETTY_PRINT ), "'\"" );
-				$column_output       = is_string( $context_column_text ) ? esc_html( $context_column_text ) : '';
+				if ( ! empty( $item['context'] ) ) {
+					$column_output = esc_html( trim( wp_json_encode( $item['context'], JSON_PRETTY_PRINT ), "'\"" ) );
+				}
 				break;
 			case 'message':
 				// The "message" is just text.
 				$column_output = $item['message'];
+				$column_output = esc_html( $column_output );
 				$column_output = $this->replace_wp_user_id_with_link( $column_output );
 				break;
 			case 'level':
