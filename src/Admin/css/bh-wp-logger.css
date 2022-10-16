@@ -11,6 +11,7 @@
 /* the td */
 .level.column-level {
     padding: 0;
+    border-right: 1px solid #c3c4c7;
 }
 
 
