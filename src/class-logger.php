@@ -85,7 +85,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			$logger = new NullLogger();
 
 		} elseif ( $settings instanceof WooCommerce_Logger_Settings_Interface
-			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) ), true ) ) {
 			// Does not use `is_plugin_active()` here because "Call to undefined function" error (maybe an admin function).
 
 			$logger = new WC_PSR_Logger( $settings );
