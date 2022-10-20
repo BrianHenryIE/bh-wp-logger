@@ -34,6 +34,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 * When an error is being logged, record the time of the last error, so later, an admin notice can be displayed,
 	 * to inform them of the new problem.
 	 *
+	 * TODO: This always displays the admin notice even when the log itself is filtered. i.e. this function runs before
+	 * the filter, so the code needs to be moved.
+	 * TODO: Allow configuring which log levels result in the admin notice.
+	 *
 	 * TODO: include a link to the log url so the last file with an error will be linked, rather than the most recent log file.
 	 *
 	 * @param string               $message The message to be logged.
@@ -86,7 +90,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			$context['filters'] = $wp_current_filter;
 
 		} elseif ( LogLevel::WARNING === $level || LogLevel::DEBUG === $settings_log_level ) {
-			$debug_backtrace            = $this->get_backtrace( 2 );
+			$debug_backtrace            = $this->get_backtrace( 3 );
 			$context['debug_backtrace'] = $debug_backtrace;
 
 			global $wp_current_filter;
@@ -99,7 +103,13 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			$exception_details['class']   = get_class( $exception );
 			$exception_details['message'] = $exception->getMessage();
 
-			// TODO: Use reflection to log properties of Exception subclasses.
+			$reflect = new \ReflectionClass( get_class( $exception ) );
+			$props   = array();
+			foreach ( $reflect->getProperties() as $property ) {
+				$property->setAccessible( true );
+				$props[ $property->getName() ] = $property->getValue( $exception );
+			}
+			$exception_details['properties'] = $props;
 
 			$context['exception'] = $exception_details;
 		}
@@ -123,7 +133,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		 * Filter to modify the log data.
 		 * Return null to cancel logging this message.
 		 *
-		 * @pararm array{level:string,message:string,context:array} $log_data
+		 * @param array{level:string,message:string,context:array} $log_data
 		 * @param Logger_Settings_Interface $settings
 		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
 		 */

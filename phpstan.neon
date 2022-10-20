@@ -15,3 +15,4 @@ parameters:
         - '#LoggerInterface\|null#'
         - '#Function apply_filters invoked with \d+ parameters, \d+ required.#'
         - '#Parameter \#2 \$callback of static method WP_Mock::expect.*Added\(\) expects callable\(\): mixed, array.*given\.#'
+        - '#Variable \$log_data in empty\(\) always exists and is not falsy#'

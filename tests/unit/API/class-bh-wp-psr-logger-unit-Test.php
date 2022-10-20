@@ -20,8 +20,8 @@ class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
 	}
 
 	/**
-	 * When an exception is passed in the context, it just gets logged as `{}`, so let's instead log the
-	 * exception type and any strings it contains.
+	 * When an exception is passed in the context, it normally just gets logged as `{}`, so let's instead log the
+	 * exception type and message, and use reflection to get its properties.
 	 *
 	 * @covers ::log
 	 */
@@ -32,7 +32,7 @@ class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
 
 		$sut = new BH_WP_PSR_Logger( $settings, $logger );
 
-		$exception = new \Exception( 'Exception message' );
+		$exception = new \Exception( 'Exception message', 123 );
 
 		\WP_Mock::userFunction(
 			'update_option'
@@ -48,8 +48,12 @@ class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
 		$logged_exception = $logger->recordsByLevel['error'][0]['context']['exception'];
 
 		$this->assertArrayHasKey( 'class', $logged_exception );
-		$this->assertArrayHasKey( 'message', $logged_exception );
 
+		$this->assertArrayHasKey( 'message', $logged_exception );
 		$this->assertEquals( 'Exception message', $logged_exception['message'] );
+
+		$this->assertArrayHasKey( 'properties', $logged_exception );
+		$this->assertEquals( 123, $logged_exception['properties']['code'] );
+
 	}
 }
