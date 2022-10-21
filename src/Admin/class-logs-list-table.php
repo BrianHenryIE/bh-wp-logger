@@ -120,7 +120,7 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * @see WP_List_Table::single_row()
 	 *
-	 * @param array{time:string, level:string, message:string, context:array} $item The current item.
+	 * @param array{time:string, level:string, message:string, context:array<mixed>} $item The current item.
 	 * @return void
 	 */
 	public function single_row( $item ) {
@@ -132,8 +132,8 @@ class Logs_List_Table extends WP_List_Table {
 	/**
 	 * Get the HTML for a column.
 	 *
-	 * @param array{time:string, level:string, message:string, context:array} $item ...whatever type get_data returns.
-	 * @param string                                                          $column_name The specified column.
+	 * @param array{time:string, level:string, message:string, context:array<mixed>} $item ...whatever type get_data returns.
+	 * @param string                                                                 $column_name The specified column.
 	 *
 	 * @return string|true|void
 	 * @see WP_List_Table::column_default()
@@ -172,6 +172,7 @@ class Logs_List_Table extends WP_List_Table {
 				$column_output = $item['message'];
 				$column_output = esc_html( $column_output );
 				$column_output = $this->replace_wp_user_id_with_link( $column_output );
+				$column_output = $this->replace_shop_order_id_with_link( $column_output );
 				break;
 			case 'level':
 				// The "level" column is just a color bar.
@@ -187,8 +188,8 @@ class Logs_List_Table extends WP_List_Table {
 		 * Filter to modify what is printed for the column.
 		 * e.g. find and replace wc_order:123 with a link to the order.
 		 *
-		 * @pararm string $column_output
-		 * @param array{time:string, level:string, message:string, context:array} $item The log entry row.
+		 * @param string $column_output
+		 * @param array{time:string, level:string, message:string, context:array<string,mixed>} $item The log entry row.
 		 * @param string $column_name
 		 * @param Logger_Settings_Interface $settings
 		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
@@ -223,7 +224,31 @@ class Logs_List_Table extends WP_List_Table {
 			return $matches[0];
 		};
 
-		$message = preg_replace_callback( '/wp_user:(\d+)/', $callback, $message );
+		$message = preg_replace_callback( '/wp_user:(\d+)/', $callback, $message ) ?? $message;
+
+		return $message;
+	}
+
+	/**
+	 * Update `shop_order:123` with links to the order.
+	 *
+	 * TODO: Make this generic for all post types.
+	 *
+	 * @param string $column_output The column output so far.
+	 *
+	 * @return string
+	 */
+	public function replace_shop_order_id_with_link( string $column_output ): string {
+
+		$callback = function( array $matches ): string {
+
+			$url  = admin_url( "post.php?post={$matches[1]}&action=edit" );
+			$link = "<a href=\"{$url}\">Order {$matches[1]}</a>";
+
+			return $link;
+		};
+
+		$message = preg_replace_callback( '/shop_order:(\d+)/', $callback, $column_output ) ?? $column_output;
 
 		return $message;
 	}
