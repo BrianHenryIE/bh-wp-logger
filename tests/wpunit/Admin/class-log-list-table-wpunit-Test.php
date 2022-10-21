@@ -43,4 +43,30 @@ class Logs_List_Table_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$this->assertStringContainsString( 'username_2', $result );
 
 	}
+
+	/**
+	 * Let's try make the shop_order:123 replacement generic.
+	 *
+	 * @covers ::replace_post_type_id_with_link
+	 */
+	public function test_replace_custom_post_type_id(): void {
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
+		$logger   = new ColorLogger();
+
+		$GLOBALS['hook_suffix'] = 'post';
+
+		$sut = new Logs_List_Table( $api, $settings, $logger );
+
+		$item = array(
+			'message' => 'a string with custom `attachment:123` post types with ids beside',
+		);
+
+		$result = $sut->column_default( $item, 'message' );
+
+		$expected = 'edit.php?post=123';
+
+		$this->assertStringContainsString( $expected, $result );
+	}
 }

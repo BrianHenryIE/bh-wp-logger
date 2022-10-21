@@ -18,6 +18,7 @@ use DateTime;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WP_List_Table;
+use WP_Post_Type;
 
 /**
  * Class Logs_Table
@@ -172,7 +173,7 @@ class Logs_List_Table extends WP_List_Table {
 				$column_output = $item['message'];
 				$column_output = esc_html( $column_output );
 				$column_output = $this->replace_wp_user_id_with_link( $column_output );
-				$column_output = $this->replace_shop_order_id_with_link( $column_output );
+				$column_output = $this->replace_post_type_id_with_link( $column_output );
 				break;
 			case 'level':
 				// The "level" column is just a color bar.
@@ -230,25 +231,45 @@ class Logs_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Update `shop_order:123` with links to the order.
+	 * Replace references to posts with links to the post edit screen.
+	 * E.g. update `shop_order:123` with link to the order called "Order 123".
+	 * E.g. update `attachment:456` with link to the attachment called "Media 456".
 	 *
-	 * TODO: Make this generic for all post types.
+	 * The backticks are required.
 	 *
 	 * @param string $column_output The column output so far.
 	 *
 	 * @return string
 	 */
-	public function replace_shop_order_id_with_link( string $column_output ): string {
+	public function replace_post_type_id_with_link( string $column_output ): string {
 
-		$callback = function( array $matches ): string {
+		/** @var array<string, WP_Post_Type> $post_types */
+		$post_types = get_post_types( array(), 'objects' );
 
-			$url  = admin_url( "post.php?post={$matches[1]}&action=edit" );
-			$link = "<a href=\"{$url}\">Order {$matches[1]}</a>";
+		/** @var array<string, WP_Post_Type> $post_types_with_ui */
+		$post_types_with_ui = array_filter(
+			$post_types,
+			function( WP_Post_Type $post_type ) {
+				return $post_type->show_ui;
+			}
+		);
+
+		$callback = function( array $matches ) use ( $post_types_with_ui ): string {
+
+			if ( ! isset( $post_types_with_ui[ $matches[1] ] ) ) {
+				return $matches[0];
+			}
+
+			$post_type      = $post_types_with_ui[ $matches[1] ];
+			$post_type_name = $post_type->labels->singular_name;
+
+			$url  = admin_url( "edit.php?post={$matches[2]}" );
+			$link = "<a href=\"{$url}\">{$post_type_name} {$matches[2]}</a>";
 
 			return $link;
 		};
 
-		$message = preg_replace_callback( '/shop_order:(\d+)/', $callback, $column_output ) ?? $column_output;
+		$message = preg_replace_callback( '/`(\w+):(\d+)`/', $callback, $column_output ) ?? $column_output;
 
 		return $message;
 	}
