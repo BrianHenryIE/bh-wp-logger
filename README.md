@@ -233,14 +233,14 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 * Don't log empty context (WC)
 * Option for what level of errors to display as admin notices
 * Option for user capability for displaying admin notices (filter, at least)
-* Zero-config WC_Logger: detect "wc", "woo" in plugin names
+* ~~Zero-config WC_Logger: detect "wc", "woo" in plugin names~~
 * Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json
 * Paging and filtering
-* Hyperlinks in messages
+* ~~Hyperlinks in messages~~
 * ~~Record timestamp the logs were last viewed at, make the plugins.php link bold if new logs are present.~~
 * ~~Auto-delete old logs~~
 * ~~Log notice should dismiss when the log page is visited~~
-* Redact sensitive data. e.g. use `userid:123` in the saved logs and replace it with richer data when displaying them
+* ~~Redact sensitive data. e.g. use `userid:123` in the saved logs and replace it with richer data when displaying them~~
 
 # Status
 
