@@ -40,9 +40,9 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 ![Plugins page logs link](./assets/plugins-page-logs-link.png "Plugins page logs link")
 
-When log messages contain `` ```wp_user:123` `` (NB: surrounded by backticks) it will be replaced with a link to the user profile.  This allows for logging useful references to users without logging their name.
+When log messages contain `` `wp_user:123` `` (NB: surrounded by single backticks) it will be replaced with a link to the user profile.  This allows for logging useful references to users without logging their name.
 
-Similarly, any post type can be linked with `post_type_name:123`, e.g. `shop_order:123` will link to the WooCommerce order.
+Similarly, any post type can be linked with `` `post_type_name:123` ``, e.g. `` `shop_order:123` `` will link to the WooCommerce order.
 
 ![Links in log message](./assets/links-in-logs.png "Log messages link to user or post")
 
