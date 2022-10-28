@@ -15,8 +15,6 @@ use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use DateTime;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 use WP_List_Table;
 use WP_Post_Type;
 
@@ -24,7 +22,7 @@ use WP_Post_Type;
  * Class Logs_Table
  */
 class Logs_List_Table extends WP_List_Table {
-	use LoggerAwareTrait;
+	protected BH_WP_PSR_Logger $logger;
 
 	protected Logger_Settings_Interface $settings;
 
@@ -39,7 +37,7 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * @param API_Interface                                                       $api The logger API.
 	 * @param Logger_Settings_Interface                                           $settings The logger settings.
-	 * @param BH_WP_PSR_Logger                                                    $logger The logger itself, to use for actual logging.
+	 * @param BH_WP_PSR_Logger                                                    $logger The logger itself, to use for actual logging. Also passed into a filter.
 	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args Arguments array from parent class.
 	 */
 	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, BH_WP_PSR_Logger $logger, array $args = array() ) {
