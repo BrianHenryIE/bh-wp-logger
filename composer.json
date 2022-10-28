@@ -98,9 +98,6 @@
             "jaschilz/php-coverage-badger": {
                 "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
             },
-            "10up/wp_mock": {
-                "Add AnyObject matcher": "https://github.com/10up/wp_mock/pull/161.patch"
-            },
             "wptrt/admin-notices":{
                 "dev-merged": "https://github.com/BrianHenryIE/admin-notices/pull/1.patch"
             }
@@ -129,7 +126,6 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "vendor/bin/strauss",
             "vendor/bin/wp core download --path=wordpress --allow-root || true;",
             "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
             "@setup-wordpress",
@@ -137,7 +133,6 @@
             "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
         ],
         "post-update-cmd": [
-            "vendor/bin/strauss",
             "@setup-wordpress",
             "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
             "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
