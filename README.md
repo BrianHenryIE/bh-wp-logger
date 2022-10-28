@@ -40,7 +40,7 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 ![Plugins page logs link](./assets/plugins-page-logs-link.png "Plugins page logs link")
 
-When log messages contain `` ```wp_user:123` `` (NB: surrounded by backticks) it will be replaced with a link to the user profile.  This allows for logging useful references to users without logging their name.
+When log messages contain `` ```wp_user:123` `` (NB: surrounded by backticks) it will be replaced with a link to the user profile.  This allows for logging useful references to users without logging their PII.
 
 Similarly, any post type can be linked with `post_type_name:123`, e.g. `shop_order:123` will link to the WooCommerce order.
 
@@ -230,7 +230,7 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 * ~~Check log directory is not publicly accessible~~
 * Check uploads dir chmod (is writable). => see [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads)
 * Add current user to context
-* Don't log empty context (WC)
+* ~~Don't log empty context (WC)~~
 * Option for what level of errors to display as admin notices
 * Option for user capability for displaying admin notices (filter, at least)
 * ~~Zero-config WC_Logger: detect "wc", "woo" in plugin names~~
@@ -241,6 +241,8 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 * ~~Auto-delete old logs~~
 * ~~Log notice should dismiss when the log page is visited~~
 * ~~Redact sensitive data. e.g. use `userid:123` in the saved logs and replace it with richer data when displaying them~~
+* Add errors to dashboard Site Health widget
+* Ensure output is properly escaped
 
 # Status
 
