@@ -45,15 +45,6 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 */
 	public function error( $message, $context = array() ) {
 
-		// TODO: If log level is none, this will display an admin notice, but it should not.
-		update_option(
-			$this->settings->get_plugin_slug() . '-recent-error-data',
-			array(
-				'message'   => $message,
-				'timestamp' => time(),
-			)
-		);
-
 		$this->log( LogLevel::ERROR, $message, $context );
 	}
 
@@ -144,6 +135,16 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		}
 
 		list( $level, $message, $context ) = array_values( $log_data );
+
+		if ( LogLevel::ERROR === $level ) {
+			update_option(
+				$this->settings->get_plugin_slug() . '-recent-error-data',
+				array(
+					'message'   => $message,
+					'timestamp' => time(),
+				)
+			);
+		}
 
 		/**
 		 * When WP CLI commands are appended with `--debug` or more specifically `--debug=plugin-slug` all messages will be output.
