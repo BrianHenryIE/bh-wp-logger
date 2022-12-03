@@ -30,21 +30,21 @@ Records a full backtrace on errors. Records two steps of backtrace on every log 
 
 Displays logs in `WP_List_Table`.
 
-![Logs WP_List_Table](./assets/logs-wp-list-table.png "Logs WP_List_Table")
+![Logs WP_List_Table](./.github/logs-wp-list-table.png "Logs WP_List_Table")
 
 Shows a dismissable admin error notice each time there is a new error.
 
-![Admin Error Notice](./assets/admin-error-notice.png "Admin error notice")
+![Admin Error Notice](./.github/admin-error-notice.png "Admin error notice")
 
 Adds a link to the logs view on the plugin's entry on plugins.php.
 
-![Plugins page logs link](./assets/plugins-page-logs-link.png "Plugins page logs link")
+![Plugins page logs link](./.github/plugins-page-logs-link.png "Plugins page logs link")
 
 When log messages contain `wp_user:123` (NB: surrounded by single backticks) it will be replaced with a link to the user profile. This allows for logging useful references to users without logging their PII.
 
 Similarly, any post type can be linked with `` `post_type_name:123` ``, e.g. `` `shop_order:123` `` will link to the WooCommerce order.
 
-![Links in log message](./assets/links-in-logs.png "Log messages link to user or post")
+![Links in log message](./.github/links-in-logs.png "Log messages link to user or post")
 
 
 ## Use
@@ -136,7 +136,7 @@ $setting_fields[] = array(
 );
 ```
 
-![WooCommerce Settings](./assets/woocommerce-settings.png "WooCommerce Settings")
+![WooCommerce Settings](./.github/woocommerce-settings.png "WooCommerce Settings")
 
 ## Filters
 
@@ -219,7 +219,7 @@ If using WP_Mock for your tests, and you are instantiating this logger, the foll
 
 The `test-plugin` folder contains a small plugin with buttons to trigger the types of errors that can be logged.
 
-![Test Plugin](./assets/test-plugin.png "Test Plugin")
+![Test Plugin](./.github/test-plugin.png "Test Plugin")
 
 ### Best Practice
 
