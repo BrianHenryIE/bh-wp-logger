@@ -74,6 +74,8 @@ class Admin_Notices extends Notices {
 			return;
 		}
 
+		// TODO: alwasy return on updater.php
+
 		$error_detail_option_name = $this->get_error_detail_option_name();
 
 		// If we're on the logs page, don't show the admin notice linking to the logs page.

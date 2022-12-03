@@ -317,6 +317,8 @@ class API implements API_Interface {
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
 
+		// global $wp_plugin_paths;
+
 		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
 
 		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $filepath, $output_array ) ) {
@@ -347,7 +349,6 @@ class API implements API_Interface {
 	 * to see was there a data at the beginning of the line. Return the first date found.
 	 *
 	 * @see https://stackoverflow.com/a/15017711/336146
-	 * TODO: NB Add transient.
 	 *
 	 * @return ?DateTimeInterface
 	 */

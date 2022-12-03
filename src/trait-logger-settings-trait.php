@@ -19,16 +19,8 @@ trait Logger_Settings_Trait {
 	 *
 	 * @var string
 	 */
-	protected string $log_level;
-
-	protected string $plugin_name;
-
-	protected string $plugin_slug;
-
-	protected string $plugin_basename;
-
 	public function get_log_level(): string {
-		return $this->log_level;
+		return LogLevel::INFO;
 	}
 
 	public function get_plugin_name(): string {
