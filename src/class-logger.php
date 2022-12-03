@@ -21,9 +21,9 @@ use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
+use BrianHenryIE\WP_Private_Uploads\BH_WP_Private_Uploads_Hooks;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Interface;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Trait;
-use BrianHenryIE\WP_Private_Uploads\WP_Includes\BH_WP_Private_Uploads;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LoggerInterface;
@@ -161,7 +161,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 			// Don't use the Private_Uploads singleton in case the parent plugin also needs it.
 			$private_uploads = new Private_Uploads( $private_uploads_settings, $this );
-			new BH_WP_Private_Uploads( $private_uploads, $private_uploads_settings, $this );
+			new BH_WP_Private_Uploads_Hooks( $private_uploads, $private_uploads_settings, $this );
 
 		}
 
