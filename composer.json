@@ -55,10 +55,11 @@
         }
     ],
     "require": {
-        "brianhenryie/bh-wp-private-uploads": "dev-master",
-        "ext-json": "*",
-        "katzgrau/klogger": "dev-master",
         "php": ">=7.4",
+        "ext-json": "*",
+        "alleyinteractive/wordpress-autoloader": "^1.1",
+        "brianhenryie/bh-wp-private-uploads": "dev-master",
+        "katzgrau/klogger": "dev-master",
         "psr/log": "^1.0.0",
         "spatie/backtrace": "^1.0.0",
         "wptrt/admin-notices": "dev-master"
@@ -91,7 +92,6 @@
         "wpackagist-theme/twentytwenty": "*",
         "brianhenryie/color-logger": "^1.0",
         "php-stubs/woocommerce-stubs": "^5.2",
-        "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master#015c9654459fd267cf12fa7846d3bf36b11c3bd7",
         "wpackagist-plugin/woocommerce": "*"
     },
     "extra": {
@@ -107,7 +107,9 @@
             "wp-content": "wordpress/wp-content",
             "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin",
             "src": "test-plugin/vendor/brianhenryie/bh-wp-logger/src",
-            "vendor/brianhenryie/bh-wp-private-uploads/src": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/src"
+            "assets": "test-plugin/vendor/brianhenryie/bh-wp-logger/src",
+            "vendor/brianhenryie/bh-wp-private-uploads/src": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/src",
+            "vendor/brianhenryie/bh-wp-private-uploads/assets": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/assets"
         },
         "phpstorm": {
             "exclude_folders": {

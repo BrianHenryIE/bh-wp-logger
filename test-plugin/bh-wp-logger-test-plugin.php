@@ -26,12 +26,12 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
+use Alley_Interactive\Autoloader\Autoloader;
 use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
-use Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
 use Psr\Log\LogLevel;
 
 // If this file is called directly, abort.
@@ -41,8 +41,10 @@ if ( ! defined( 'WPINC' ) ) {
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$wpcs_autoloader = new WP_Namespace_Autoloader();
-$wpcs_autoloader->init();
+Autoloader::generate(
+	__NAMESPACE__,
+	__DIR__,
+)->register();
 
 /**
  * Current plugin version.
