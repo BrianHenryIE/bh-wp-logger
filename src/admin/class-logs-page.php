@@ -166,8 +166,10 @@ class Logs_Page {
 		// This is the bh-wp-logger JavaScript version, not the plugin version.
 		$version = '1.0.0';
 
-		$js_file_url = plugin_dir_url( __FILE__ ) . 'js/bh-wp-logger-admin.js';
-		wp_enqueue_script( 'bh-wp-logger-admin-logs-page-' . $slug, $js_file_url, array( 'jquery' ), $version, true );
+		$js_path = realpath( __DIR__ . '/../../' ) . '/assets/bh-wp-logger-admin.js';
+		$js_url  = plugin_dir_url( $js_path ) . 'bh-wp-logger-admin.js';
+
+		wp_enqueue_script( 'bh-wp-logger-admin-logs-page-' . $slug, $js_url, array( 'jquery' ), $version, true );
 	}
 
 	/**
@@ -187,11 +189,14 @@ class Logs_Page {
 			return;
 		}
 
-		$handle       = "{$this->settings->get_plugin_slug()}-logs";
-		$css_file_url = plugin_dir_url( __FILE__ ) . 'css/bh-wp-logger.css';
-		$version      = '1.0.0';
+		$handle = "{$this->settings->get_plugin_slug()}-logs";
 
-		wp_enqueue_style( $handle, $css_file_url, array(), $version, 'all' );
+		$version = '1.0.0';
+
+		$css_path = realpath( __DIR__ . '/../../' ) . '/assets/bh-wp-logger.css';
+		$css_url  = plugin_dir_url( $css_path ) . 'bh-wp-logger.css';
+
+		wp_enqueue_style( $handle, $css_url, array(), $version, 'all' );
 	}
 
 }
