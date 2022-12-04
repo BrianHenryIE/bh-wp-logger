@@ -32,7 +32,7 @@ Displays logs in `WP_List_Table`.
 
 ![Logs WP_List_Table](./.github/logs-wp-list-table.png "Logs WP_List_Table")
 
-Shows a dismissable admin error notice each time there is a new error.
+Shows a dismissible admin error notice each time there is a new error.
 
 ![Admin Error Notice](./.github/admin-error-notice.png "Admin error notice")
 
@@ -40,7 +40,7 @@ Adds a link to the logs view on the plugin's entry on plugins.php.
 
 ![Plugins page logs link](./.github/plugins-page-logs-link.png "Plugins page logs link")
 
-When log messages contain `wp_user:123` (NB: surrounded by single backticks) it will be replaced with a link to the user profile. This allows for logging useful references to users without logging their PII.
+When log messages contain `` `wp_user:123` `` (NB: surrounded by single backticks) it will be replaced with a link to the user profile. This allows for logging useful references to users without logging their PII.
 
 Similarly, any post type can be linked with `` `post_type_name:123` ``, e.g. `` `shop_order:123` `` will link to the WooCommerce order.
 
@@ -170,7 +170,7 @@ E.g. turn text in logs into hyperlinks as it is being displayed in the logs tabl
 
 ```php
 /**
- * Update `wc_order:123` with links to the order.
+ * Update ` `wc_order:123` ` with links to the order.
  * Use preg_replace_callback to find and replace all instances in the string.
  *
  * @hooked {$plugin_slug}_bh_wp_logger_column
@@ -179,11 +179,11 @@ E.g. turn text in logs into hyperlinks as it is being displayed in the logs tabl
  * @param array{time:string, level:string, message:string, context:array} $item The log entry row.
  * @param string                                                          $column_name The current column name.
  * @param Logger_Settings_Interface                                       $logger_settings The logger settings.
- * @param BH_WP_PSR_Logger                                                $logger The logger API instance.
+ * @param BH_WP_PSR_Logger                                                $bh_wp_psr_logger The logger API instance.
  *
  * @return string
  */
-function replace_wc_order_id_with_link( string $column_output, array $item, string $column_name,\BrianHenryIE\WP_Logger\Logger_Settings_Interface $settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger ): string {
+function replace_wc_order_id_with_link( string $column_output, array $item, string $column_name,\BrianHenryIE\WP_Logger\Logger_Settings_Interface $logger_settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger ): string {
 
     if ( 'message' !== $column_name ) {
         return $column_output;
@@ -197,7 +197,7 @@ function replace_wc_order_id_with_link( string $column_output, array $item, stri
         return $link;
     };
 
-    $message = preg_replace_callback( '/wc_order:(\d+)/', $callback, $column_output ) ?? $column_output;
+    $message = preg_replace_callback( '/`wc_order:(\d+)`/', $callback, $column_output ) ?? $column_output;
 
     return $message;
 }
