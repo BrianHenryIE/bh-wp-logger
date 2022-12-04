@@ -266,11 +266,12 @@ class Logs_List_Table extends WP_List_Table {
 				return $matches[0];
 			}
 
+			$post_id        = $matches[2];
 			$post_type      = $post_types_with_ui[ $matches[1] ];
 			$post_type_name = $post_type->labels->singular_name;
 
-			$url  = get_edit_post_link( $matches[2] );
-			$link = "<a href=\"{$url}\">{$post_type_name} {$matches[2]}</a>";
+			$url  = get_edit_post_link( $post_id );
+			$link = "<a href=\"{$url}\">{$post_type_name} {$post_id}</a>";
 
 			return $link;
 		};

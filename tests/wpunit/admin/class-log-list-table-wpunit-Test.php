@@ -53,19 +53,32 @@ class Logs_List_Table_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		$post_id = wp_insert_attachment( array() );
 
 		$GLOBALS['hook_suffix'] = 'post';
 
 		$sut = new Logs_List_Table( $api, $settings, $logger );
 
 		$item = array(
-			'message' => 'a string with custom `attachment:123` post types with ids beside',
+			'message' => "a string with custom `attachment:{$post_id}` post types with ids beside",
+		);
+
+		// Output relies on the current user being able to edit_others_posts.
+		add_filter(
+			'user_has_cap',
+			function ( $allcaps, $caps, $args, $user ) {
+				$allcaps['edit_others_posts'] = true;
+				return $allcaps;
+			},
+			10,
+			4
 		);
 
 		$result = $sut->column_default( $item, 'message' );
 
-		$expected = 'edit.php?post=123';
+		$expected = esc_html( "post.php?post={$post_id}&action=edit" );
 
 		$this->assertStringContainsString( $expected, $result );
 	}
