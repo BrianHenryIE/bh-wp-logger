@@ -241,10 +241,18 @@ class Logs_List_Table extends WP_List_Table {
 	 */
 	public function replace_post_type_id_with_link( string $column_output ): string {
 
-		/** @var array<string, WP_Post_Type> $post_types */
+		/**
+		 * Get the list of valid post types registered with WordPress.
+		 *
+		 * @var array<string, WP_Post_Type> $post_types
+		 */
 		$post_types = get_post_types( array(), 'objects' );
 
-		/** @var array<string, WP_Post_Type> $post_types_with_ui */
+		/**
+		 * Filter the list of registered post types to only those with a UI we can link to.
+		 *
+		 * @var array<string, WP_Post_Type> $post_types_with_ui
+		 */
 		$post_types_with_ui = array_filter(
 			$post_types,
 			function( WP_Post_Type $post_type ) {
@@ -261,7 +269,7 @@ class Logs_List_Table extends WP_List_Table {
 			$post_type      = $post_types_with_ui[ $matches[1] ];
 			$post_type_name = $post_type->labels->singular_name;
 
-			$url  = admin_url( "edit.php?post={$matches[2]}" );
+			$url  = get_edit_post_link( $matches[2] );
 			$link = "<a href=\"{$url}\">{$post_type_name} {$matches[2]}</a>";
 
 			return $link;
