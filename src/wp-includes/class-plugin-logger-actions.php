@@ -117,7 +117,7 @@ class Plugin_Logger_Actions {
 	protected function add_admin_ui_logs_page_hooks(): void {
 
 		$logs_page = new Logs_Page( $this->api, $this->settings, $this->wrapped_real_logger );
-		add_action( 'admin_menu', array( $logs_page, 'add_page' ) );
+		add_action( 'admin_menu', array( $logs_page, 'add_page' ), PHP_INT_MAX );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_styles' ) );
 	}

@@ -58,16 +58,30 @@ class Logs_Page {
 	/**
 	 * Add a WordPress admin UI page, but without any menu linking to it.
 	 *
-	 * @hooked admin_init
+	 * @hooked admin_menu
+	 *
+	 * @see wp-admin/menu.php
 	 */
 	public function add_page(): void {
 
-		$logs_slug = "{$this->settings->get_plugin_slug()}-logs";
+		$logs_slug  = "{$this->settings->get_plugin_slug()}-logs";
+		$logs_title = 'Logs';
+
+		$parent_slug = '';
+
+		global $menu;
+		foreach ( $menu as $menu_item ) {
+			if ( stristr( $menu_item[0], 'logs' ) || stristr( $menu_item[2], 'logs' ) || stristr( $menu_item[3], 'logs' ) ) {
+				$parent_slug = $menu_item[2];
+				$logs_title  = $this->settings->get_plugin_name();
+				break;
+			}
+		}
 
 		add_submenu_page(
-			'',
+			$parent_slug,
 			__( 'Logs', 'bh-wp-logger' ),
-			'logs',
+			$logs_title,
 			'manage_options',
 			$logs_slug,
 			array( $this, 'display_page' )
