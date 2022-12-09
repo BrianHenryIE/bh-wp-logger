@@ -64,7 +64,7 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * TODO: Move out of here. This should be a generic PSR-Log-Data class.
 	 *
-	 * @return array<array{time:string,datetime:?DateTime,level:string,message:string,context:?stdClass}>
+	 * @return array<array{time:string,datetime:?DateTime,level:string,message:string,context:?\stdClass}>
 	 */
 	public function get_data(): array {
 
@@ -163,7 +163,8 @@ class Logs_List_Table extends WP_List_Table {
 				break;
 			case 'context':
 				if ( ! empty( $item['context'] ) ) {
-					$column_output = esc_html( trim( wp_json_encode( $item['context'], JSON_PRETTY_PRINT ), "'\"" ) );
+					$pretty_context = wp_json_encode( $item['context'], JSON_PRETTY_PRINT );
+					$column_output  = $pretty_context ? esc_html( trim( $pretty_context, "'\"" ) ) : '';
 				}
 				break;
 			case 'message':

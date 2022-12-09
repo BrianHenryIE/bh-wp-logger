@@ -199,7 +199,7 @@ class API implements API_Interface {
 	 *
 	 * @used-by Logs_Page
 	 *
-	 * @return array{success:bool, message?:string, deleted_files?:array<string>, failed_to_delete?:array<string>}
+	 * @return array{success:bool, deleted_files:array<string>, failed_to_delete:array<string>}
 	 */
 	public function delete_all_logs(): array {
 
@@ -317,8 +317,6 @@ class API implements API_Interface {
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
 
-		// global $wp_plugin_paths;
-
 		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
 
 		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $filepath, $output_array ) ) {
@@ -338,6 +336,14 @@ class API implements API_Interface {
 		return false;
 	}
 
+	/**
+	 * Get the name of the plugin-specific transient which indicates the last log message time.
+	 *
+	 * The value is used on plugins.php to show if new logs have been recorded.
+	 * A transient is used to avoid re-calculating it from reading the log files from disk.
+	 *
+	 * @return string
+	 */
 	public function get_last_log_time_transient_name(): string {
 		return $this->settings->get_plugin_slug() . '-last-log-time';
 	}
@@ -370,6 +376,11 @@ class API implements API_Interface {
 
 			$file_pointer = fopen( $last_log_file_path, 'r' );
 
+			if ( false === $file_pointer ) {
+				$this->logger->warning( "Failed opening log file at {$last_log_file_path}." );
+				continue;
+			}
+
 			$offset_position = - 2;
 
 			$current_line = '';
@@ -380,6 +391,7 @@ class API implements API_Interface {
 
 					if ( 1 === preg_match( '/^(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s/im', $current_line, $output_array ) ) {
 						set_transient( $transient_name, $output_array['time'], DAY_IN_SECONDS );
+						// Log time will always be UTC.
 						return new DateTimeImmutable( $output_array['time'], new DateTimeZone( 'UTC' ) );
 					}
 
@@ -450,7 +462,7 @@ class API implements API_Interface {
 	 *
 	 * @param string $filepath Path to the log file to read.
 	 *
-	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}>
+	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:\stdClass|null}>
 	 */
 	public function parse_log( string $filepath ): array {
 
@@ -489,7 +501,7 @@ class API implements API_Interface {
 	 *
 	 * @param array{line_one_parsed:array{time:string,level:string,message:string}, lines:string[]} $input_lines A single log entries as a set of lines.
 	 *
-	 * @return array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}
+	 * @return array{time:string,datetime:DateTime|null,level:string,message:string,context:\stdClass|null}
 	 */
 	protected function log_lines_to_entry( array $input_lines ): array {
 

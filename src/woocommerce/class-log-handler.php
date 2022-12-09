@@ -63,8 +63,8 @@ class Log_Handler {
 	 * @hooked woocommerce_format_log_entry
 	 * @see \WC_Log_Handler::format_entry()
 	 *
-	 * @param string                                                            $entry The log entry already built by WooCommerce.
-	 * @param array{timestamp:int, level:string, message:string, context:array} $log_data_array The log level, message, context and timestamp in an array.
+	 * @param string                                                                              $entry The log entry already built by WooCommerce.
+	 * @param array{timestamp:int, level:string, message:string, context:array<int|string,mixed>} $log_data_array The log level, message, context and timestamp in an array.
 	 *
 	 * @return string
 	 */

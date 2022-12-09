@@ -7,6 +7,7 @@
 
 namespace BrianHenryIE\WP_Logger;
 
+use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
@@ -53,8 +54,9 @@ interface API_Interface {
 	 * Delete all logs for this plugin.
 	 *
 	 * @used-by Logs_Page
+	 * @used-by AJAX::delete_all()
 	 *
-	 * @return array{success: bool, deleted_files: array, failed_to_delete: ?array}
+	 * @return array{success: bool, deleted_files: string[], failed_to_delete: string[]}
 	 */
 	public function delete_all_logs(): array;
 
