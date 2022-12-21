@@ -65,7 +65,7 @@ class Logs_Page {
 	public function add_page(): void {
 
 		$logs_slug  = "{$this->settings->get_plugin_slug()}-logs";
-		$logs_title = 'Logs';
+		$menu_title = 'Logs';
 
 		$parent_slug = '';
 
@@ -73,7 +73,7 @@ class Logs_Page {
 		foreach ( $menu as $menu_item ) {
 			if ( stristr( $menu_item[0], 'logs' ) || stristr( $menu_item[2], 'logs' ) || stristr( $menu_item[3], 'logs' ) ) {
 				$parent_slug = $menu_item[2];
-				$logs_title  = $this->settings->get_plugin_name();
+				$menu_title  = $this->settings->get_plugin_name();
 				break;
 			}
 		}
@@ -81,7 +81,7 @@ class Logs_Page {
 		add_submenu_page(
 			$parent_slug,
 			__( 'Logs', 'bh-wp-logger' ),
-			$logs_title,
+			$menu_title,
 			'manage_options',
 			$logs_slug,
 			array( $this, 'display_page' )
