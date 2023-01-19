@@ -272,8 +272,8 @@ class API implements API_Interface {
 				|| 'call_user_func_array' === $frame->method
 				|| basename( $frame->file ) === 'class-php-error-handler.php'
 				|| basename( $frame->file ) === 'class-functions.php'
-				|| false !== strpos( $frame->file, 'bh-wp-logger/src/API' )
-				|| false !== strpos( $frame->file, 'psr/log/Psr/Log/' )
+				|| false !== stripos( $frame->file, 'brianhenryie/bh-wp-logger/src' )
+				|| false !== stripos( $frame->file, 'psr/log/Psr/Log/' )
 				|| false !== strpos( $frame->file, 'php-http/logger-plugin' )
 			) {
 				return false;
