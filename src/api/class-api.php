@@ -317,9 +317,9 @@ class API implements API_Interface {
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
 
-		$capture_first_string_after_slash_in_plugins_dir = '/' . str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' ) . '/';
+		$capture_first_string_after_slash_in_plugins_dir = str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' );
 
-		if ( 1 === preg_match( $capture_first_string_after_slash_in_plugins_dir, $filepath, $output_array ) ) {
+		if ( 1 === preg_match( '/' . preg_quote( $capture_first_string_after_slash_in_plugins_dir, '/' ) . '/', $filepath, $output_array ) ) {
 
 			$slug = $output_array[1];
 
