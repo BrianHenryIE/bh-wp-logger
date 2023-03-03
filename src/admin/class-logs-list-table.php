@@ -160,6 +160,7 @@ class Logs_List_Table extends WP_List_Table {
 					$column_output .= 'Could not parse date: ';
 				}
 				$column_output .= $time;
+				$column_output  = '<span>' . $column_output . '</span>';
 				break;
 			case 'context':
 				if ( ! empty( $item['context'] ) ) {
