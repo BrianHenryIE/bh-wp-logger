@@ -3,6 +3,24 @@
 
 	$(function() {
 
+			function show_hide_log_checkbox( element ) {
+				let id = $(element).attr('id');
+				let log_level = id.replace('log_level_display_checkbox_','');
+				let css_class = 'tr.level-'+log_level;
+				let display = $(element).is(':checked') ? '' : 'none';
+
+				$(css_class).css('display', display);
+			}
+
+			$('.log_level_display_checkbox').click( function( e ) {
+				show_hide_log_checkbox( this );
+			});
+
+			// Respect the state upon refresh.
+			$('.log_level_display_checkbox').each( function () {
+				show_hide_log_checkbox( this );
+			});
+
 			// When the date is changed, reload the page.
 			$('#log_date').change(function() {
 				var selectedDate = $('#log_date').val();

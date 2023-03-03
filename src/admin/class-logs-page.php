@@ -15,7 +15,7 @@ use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
 /**
@@ -148,6 +148,32 @@ class Logs_Page {
 		$filename     = basename( $filepath );
 		// TODO: Show file size here. Show number of entries.
 		echo '<p>Displaying log file at <a href="' . esc_url( $download_url ) . '" download="' . esc_attr( $filename ) . '"><code>' . esc_html( $filepath ) . '</code></a></p>';
+
+		echo '<p>Display levels: ';
+
+		$log_level_counts = array(
+			LogLevel::ERROR   => 0,
+			LogLevel::WARNING => 0,
+			LogLevel::NOTICE  => 0,
+			LogLevel::INFO    => 0,
+			LogLevel::DEBUG   => 0,
+		);
+		foreach ( $logs_table->get_data() as $datum ) {
+			$log_level_counts[ strtolower( $datum['level'] ) ]++;
+		}
+
+		$checkboxes = array();
+		foreach ( $log_level_counts as $log_level => $log_level_count ) {
+			$disabled       = 0 === $log_level_count ? 'disabled' : '';
+			$friendly_level = ucfirst( $log_level );
+			$checkboxes[]   = "<input {$disabled} class=\"log_level_display_checkbox\" type=\"checkbox\" id=\"log_level_display_checkbox_{$log_level}\" name=\"log_level_display_checkbox_{$log_level}\" checked> <label for=\"log_level_display_checkbox_{$log_level}\">$friendly_level ($log_level_count)</label>";
+		}
+
+		echo implode( ' • ', $checkboxes );
+
+		echo '</p>';
+
+		// TODO: Add an action here for other plugins to add controls.
 
 		// Maybe should use set file?
 		$logs_table->set_date( $chosen_date );
