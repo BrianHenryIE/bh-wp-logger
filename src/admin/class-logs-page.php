@@ -209,7 +209,7 @@ class Logs_Page {
 		}
 
 		// This is the bh-wp-logger JavaScript version, not the plugin version.
-		$version = '1.0.0';
+		$version = '1.1.0';
 
 		$js_path = realpath( __DIR__ . '/../../' ) . '/assets/bh-wp-logger-admin.js';
 		$js_url  = plugin_dir_url( $js_path ) . 'bh-wp-logger-admin.js';
