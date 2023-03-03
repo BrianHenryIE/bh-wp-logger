@@ -70,6 +70,21 @@
 
 			$('.wp-list-table').colResizable();
 
+			renderjson.set_icons('+', '-');
+			renderjson.set_show_to_level(2);
+
+			$('.log-context-pre').each( function () {
+
+				let json_context = $(this).data('json');
+				let rendered_context = renderjson(json_context);
+
+				$(this).parent().append(rendered_context);
+
+				// Leave the existing content in the TD so it can be searched.
+				$(this).css('height','0');
+				$(this).css('font-size','0');
+			});
+
 		}
 	);
 

@@ -165,7 +165,9 @@ class Logs_List_Table extends WP_List_Table {
 			case 'context':
 				if ( ! empty( $item['context'] ) ) {
 					$pretty_context = wp_json_encode( $item['context'], JSON_PRETTY_PRINT );
-					$column_output  = $pretty_context ? esc_html( trim( $pretty_context, "'\"" ) ) : '';
+					// phpcs:disable WordPress.PHP.DisallowShortTernary.Found
+					$un_pretty_context = wp_json_encode( $item['context'] ) ?: '';
+					$column_output     = $pretty_context ? '<pre data-json="' . esc_html( $un_pretty_context ) . '" class="log-context-pre">' . esc_html( trim( $pretty_context, "'\"" ) ) . '</pre>' : esc_html( $item['context'] );
 				}
 				break;
 			case 'message':

@@ -189,6 +189,12 @@ class Logs_Page {
 		$js_url  = plugin_dir_url( $js_path ) . 'bh-wp-logger-admin.js';
 
 		wp_enqueue_script( 'bh-wp-logger-admin-logs-page-' . $slug, $js_url, array( 'jquery' ), $version, true );
+
+		$renderjson_js_path = realpath( __DIR__ . '/../../' ) . '/assets/vendor/renderjson/renderjson.js';
+		$renderjson_js_url  = plugin_dir_url( $renderjson_js_path ) . 'renderjson.js';
+
+		wp_enqueue_script( 'renderjson', $renderjson_js_url, array(), '1.4', true );
+
 		$colresizable_js_path = realpath( __DIR__ . '/../../' ) . '/assets/vendor/colresizable/colResizable-1.6.min.js';
 		$colresizable_js_url  = plugin_dir_url( $colresizable_js_path ) . 'colResizable-1.6.min.js';
 
