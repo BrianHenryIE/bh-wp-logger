@@ -68,6 +68,8 @@
 			// Set the column-time width to only what's needed.
 			$('.column-time').css('width',$('td.column-time').first().children().first().width()+25);
 
+			$('.wp-list-table').colResizable();
+
 		}
 	);
 
