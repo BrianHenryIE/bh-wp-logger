@@ -168,12 +168,17 @@ class Logs_Page {
 	 */
 	public function enqueue_scripts(): void {
 
-		$slug = $this->settings->get_plugin_slug();
-		$page = "admin_page_{$slug}-logs";
+		$slug        = $this->settings->get_plugin_slug();
+		$page_suffix = "_{$slug}-logs";
 
 		$current_page = get_current_screen();
 
-		if ( is_null( $current_page ) || $current_page->id !== $page ) {
+		/**
+		 * `$current_page->id` will begin with `admin_page` or `$parent_slug` determined in `add_page()`.
+		 *
+		 * @see Logs_Page::add_page()
+		 */
+		if ( is_null( $current_page ) || substr( $current_page->id, -strlen( $page_suffix ) ) !== $page_suffix ) {
 			return;
 		}
 
@@ -194,12 +199,17 @@ class Logs_Page {
 	 */
 	public function enqueue_styles(): void {
 
-		$slug = $this->settings->get_plugin_slug();
-		$page = "admin_page_{$slug}-logs";
+		$slug        = $this->settings->get_plugin_slug();
+		$page_suffix = "_{$slug}-logs";
 
 		$current_page = get_current_screen();
 
-		if ( is_null( $current_page ) || $current_page->id !== $page ) {
+		/**
+		 * `$current_page->id` will begin with `admin_page` or `$parent_slug` determined in `add_page()`.
+		 *
+		 * @see Logs_Page::add_page()
+		 */
+		if ( is_null( $current_page ) || substr( $current_page->id, -strlen( $page_suffix ) ) !== $page_suffix ) {
 			return;
 		}
 
