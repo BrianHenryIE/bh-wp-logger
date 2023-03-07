@@ -106,8 +106,6 @@ class Plugin_Logger_Actions {
 		add_action( 'admin_init', array( $admin_notices, 'admin_notices' ), 9 );
 		// Add the notice.
 		add_action( 'admin_notices', array( $admin_notices, 'the_notices' ) );
-		// Print the script to the footer.
-		add_action( 'admin_init', array( $admin_notices, 'register_scripts' ) );
 	}
 
 	/**
