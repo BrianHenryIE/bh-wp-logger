@@ -54,9 +54,15 @@ Similarly, any post type can be linked with `` `post_type_name:123` ``, e.g. `` 
 This library is not on Packagist yet, so first add this repo:
 
 ```
+composer config minimum-stability dev
+composer config prefer-stable true
+
 composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger
 composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads
+
 composer require --dev cweagans/composer-patches
+composer config extra.enable-patching true
+
 composer require brianhenryie/bh-wp-logger
 ```
 
