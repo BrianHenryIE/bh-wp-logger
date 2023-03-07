@@ -4,59 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "72e58795edc2dd66e9b0e906eba21466",
+    "content-hash": "aba10d34603b0711ef8c26289b5f1e21",
     "packages": [
-        {
-            "name": "alleyinteractive/wordpress-autoloader",
-            "version": "v1.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/alleyinteractive/wordpress-autoloader.git",
-                "reference": "c7599d95f49f1cdc38fad19944a50b19ec0dd6ca"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/alleyinteractive/wordpress-autoloader/zipball/c7599d95f49f1cdc38fad19944a50b19ec0dd6ca",
-                "reference": "c7599d95f49f1cdc38fad19944a50b19ec0dd6ca",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4.0|^8.0|^8.1"
-            },
-            "require-dev": {
-                "alleyinteractive/alley-coding-standards": "^0.3",
-                "phpunit/phpunit": "^9.5.8"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/class-autoloader.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Alley Interactive",
-                    "email": "info@alley.co"
-                }
-            ],
-            "description": "Autoload files using WordPress File Conventions",
-            "support": {
-                "issues": "https://github.com/alleyinteractive/wordpress-autoloader/issues",
-                "source": "https://github.com/alleyinteractive/wordpress-autoloader/tree/v1.1.1"
-            },
-            "time": "2022-08-31T20:51:21+00:00"
-        },
         {
             "name": "brianhenryie/bh-wp-private-uploads",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads",
-                "reference": "d384fb97d1782a1148064717647ac934861dfb9f"
+                "reference": "9c62d8620cf2bfffc9064ad0c394587492c562f3"
             },
             "require": {
                 "ext-fileinfo": "*",
@@ -103,7 +59,7 @@
                         "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
                     },
                     "wptrt/admin-notices": {
-                        "dev-merged": "https://github.com/BrianHenryIE/admin-notices/pull/1.patch"
+                        "Fix Firefox race condition": "https://github.com/BrianHenryIE/admin-notices/commit/af52f563398b42cff82d38eefa55c8121d698ebe.patch"
                     }
                 },
                 "symlinks": {
@@ -213,7 +169,7 @@
                 }
             ],
             "description": "This is a short description of what plugin_title does.",
-            "time": "2022-12-03T04:40:40+00:00"
+            "time": "2023-03-07T21:25:36+00:00"
         },
         {
             "name": "katzgrau/klogger",
@@ -482,6 +438,50 @@
                 "source": "https://github.com/10up/wp_mock/tree/0.5.0"
             },
             "time": "2022-11-01T03:01:40+00:00"
+        },
+        {
+            "name": "alleyinteractive/wordpress-autoloader",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alleyinteractive/wordpress-autoloader.git",
+                "reference": "c7599d95f49f1cdc38fad19944a50b19ec0dd6ca"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alleyinteractive/wordpress-autoloader/zipball/c7599d95f49f1cdc38fad19944a50b19ec0dd6ca",
+                "reference": "c7599d95f49f1cdc38fad19944a50b19ec0dd6ca",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4.0|^8.0|^8.1"
+            },
+            "require-dev": {
+                "alleyinteractive/alley-coding-standards": "^0.3",
+                "phpunit/phpunit": "^9.5.8"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/class-autoloader.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Alley Interactive",
+                    "email": "info@alley.co"
+                }
+            ],
+            "description": "Autoload files using WordPress File Conventions",
+            "support": {
+                "issues": "https://github.com/alleyinteractive/wordpress-autoloader/issues",
+                "source": "https://github.com/alleyinteractive/wordpress-autoloader/tree/v1.1.1"
+            },
+            "time": "2022-08-31T20:51:21+00:00"
         },
         {
             "name": "antecedent/patchwork",
