@@ -42,10 +42,6 @@
             "type": "git"
         },
         {
-            "url": "https://github.com/BrianHenryIE/admin-notices",
-            "type": "git"
-        },
-        {
             "type":"composer",
             "url":"https://wpackagist.org"
         },
@@ -98,8 +94,8 @@
             "jaschilz/php-coverage-badger": {
                 "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
             },
-            "wptrt/admin-notices":{
-                "dev-merged": "https://github.com/BrianHenryIE/admin-notices/pull/1.patch"
+            "wptrt/admin-notices": {
+                "Fix Firefox race condition": "https://github.com/BrianHenryIE/admin-notices/commit/af52f563398b42cff82d38eefa55c8121d698ebe.patch"
             }
         },
         "symlinks": {

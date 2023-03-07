@@ -55,12 +55,12 @@ This library is not on Packagist yet, so first add this repo:
 
 ```
 composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger
-composer config repositories.wptrt/admin-notices git https://github.com/brianhenryie/admin-notices
 composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads
+composer require --dev cweagans/composer-patches
 composer require brianhenryie/bh-wp-logger
 ```
 
-It is using a fork of [wptrt/admin-notices](https://github.com/WPTT/admin-notices) because of [a race condition in Firefox](https://github.com/WPTT/admin-notices/issues/14). And it uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible.
+It is using [wptrt/admin-notices](https://github.com/WPTT/admin-notices) which has [a race condition in Firefox](https://github.com/WPTT/admin-notices/issues/14) that need to be patched. And it uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible.
 
 
 ### Instantiate
