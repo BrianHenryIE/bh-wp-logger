@@ -53,7 +53,6 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "alleyinteractive/wordpress-autoloader": "^1.1",
         "brianhenryie/bh-wp-private-uploads": "dev-master",
         "katzgrau/klogger": "dev-master",
         "psr/log": "^1.0.0",
@@ -63,6 +62,7 @@
     "require-dev": {
         "10up/wp_mock": "*",
         "antecedent/patchwork": "^2.1",
+        "alleyinteractive/wordpress-autoloader": "^1.1",
         "brianhenryie/composer-phpstorm": "dev-master",
         "codeception/module-asserts": "^1.0",
         "codeception/module-cli": "^1.0",
