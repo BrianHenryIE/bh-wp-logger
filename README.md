@@ -51,7 +51,7 @@ Similarly, any post type can be linked with `` `post_type_name:123` ``, e.g. `` 
 
 ### Composer
 
-This library is not on Packagist yet, so first add this repo:
+This library is not on Packagist yet.
 
 ```
 composer config minimum-stability dev
@@ -147,7 +147,7 @@ $setting_fields[] = array(
 
 ## Filters
 
-Two filter are present, to modify the log data as it is being saved, and to modify the log data as it is being presented.
+Two filters are present, to modify the log data as it is being saved, and to modify the log data as it is being presented.
 
 E.g. change the log level for specific log messages:
 
@@ -241,7 +241,7 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 * Option for what level of errors to display as admin notices
 * Option for user capability for displaying admin notices (filter, at least)
 * ~~Zero-config WC_Logger: detect "wc", "woo" in plugin names~~
-* Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json
+* ~~Use [Code prettify](https://github.com/googlearchive/code-prettify) on the context json~~ : Used [caldwell/renderjson](https://github.com/caldwell/renderjson)
 * Paging and filtering
 * ~~Hyperlinks in messages~~
 * ~~Record timestamp the logs were last viewed at, make the plugins.php link bold if new logs are present.~~
@@ -254,10 +254,11 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 Minor concerns:
 * Debug logging could maybe be moved to a shutdown handler
 * Transients to suppress duplicate logs might be inefficient
-* 
 
 # Status
 
-Very much a v0.x.
+To date I think it has been used mostly by me, i.e. internal projects. There are no egrarious issues. It _should_ work for everyone but I would like some feedback from others on how well it works for you. 
 
 I'll start at Semver 1.0.0 once I've caught up with WPCS, PhpStan and PhpUnit. There's about 65 tests and 43% coverage. WPCS + PHPStan are both pretty good.
+
+I think that's higher code-quality than most WordPress plugins.
