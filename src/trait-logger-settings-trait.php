@@ -20,15 +20,15 @@ trait Logger_Settings_Trait {
 	 * @var string
 	 */
 	public function get_log_level(): string {
-		return LogLevel::INFO;
+		return get_option( $this->get_plugin_slug(). '_log_level', LogLevel::INFO );
 	}
 
 	public function get_plugin_name(): string {
-		return $this->plugin_name;
+		return get_plugins()[$this->get_plugin_basename()]['Name'];
 	}
 
 	public function get_plugin_slug(): string {
-		return $this->plugin_slug;
+		return explode( '/', $this->get_plugin_basename() )[0];
 	}
 
 	public function get_plugin_basename(): string {
