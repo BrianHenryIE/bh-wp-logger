@@ -57,11 +57,12 @@ This library is not on Packagist yet, so first add this repo:
 composer config minimum-stability dev
 composer config prefer-stable true
 
-composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger
-composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads
-
+composer config allow-plugins.cweagans/composer-patches true
 composer require --dev cweagans/composer-patches
 composer config extra.enable-patching true
+
+composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger
+composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads
 
 composer require brianhenryie/bh-wp-logger
 ```
@@ -249,6 +250,11 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 * ~~Redact sensitive data. e.g. use `userid:123` in the saved logs and replace it with richer data when displaying them~~
 * Add errors to dashboard Site Health widget
 * Ensure output is properly escaped
+
+Minor concerns:
+* Debug logging could maybe be moved to a shutdown handler
+* Transients to suppress duplicate logs might be inefficient
+* 
 
 # Status
 
