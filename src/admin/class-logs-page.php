@@ -224,7 +224,7 @@ class Logs_Page {
 		$colresizable_js_path = realpath( __DIR__ . '/../../' ) . '/assets/vendor/colresizable/colResizable-1.6.min.js';
 		$colresizable_js_url  = plugin_dir_url( $colresizable_js_path ) . 'colResizable-1.6.min.js';
 
-		wp_enqueue_script( 'colresizable', $colresizable_js_url, array('jquery'), '1.6', true );
+		wp_enqueue_script( 'colresizable', $colresizable_js_url, array( 'jquery' ), '1.6', true );
 	}
 
 	/**
