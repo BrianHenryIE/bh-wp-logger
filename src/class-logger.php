@@ -58,7 +58,13 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 		if ( ! isset( self::$instance ) ) {
 
 			// Zero-config.
-			$settings = $settings ?? new Logger_Settings();
+			$settings = $settings ?? new class() implements Logger_Settings_Interface {
+				use Logger_Settings_Trait;
+			};
+
+			if ( 'none' == $settings->get_log_level() ) {
+				return new NullLogger();
+			}
 
 			$logger = new self( $settings );
 
@@ -81,10 +87,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 */
 	public function __construct( Logger_Settings_Interface $settings ) {
 
-		if ( 'none' === $settings->get_log_level() ) {
-			$logger = new NullLogger();
-
-		} elseif ( $settings instanceof WooCommerce_Logger_Settings_Interface
+		if ( $settings instanceof WooCommerce_Logger_Settings_Interface
 			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) ), true ) ) {
 			// Does not use `is_plugin_active()` here because "Call to undefined function" error (maybe an admin function).
 
