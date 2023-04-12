@@ -165,7 +165,7 @@ class PHP_Error_Handler {
 
 		// If the source file has the plugin dir in it.
 		// Prepend the WP_PLUGINS_DIR so a subdir with the same name (e.g. my-plugin/integrations/your-plugin) does not match.
-		$plugin_dir          = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . explode( '/', $this->settings->get_plugin_basename() )[0];
+		$plugin_dir          = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $this->settings->get_plugin_slug();
 		$plugin_dir_realpath = realpath( $plugin_dir );
 
 		if ( false !== strpos( $errfile, $plugin_dir ) || ( false !== $plugin_dir_realpath && false !== strpos( $errfile, $plugin_dir_realpath ) ) ) {
