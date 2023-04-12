@@ -60,7 +60,6 @@ class Plugin_Logger_Actions {
 		$this->api                 = $api;
 
 		$this->add_error_handler_hooks();
-		$this->add_wordpress_error_handling_hooks();
 
 		$this->add_admin_ui_logs_page_hooks();
 		$this->add_admin_notices_hooks();
@@ -69,6 +68,23 @@ class Plugin_Logger_Actions {
 		$this->add_cron_hooks();
 		$this->add_private_uploads_hooks();
 		$this->define_init_hooks();
+
+		if ( ! $this->is_wp_debug() ) {
+			return;
+		}
+
+		$this->add_wordpress_error_handling_hooks();
+	}
+
+	/**
+	 *
+	 *
+	 * Defined as a protected function so it can be overridden.
+	 * Caution: only consider overriding this when running on your own site. This
+	 * adds significant inefficiency.
+	 */
+	protected function is_wp_debug(): bool {
+		return defined( 'WP_DEBUG' ) && WP_DEBUG;
 	}
 
 	/**
@@ -85,8 +101,15 @@ class Plugin_Logger_Actions {
 
 	/**
 	 * Add hooks to WordPress's handling of deprecated functions etc. in order to log it ourselves.
+	 *
+	 * Only runs in WP_DEBUG because this runs a backtrace on every entry to the error log, which can be significant
+	 * when other plugins are not "clean".
 	 */
 	protected function add_wordpress_error_handling_hooks(): void {
+
+		if ( ! $this->is_wp_debug() ) {
+			return;
+		}
 
 		$functions = new Functions( $this->api, $this->settings, $this->wrapped_real_logger );
 

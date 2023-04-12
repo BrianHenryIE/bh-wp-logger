@@ -125,7 +125,11 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
-		new Plugin_Logger_Actions( $api, $settings, $logger );
+		new class($api, $settings, $logger ) extends Plugin_Logger_Actions {
+			protected function is_wp_debug(): bool {
+				return true;
+			}
+		};
 	}
 
 	/**
