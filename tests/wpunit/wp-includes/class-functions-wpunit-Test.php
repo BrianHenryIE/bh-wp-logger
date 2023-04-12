@@ -108,7 +108,7 @@ class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 				'get_plugin_slug' => 'test-plugin',
 			)
 		);
-		$logger   = new NullLogger();
+		$logger   = new ColorLogger();
 
 		$sut = new Functions( $api, $settings, $logger );
 
