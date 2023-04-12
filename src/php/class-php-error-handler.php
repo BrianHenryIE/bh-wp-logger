@@ -113,8 +113,10 @@ class PHP_Error_Handler {
 		$context          = array();
 		$context['error'] = array_combine( array( 'errno', 'errstr', 'errfile', 'errline' ), array_slice( $func_args, 0, 4 ) );
 
+		$backtrace_cache_hash = sanitize_key( implode( ',', array_slice( $func_args, 0, 4 ) ) );
+
 		// This would be added anyway in some cases, but for PHP errors, let's always have a little backtrace.
-		$backtrace_frames           = $this->api->get_backtrace( 3 );
+		$backtrace_frames           = $this->api->get_backtrace( $backtrace_cache_hash, 3 );
 		$context['debug_backtrace'] = $backtrace_frames;
 
 		$log_level = $this->errno_to_psr3( $errno );
@@ -178,7 +180,7 @@ class PHP_Error_Handler {
 		}
 
 		// e.g. WooCommerce Admin could be the $errfile of a problem caused by another plugin, so we need to... trace back.
-		return $this->api->is_backtrace_contains_plugin();
+		return $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) );
 	}
 
 	/**

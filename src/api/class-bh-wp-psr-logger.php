@@ -73,7 +73,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 
 		if ( LogLevel::ERROR === $level ) {
 
-			$debug_backtrace            = $this->get_backtrace();
+			$debug_backtrace            = $this->get_backtrace( null, null );
 			$context['debug_backtrace'] = $debug_backtrace;
 
 			// TODO: This could be useful on all logs.
@@ -81,7 +81,8 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			$context['filters'] = $wp_current_filter;
 
 		} elseif ( LogLevel::WARNING === $level || LogLevel::DEBUG === $settings_log_level ) {
-			$debug_backtrace            = $this->get_backtrace( 3 );
+
+			$debug_backtrace            = $this->get_backtrace( null, 3 );
 			$context['debug_backtrace'] = $debug_backtrace;
 
 			global $wp_current_filter;

@@ -34,6 +34,8 @@ class API implements API_Interface {
 
 	use LoggerAwareTrait;
 
+	const CACHE_GROUP_KEY = 'bh-wp-logger';
+
 	/**
 	 * Needed for the plugin slug to link correctly.
 	 *
@@ -264,7 +266,20 @@ class API implements API_Interface {
 	 *
 	 * @return Frame[]
 	 */
-	public function get_backtrace( ?int $steps = null ): array {
+	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array {
+
+		if ( ! empty( $source_hash ) ) {
+			$source_hash = sanitize_key( $source_hash );
+
+			// Maybe another plugin has already run this backtrace and we can use the cached version.
+			$backtrace_cache_key = "backtrace_$source_hash";
+
+			$backtrace_cached = wp_cache_get( $backtrace_cache_key, self::CACHE_GROUP_KEY );
+
+			if ( false !== $backtrace_cached ) {
+				return $backtrace_cached;
+			}
+		}
 
 		$starting_from_frame_closure = function( Frame $frame ): bool {
 			if ( __FILE__ === $frame->file
@@ -280,7 +295,13 @@ class API implements API_Interface {
 			return true;
 		};
 
-		return Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->limit( $steps ?? 0 )->frames();
+		$backtrace_frames = Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->limit( $steps ?? 0 )->frames();
+
+		if ( ! empty( $source_hash ) ) {
+			wp_cache_set( $backtrace_cache_key, $backtrace_frames, self::CACHE_GROUP_KEY, DAY_IN_SECONDS );
+		}
+
+		return $backtrace_frames;
 	}
 
 	/**
@@ -288,18 +309,39 @@ class API implements API_Interface {
 	 *
 	 * @return bool
 	 */
-	public function is_backtrace_contains_plugin(): bool {
+	public function is_backtrace_contains_plugin( ?string $source_hash = null ): bool {
 
-		$frames = $this->get_backtrace();
+		// TODO: What's the longest allowed cache key?
+		if ( ! empty( $source_hash ) ) {
+			$source_hash                            = sanitize_key( $source_hash );
+			$is_backtrace_contains_plugin_cache_key = "{$this->settings->get_plugin_slug()}_{$source_hash}";
+
+			$is_backtrace_contains_plugin_cached = wp_cache_get( $is_backtrace_contains_plugin_cache_key, self::CACHE_GROUP_KEY );
+
+			if ( false !== $is_backtrace_contains_plugin_cached ) {
+				return 'yes' === $is_backtrace_contains_plugin_cached;
+			}
+
+			$frames = $this->get_backtrace( $source_hash, null );
+
+		} else {
+			$frames = $this->get_backtrace( null, null );
+		}
+
+		$is_file_from_plugin = false;
 
 		foreach ( $frames as $frame ) {
 
 			if ( $this->is_file_from_plugin( $frame->file ) ) {
-				return true;
+				$is_file_from_plugin = true;
+				break;
 			}
 		}
+		if ( ! empty( $source_hash ) ) {
+			wp_cache_set( $is_backtrace_contains_plugin_cache_key, $is_file_from_plugin ? 'yes' : 'no', self::CACHE_GROUP_KEY, DAY_IN_SECONDS );
+		}
 
-		return false;
+		return $is_file_from_plugin;
 	}
 
 	/**

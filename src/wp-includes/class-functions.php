@@ -76,7 +76,7 @@ class Functions {
 	 */
 	public function log_deprecated_functions_only_once_per_day( $function, $replacement_function, $version ): void {
 
-		if ( ! $this->api->is_backtrace_contains_plugin() ) {
+		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
 		}
 
@@ -136,7 +136,7 @@ class Functions {
 	 */
 	public function log_deprecated_arguments_only_once_per_day( $function, $message, $version ): void {
 
-		if ( ! $this->api->is_backtrace_contains_plugin() ) {
+		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
 		}
 
@@ -197,7 +197,7 @@ class Functions {
 	 */
 	public function log_doing_it_wrong_only_once_per_day( $function, $message, $version ): void {
 
-		if ( ! $this->api->is_backtrace_contains_plugin() ) {
+		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
 		}
 
@@ -263,7 +263,7 @@ class Functions {
 	 */
 	public function log_deprecated_hook_only_once_per_day( $hook, $replacement, $version, $message ): void {
 
-		if ( ! $this->api->is_backtrace_contains_plugin() ) {
+		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
 		}
 

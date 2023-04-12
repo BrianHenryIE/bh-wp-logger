@@ -135,4 +135,71 @@ EOD;
 		$expected = new \DateTime( '2022-02-23T22:56:04+00:00' );
 		$this->assertEquals( $expected->getTimestamp(), $result->getTimestamp() );
 	}
+
+	/**
+	 * @covers ::is_backtrace_contains_plugin
+	 */
+	public function test_is_backtrace_contains_plugin(): void {
+
+		$logger   = new ColorLogger();
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'test-plugin',
+			)
+		);
+
+		$cache_hash = 'hash1';
+
+		\WP_Mock::userFunction(
+			'wp_cache_get',
+			array(
+				'args'   => array( "test-plugin_{$cache_hash}", 'bh-wp-logger' ),
+				'times'  => 1,
+				'return' => false,
+			)
+		);
+
+		\WP_Mock::userFunction(
+			'wp_cache_get',
+			array(
+				'args'   => array( "backtrace_{$cache_hash}", 'bh-wp-logger' ),
+				'times'  => 1,
+				'return' => false,
+			)
+		);
+
+		\WP_Mock::userFunction(
+			'wp_cache_set',
+			array(
+				'args'  => array( "backtrace_{$cache_hash}", \WP_Mock\Functions::type( 'array' ), 'bh-wp-logger', 86400 ),
+				'times' => 1,
+			)
+		);
+
+		\WP_Mock::userFunction(
+			'plugin_basename',
+			array(
+				'args'   => array( \WP_Mock\Functions::type( 'string' ) ),
+				'times'  => 1,
+				'return' => 'test-plugin/subfolder/guilty-file.php',
+			)
+		);
+
+		\WP_Mock::userFunction(
+			'wp_cache_set',
+			array(
+				'args'  => array( "test-plugin_{$cache_hash}", 'yes', 'bh-wp-logger', 86400 ),
+				'times' => 1,
+			)
+		);
+
+		\WP_Mock::passthruFunction( 'sanitize_key' );
+
+		$sut = new API( $settings, $logger );
+
+		$result = $sut->is_backtrace_contains_plugin( $cache_hash );
+
+		$this->assertTrue( $result );
+	}
 }

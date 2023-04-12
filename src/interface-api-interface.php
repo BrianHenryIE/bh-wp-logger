@@ -94,14 +94,14 @@ interface API_Interface {
 	 *
 	 * @return Frame[]
 	 */
-	public function get_backtrace( ?int $steps = null ): array;
+	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array;
 
 	/**
 	 * Checks the current backtrace for any reference to the current plugin.
 	 *
-	 * @return bool
+	 * Use `implode( '', func_get_args() )`
 	 */
-	public function is_backtrace_contains_plugin(): bool;
+	public function is_backtrace_contains_plugin( ?string $source_hash = null ): bool;
 
 	/**
 	 * Given a filepath (from a backtrace or error message) determine is it from this plugin.
