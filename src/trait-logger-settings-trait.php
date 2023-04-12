@@ -61,21 +61,4 @@ trait Logger_Settings_Trait {
 		return explode( '/', $this->get_plugin_basename() )[0];
 	}
 
-	/**
-	 * The plugin basename. Used to add the Logs link on `plugins.php`.
-	 *
-	 * @see https://core.trac.wordpress.org/ticket/42670
-	 *
-	 * @throws Exception When it cannot be determined. I.e. a symlink inside a symlink.
-	 */
-	public function get_plugin_basename(): string {
-
-		$wp_plugin_basename = plugin_basename( __DIR__ );
-
-		$plugin_filename = get_plugins( explode( '/', $wp_plugin_basename )[0] );
-
-		return array_key_first( $plugin_filename );
-
-		throw new Exception( 'Plugin installed in an unusual directory.' );
-	}
 }
