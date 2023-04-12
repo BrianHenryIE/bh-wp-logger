@@ -164,9 +164,11 @@ class Logs_Page {
 
 		$checkboxes = array();
 		foreach ( $log_level_counts as $log_level => $log_level_count ) {
-			$disabled       = 0 === $log_level_count ? 'disabled' : '';
-			$friendly_level = ucfirst( $log_level );
-			$checkboxes[]   = "<input {$disabled} class=\"log_level_display_checkbox\" type=\"checkbox\" id=\"log_level_display_checkbox_{$log_level}\" name=\"log_level_display_checkbox_{$log_level}\" checked> <label for=\"log_level_display_checkbox_{$log_level}\">$friendly_level ($log_level_count)</label>";
+			$disabled        = 0 === $log_level_count ? 'disabled' : '';
+			$friendly_level  = ucfirst( $log_level );
+			$log_level       = esc_attr( $log_level );
+			$log_level_count = intval( $log_level_count );
+			$checkboxes[]    = "<input {$disabled} class=\"log_level_display_checkbox\" type=\"checkbox\" id=\"log_level_display_checkbox_{$log_level}\" name=\"log_level_display_checkbox_{$log_level}\" checked> <label for=\"log_level_display_checkbox_{$log_level}\">$friendly_level ($log_level_count)</label>";
 		}
 
 		echo implode( ' • ', $checkboxes );

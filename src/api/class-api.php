@@ -11,19 +11,18 @@ use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use BrianHenryIE\WP_Logger\Logger;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Spatie\Backtrace\Backtrace;
 use Spatie\Backtrace\Frame;
-use stdClass;
 
 /**
  * BH_WP_PSR_Logger extends this, then Logger extends that.
@@ -441,7 +440,7 @@ class API implements API_Interface {
 		if ( is_null( $date_time ) ) {
 			try {
 				$date_time = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
-			} catch ( \Exception $exception ) {
+			} catch ( Exception $exception ) {
 				// This will never happen.
 				return;
 			}

@@ -19,15 +19,36 @@ use WP_List_Table;
 use WP_Post_Type;
 
 /**
- * Class Logs_Table
+ * WordPress list table for displaying the logs.
  */
 class Logs_List_Table extends WP_List_Table {
+	/**
+	 * Passed into the `plugin-slug_bh_wp_logger_column` filter.
+	 */
 	protected BH_WP_PSR_Logger $logger;
 
+	/**
+	 * Used for the `plugin-slug_bh_wp_logger_column` filter name, and is also passed into the filter.
+	 *
+	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
+	 */
 	protected Logger_Settings_Interface $settings;
 
+	/**
+	 * Logger functions.
+	 *
+	 * @uses \BrianHenryIE\WP_Logger\API_Interface::get_log_files()
+	 * @uses \BrianHenryIE\WP_Logger\API_Interface::parse_log()
+	 */
 	protected API_Interface $api;
 
+	/**
+	 * The logs are displayed one day at a time. The most recent day's log file, or the optionally specified date.
+	 *
+	 * @used-by Logs_List_Table::get_data()
+	 *
+	 * @var string|null
+	 */
 	protected ?string $selected_date = null;
 
 	/**
@@ -84,6 +105,8 @@ class Logs_List_Table extends WP_List_Table {
 
 	/**
 	 * Get the list of columns in this table.
+	 *
+	 * TODO: Add a filter/instructions on how to add a new column.
 	 *
 	 * @overrides WP_List_Table::get_columns()
 	 * @see WP_List_Table::get_columns()
@@ -167,7 +190,7 @@ class Logs_List_Table extends WP_List_Table {
 					$pretty_context = wp_json_encode( $item['context'], JSON_PRETTY_PRINT );
 					// phpcs:disable WordPress.PHP.DisallowShortTernary.Found
 					$un_pretty_context = wp_json_encode( $item['context'] ) ?: '';
-					$column_output     = $pretty_context ? '<pre data-json="' . esc_html( $un_pretty_context ) . '" class="log-context-pre">' . esc_html( trim( $pretty_context, "'\"" ) ) . '</pre>' : esc_html( $item['context'] );
+					$column_output     = $pretty_context ? '<pre data-json="' . esc_html( $un_pretty_context ) . '" class="log-context-pre">' . esc_html( trim( $pretty_context, "'\"" ) ) . '</pre>' : esc_html( print_r( $item['context'], true ) );
 				}
 				break;
 			case 'message':

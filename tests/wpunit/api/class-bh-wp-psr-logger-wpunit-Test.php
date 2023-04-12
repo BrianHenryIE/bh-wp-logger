@@ -10,6 +10,7 @@ use Codeception\Stub\Expected;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger
@@ -33,6 +34,11 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$sut = new BH_WP_PSR_Logger( $setttings );
 
 		$logger = new class() extends ColorLogger {
+			/**
+			 * Extend TestLogger to record context.
+			 *
+			 * @see TestLogger
+			 */
 			public $context = array();
 			public function log( $level, $message, array $context = array() ) {
 				$this->context = $context;

@@ -16,8 +16,6 @@
 namespace BrianHenryIE\WP_Logger;
 
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
-use BrianHenryIE\WP_Logger\API\Logger_Settings;
-use BrianHenryIE\WP_Logger\WP_Includes\Plugins;
 use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
 use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
@@ -72,7 +70,6 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 			// Add the hooks.
 			new Plugin_Logger_Actions( self::$instance, $settings, self::$instance );
-
 		}
 
 		return self::$instance;
