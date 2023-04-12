@@ -85,7 +85,7 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 		\WP_Mock::userFunction(
 			'get_option',
 			array(
-				'args'   => array( 'active_plugins' ),
+				'args'   => array( 'active_plugins', \WP_Mock\Functions::type( 'array' ) ),
 				'return' => array( 'woocommerce/woocommerce.php' ),
 			)
 		);
