@@ -123,7 +123,7 @@ class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
 		);
 
 		$handle  = 'bh-wp-logger-admin-logs-page-test-enqueue-styles';
-		$version = '1.0.0';
+		$version = '1.1.0';
 
 		\WP_Mock::userFunction(
 			'wp_enqueue_script',
@@ -131,7 +131,7 @@ class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
 				'args'  => array(
 					$handle,
 					\WP_Mock\Functions::type( 'string' ),
-					array( 'jquery' ),
+					\WP_Mock\Functions::type( 'array' ), // 2023-03: jquery, renderjson, colresizable
 					$version,
 					true,
 				),
@@ -139,10 +139,38 @@ class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 
+		\WP_Mock::userFunction(
+			'wp_enqueue_script',
+			array(
+				'args'  => array(
+					'renderjson',
+					\WP_Mock\Functions::type( 'string' ),
+					\WP_Mock\Functions::type( 'array' ),
+					\WP_Mock\Functions::type( 'string' ), // version.
+					true,
+				),
+				'times' => 1,
+			)
+		);
+
+		\WP_Mock::userFunction(
+			'wp_enqueue_script',
+			array(
+				'args'  => array(
+					'colresizable',
+					\WP_Mock\Functions::type( 'string' ),
+					\WP_Mock\Functions::type( 'array' ),
+					\WP_Mock\Functions::type( 'string' ), // version.
+					true,
+				),
+				'times' => 1,
+			)
+		);
+
+		\WP_Mock::passthruFunction( 'plugin_dir_url' );
+
 		$sut = new Logs_Page( $api, $settings, $logger );
 
 		$sut->enqueue_scripts();
-
 	}
-
 }
