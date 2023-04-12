@@ -357,24 +357,7 @@ class API implements API_Interface {
 	 * @return bool
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
-
-		$capture_first_string_after_slash_in_plugins_dir = str_replace( DIRECTORY_SEPARATOR, '\\' . DIRECTORY_SEPARATOR, WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . '([^' . DIRECTORY_SEPARATOR . ']*)' );
-
-		if ( 1 === preg_match( '/' . preg_quote( $capture_first_string_after_slash_in_plugins_dir, '/' ) . '/', $filepath, $output_array ) ) {
-
-			$slug = $output_array[1];
-
-			if ( $this->settings->get_plugin_slug() === $slug ) {
-				return true;
-			}
-		}
-
-		$plugin_dir_realpath = realpath( WP_PLUGIN_DIR . '/' . explode( '/', $this->settings->get_plugin_basename() )[0] );
-		if ( false !== $plugin_dir_realpath && false !== strpos( $filepath, $plugin_dir_realpath ) ) {
-			return true;
-		}
-
-		return false;
+		return 0 === strpos( plugin_basename( realpath( $filepath ) ), $this->settings->get_plugin_slug() );
 	}
 
 	/**
