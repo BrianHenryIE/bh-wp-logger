@@ -72,6 +72,17 @@
 	</div>
 
 	<div>
+		<h3>Trigger a WordPress <code>doing_it_wrong</code> warning</h3>
+
+		<form>
+			<button type="button" class="button log log-test" name="doing_it_wrong_run-wordpress">doing_it_wrong</button>
+			<button type="button" class="button log log-test" name="deprecated_function_run-wordpress">deprecated_function</button>
+			<button type="button" class="button log log-test" name="deprecated_argument_run-wordpress">deprecated_argument</button>
+			<button type="button" class="button log log-test" name="deprecated_hook_run-wordpress">deprecated_hook</button>
+		</form>
+	</div>
+
+	<div>
 		<h3>Throw an [uncaught] Exception</h3>
 
 		<pre>throw new \Exception( 'log test exception' );</pre>

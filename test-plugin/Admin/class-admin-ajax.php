@@ -84,6 +84,18 @@ class Admin_Ajax {
 				case 'error-php':
 					trigger_error( 'log test error php', E_USER_ERROR );
 					break;
+				case 'doing_it_wrong_run-wordpress':
+					_doing_it_wrong( 'is_allowed_dir', 'The "$dir" argument must be a non-empty string.', '6.2.0' );
+					break;
+				case 'deprecated_function_run-wordpress':
+					_deprecated_function( 'tinymce_include', '2.1.0', 'wp_editor()' );
+					break;
+				case 'deprecated_argument_run-wordpress':
+					_deprecated_argument( 'wp_editor()', '3.9.0', 'TinyMCE editor IDs cannot have brackets.' );
+					break;
+				case 'deprecated_hook_run-wordpress':
+					_deprecated_hook( 'hook_name', 'version', 'replacement', 'message' );
+					break;
 				case 'uncaught-exception':
 					throw new \Exception( 'log test exception' );
 				case 'delete-transients':
