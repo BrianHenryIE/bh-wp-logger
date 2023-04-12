@@ -126,7 +126,7 @@ class Functions {
 	 * Limits logging deprecated arguments to once per day.
 	 * Logs more detail than usual.
 	 *
-	 * @hooked deprecated_argument_run
+	 * @hooked deprecated_function_run
 	 *
 	 * @param string $function The function that was called.
 	 * @param string $message  A message regarding the change.
