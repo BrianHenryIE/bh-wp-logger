@@ -124,6 +124,9 @@ class Logs_Page {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$chosen_date = isset( $_GET['log_date'] ) ? sanitize_key( $_GET['log_date'] ) : array_key_last( $log_files );
 
+		// Maybe should use set file?
+		$logs_table->set_date( $chosen_date );
+
 		// TODO: Allow filtering here to add external log files, e.g. from Authorize.net SDK.
 		foreach ( $log_files as $date => $path ) {
 			$date_formatted = $date;
@@ -177,15 +180,12 @@ class Logs_Page {
 
 		// TODO: Add an action here for other plugins to add controls.
 
-		// Maybe should use set file?
-		$logs_table->set_date( $chosen_date );
 		$logs_table->prepare_items();
-
-		$this->api->set_last_logs_view_time();
-
 		$logs_table->display();
 
 		echo '</div>';
+
+		$this->api->set_last_logs_view_time();
 	}
 
 	/**
