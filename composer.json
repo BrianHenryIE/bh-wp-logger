@@ -87,6 +87,7 @@
         "wpackagist-theme/twentytwenty": "*",
         "brianhenryie/color-logger": "^1.0",
         "php-stubs/woocommerce-stubs": "^5.2",
+        "woocommerce/woocommerce-sniffs": "*",
         "wpackagist-plugin/woocommerce": "*"
     },
     "extra": {
