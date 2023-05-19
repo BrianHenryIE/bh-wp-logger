@@ -10,6 +10,7 @@ namespace BrianHenryIE\WP_Logger\WP_Includes;
 use BrianHenryIE\WP_Logger\Admin\Admin_Notices;
 use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
+use BrianHenryIE\WP_Logger\Admin\Plugin_Installer;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
@@ -65,6 +66,7 @@ class Plugin_Logger_Actions {
 		$this->add_admin_notices_hooks();
 		$this->add_ajax_hooks();
 		$this->add_plugins_page_hooks();
+		$this->add_plugin_installer_page_hooks();
 		$this->add_cron_hooks();
 		$this->add_private_uploads_hooks();
 		$this->define_init_hooks();
@@ -163,6 +165,18 @@ class Plugin_Logger_Actions {
 
 		$hook = "plugin_action_links_{$this->settings->get_plugin_basename()}";
 		add_filter( $hook, array( $plugins_page, 'add_logs_action_link' ), 99, 4 );
+	}
+
+	/**
+	 * Add link to Logs on the plugin installer page (after installing a plugin via .zip file).
+	 *
+	 * Hooked late because the logs link should be last.
+	 */
+	protected function add_plugin_installer_page_hooks(): void {
+
+		$plugin_installer = new Plugin_Installer( $this->settings );
+
+		add_filter( 'install_plugin_complete_actions', array( $plugin_installer, 'add_logs_link' ), 99, 3 );
 	}
 
 	/**

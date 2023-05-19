@@ -4,6 +4,7 @@ namespace BrianHenryIE\WP_Logger\WP_Includes;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Admin\AJAX;
+use BrianHenryIE\WP_Logger\Admin\Plugin_Installer;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
@@ -59,6 +60,27 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 				'get_plugin_basename' => $basename,
 			)
 		);
+		$api      = $this->makeEmpty( API_Interface::class );
+		new Plugin_Logger_Actions( $api, $settings, $logger );
+	}
+
+
+	/**
+	 * @covers ::add_plugin_installer_page_hooks
+	 */
+	public function test_plugins_installer_page_hooks(): void {
+
+		$basename = 'test-plugin/test-plugin.php';
+
+		\WP_Mock::expectFilterAdded(
+			'install_plugin_complete_actions',
+			array( new AnyInstance( Plugin_Installer::class ), 'add_logs_link' ),
+			99,
+			3
+		);
+
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 		new Plugin_Logger_Actions( $api, $settings, $logger );
 	}
