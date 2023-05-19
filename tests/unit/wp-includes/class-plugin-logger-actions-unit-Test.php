@@ -48,7 +48,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 		\WP_Mock::expectFilterAdded(
 			"plugin_action_links_{$basename}",
 			array( new AnyInstance( Plugins_Page::class ), 'add_logs_action_link' ),
-			10,
+			99,
 			4
 		);
 
