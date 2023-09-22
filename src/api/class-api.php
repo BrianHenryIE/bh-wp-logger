@@ -276,7 +276,7 @@ class API implements API_Interface {
 
 			$backtrace_cached = wp_cache_get( $backtrace_cache_key, self::CACHE_GROUP_KEY );
 
-			if ( false !== $backtrace_cached ) {
+			if ( false !== $backtrace_cached && is_array( $backtrace_cached ) ) {
 				return $backtrace_cached;
 			}
 		}
