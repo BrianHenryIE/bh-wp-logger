@@ -60,7 +60,8 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 				use Logger_Settings_Trait;
 			};
 
-			if ( 'none' == $settings->get_log_level() ) {
+			// TODO: This is wrong, the directory must be assumed to contain files and be kept private.
+			if ( 'none' === $settings->get_log_level() ) {
 				return new NullLogger();
 			}
 

@@ -10,6 +10,8 @@
 				let display = $(element).is(':checked') ? '' : 'none';
 
 				$(css_class).css('display', display);
+
+				// TODO: Refresh the page height. Scrolling to the bottom currently results in lots of empty whitespace after the rows are hidden.
 			}
 
 			$('.log_level_display_checkbox').click( function( e ) {

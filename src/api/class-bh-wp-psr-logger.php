@@ -14,6 +14,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use Spatie\Backtrace\Backtrace;
 use WP_CLI;
 
 /**
@@ -68,6 +69,12 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	public function log( $level, $message, $context = array() ) {
 
 		$context = array_merge( $context, $this->get_common_context() );
+
+		if ( isset( $context['exception'] ) && $context['exception'] instanceof \Throwable ) {
+			$exception_backtrace = $context['exception']->getTrace();
+			// Backtrace::createForThrowable( $exception_backtrace );
+
+		}
 
 		$settings_log_level = $this->settings->get_log_level();
 

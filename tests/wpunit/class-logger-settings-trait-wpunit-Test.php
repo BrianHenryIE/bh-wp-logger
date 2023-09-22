@@ -100,4 +100,152 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 
 		self::assertEquals( 'test-plugin', $sut->get_plugin_slug() );
 	}
+
+	/**
+	 * @covers ::get_plugin_basename
+	 */
+	public function test_get_plugin_slug1(): void {
+
+		$this->markTestIncomplete( 'TODO' );
+
+		$plugins_array = array(
+			'bh-wp-logger/bh-wp-logger'   =>
+				array(
+					'Name'        => 'BH WP Logger Test Plugin',
+					'PluginURI'   => 'http://github.com/username/bh-wp-logger-test-plugin/',
+					'Version'     => '1.0.0',
+					'Description' => 'This is a short description of what the plugin does. It\'s displayed in the WordPress admin area.',
+					'Title'       => 'BH WP Logger Test Plugin',
+				),
+			'woocommerce/woocommerce.php' =>
+				array(
+					'WC requires at least' => '',
+					'WC tested up to'      => '',
+					'Woo'                  => '',
+					'Name'                 => 'WooCommerce',
+					'PluginURI'            => 'https://woocommerce.com/',
+					'Version'              => '7.4.1',
+					'Description'          => 'An eCommerce toolkit that helps you sell anything. Beautifully.',
+					'Author'               => 'Automattic',
+					'AuthorURI'            => 'https://woocommerce.com',
+					'TextDomain'           => 'woocommerce',
+					'DomainPath'           => '/i18n/languages/',
+					'Network'              => false,
+					'RequiresWP'           => '5.9',
+					'RequiresPHP'          => '7.2',
+					'UpdateURI'            => '',
+					'Title'                => 'WooCommerce',
+					'AuthorName'           => 'Automattic',
+				),
+		);
+
+		wp_cache_set( 'plugins', $plugins_array, 'plugins' );
+
+		$sut = new class() {
+			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+		};
+
+		global $wp_plugin_paths;
+		$wp_plugin_paths['/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger'] = '/Users/brianhenry/Sites/bh-wp-logger';
+
+		$result = $sut->get_plugin_slug();
+
+		$this->assertEquals( 'bh-wp-logger', $result );
+	}
+
+	/**
+	 * @covers ::get_plugin_basename
+	 */
+	public function test_get_plugin_slugssss(): void {
+
+		$this->markTestIncomplete( 'TODO' );
+
+		global $wp_plugin_paths;
+		$wp_plugin_paths['/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger-test-plugin'] = realpath( '/Users/brianhenry/Sites/bh-wp-logger/test-plugin' );
+
+		$test_file = '/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger-test-plugin/admin/class-admin.php';
+
+		$realpath_test_file = realpath( $test_file );
+
+		// Returns `bh-wp-logger-test-plugin/admin/class-admin.php`.
+		$plugin_basename = plugin_basename( $realpath_test_file );
+
+		$plugin_slug = explode( '/', $plugin_basename )[0];
+		self::assertEquals( 'bh-wp-logger-test-plugin', $plugin_slug );
+	}
+
+
+	/**
+	 * @covers ::get_plugin_basename
+	 */
+	public function test_discover_symlinked_plugin_relative_directory(): void {
+
+		$this->markTestIncomplete( 'TODO' );
+
+		global $wp_plugin_paths;
+		$wp_plugin_paths = array(
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/admin-menu-editor' => '/Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/admin-menu-editor',
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger' => '/Users/brianhenry/Sites/bh-wp-logger',
+		);
+
+		$sut = new class() {
+			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+		};
+
+		$normal_plugin_file = '/Users/brianhenry/Sites/bh-wp-logger/subdir/file.php';
+
+		$result = $sut->discover_plugin_relative_directory( $normal_plugin_file );
+
+		$this->assertEquals( 'bh-wp-logger', $result );
+
+	}
+
+	/**
+	 * @covers ::get_plugin_basename
+	 */
+	public function test_discover_plugin_data_simple_null(): void {
+
+		$this->markTestIncomplete( 'TODO' );
+
+		$sut = new class() {
+			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+		};
+
+		// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/src/WP_Includes.
+		// And $wp_plugin_paths is empty.
+
+		$result = $sut->discover_plugin_data();
+
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * @covers ::get_plugin_basename
+	 */
+	public function test_discover_plugin_data_not_found_null(): void {
+
+		$this->markTestIncomplete( 'TODO' );
+
+		global $wp_plugin_paths;
+		$wp_plugin_paths = array(
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/admin-menu-editor' => '/Users/brianhenry/Sites/bh-wp-logger/wp-content/plugins/admin-menu-editor',
+			'/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger' => '/Users/brianhenry/Sites/bh-wp-logger',
+		);
+
+		$sut = new class() {
+			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+		};
+
+			// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/src/WP_Includes.
+
+		$cache_plugins = array(
+			'bh-wp-logger' => array(),
+		);
+
+		wp_cache_set( 'plugins', $cache_plugins, 'plugins' );
+
+		$result = $sut->discover_plugin_data();
+
+		$this->assertNull( $result );
+	}
 }

@@ -33,7 +33,6 @@ class API_Unit_Test extends \Codeception\Test\Unit {
 		$result = $api->get_backtrace();
 
 		$this->assertEquals( $result[0]->file, __FILE__ );
-
 	}
 
 
