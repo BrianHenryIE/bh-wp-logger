@@ -57,7 +57,7 @@
         "katzgrau/klogger": "dev-master",
         "psr/log": "^1.0.0",
         "spatie/backtrace": "^1.0.0",
-        "wptrt/admin-notices": "dev-master"
+        "wptrt/admin-notices": "dev-main#42101e8cf841b17342fcef984a06caf63990c6f2 "
     },
     "require-dev": {
         "10up/wp_mock": "*",
