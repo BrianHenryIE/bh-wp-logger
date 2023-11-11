@@ -1,6 +1,6 @@
 {
     "name": "brianhenryie/bh-wp-logger",
-    "description": "This is a short description of what plugin_title does.",
+    "description": "A PSR logger for WordPress plugins, with a nice WP_List_Table UI.",
     "type": "library",
     "license": "GPL-2.0+-or-later",
     "authors": [
