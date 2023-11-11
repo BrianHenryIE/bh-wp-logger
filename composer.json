@@ -57,9 +57,9 @@
         "brianhenryie/bh-wc-logger": "dev-main",
         "brianhenryie/bh-wp-cli-logger": "*",
         "katzgrau/klogger": "dev-master",
-        "psr/log": "^1.0.0",
-        "spatie/backtrace": "^1.0.0",
-        "wptrt/admin-notices": "dev-master#42101e8cf841b17342fcef984a06caf63990c6f2 "
+        "psr/log": "^1.0",
+        "spatie/backtrace": "^1.0",
+        "wptrt/admin-notices": "dev-master"
     },
     "require-dev": {
         "10up/wp_mock": "^1.0",
@@ -75,6 +75,7 @@
         "codeception/util-universalframework": "*",
         "cweagans/composer-patches": "*",
         "jaschilz/php-coverage-badger": "^2.0",
+        "kporras07/composer-symlinks": "dev-master",
         "lucatume/wp-browser": "^3.0|^4.0",
         "php-stubs/woocommerce-stubs": "*",
         "phpcompatibility/phpcompatibility-wp": "*",
@@ -125,16 +126,19 @@
     "scripts": {
         "post-install-cmd": [
             "vendor/bin/wp core download --path=wordpress --allow-root || true;",
-            "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
+            "@create-symlinks",
             "@setup-wordpress",
             "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
             "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
         ],
         "post-update-cmd": [
             "@setup-wordpress",
-            "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks",
+            "@create-symlinks",
             "BrianHenryIE\\ComposerPhpStorm\\ExcludeFolders::update",
             "BrianHenryIE\\ComposerPhpStorm\\PHPUnitRunConfigurations::update"
+        ],
+        "create-symlinks": [
+            "Kporras07\\ComposerSymlinks\\ScriptHandler::createSymlinks"
         ],
         "setup-wordpress": [
             "wp core download --path=wordpress --allow-root || true",
@@ -142,8 +146,6 @@
             "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp core install --url=\"localhost:8080/$PLUGIN_SLUG\" --title=\"$PLUGIN_NAME\" --admin_user=admin --admin_password=password --admin_email=admin@example.org || true; wp plugin activate $PLUGIN_SLUG || true;",
             "wp user create bob bob@example.org --user_pass=password || true;",
             "wp core update --allow-root || true",
-            "patch ./wordpress/wp-config.php ./patches/wp-debug.diff -s -N -f --no-backup-if-mismatch --reject-file= || true;",
-            "patch ./wordpress/wp-includes/plugin.php ./patches/42670.diff -s -N -f --no-backup-if-mismatch --reject-file= || true;",
             "mkdir -p wordpress/wp-content/uploads"
         ],
         "create-databases": [
