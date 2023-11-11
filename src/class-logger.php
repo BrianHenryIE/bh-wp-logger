@@ -15,10 +15,10 @@
 
 namespace BrianHenryIE\WP_Logger;
 
+use BrianHenryIE\WC_Logger\Log_Context_Handler;
+use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
-use BrianHenryIE\WP_Logger\WooCommerce\Log_Handler;
-use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
 use BrianHenryIE\WP_Private_Uploads\BH_WP_Private_Uploads_Hooks;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Interface;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Trait;
@@ -92,7 +92,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			$logger = new WC_PSR_Logger( $settings );
 
 			// Add context to WooCommerce logs.
-			$wc_log_handler = new Log_Handler( $this, $settings, $this );
+			$wc_log_handler = new Log_Context_Handler( $settings );
 			add_filter( 'woocommerce_format_log_entry', array( $wc_log_handler, 'add_context_to_logs' ), 10, 2 );
 
 			// TODO: What's the log file name when it's a wc-log?

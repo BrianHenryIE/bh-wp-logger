@@ -54,6 +54,7 @@
         "php": ">=7.4",
         "ext-json": "*",
         "brianhenryie/bh-wp-private-uploads": "dev-master",
+        "brianhenryie/bh-wc-logger": "dev-main",
         "katzgrau/klogger": "dev-master",
         "psr/log": "^1.0.0",
         "spatie/backtrace": "^1.0.0",
@@ -99,7 +100,9 @@
             "src": "test-plugin/vendor/brianhenryie/bh-wp-logger/src",
             "assets": "test-plugin/vendor/brianhenryie/bh-wp-logger/assets",
             "vendor/brianhenryie/bh-wp-private-uploads/src": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/src",
-            "vendor/brianhenryie/bh-wp-private-uploads/assets": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/assets"
+            "vendor/brianhenryie/bh-wc-logger/src": "test-plugin/vendor/brianhenryie/bh-wc-logger/src",
+            "vendor/brianhenryie/bh-wp-private-uploads/assets": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/assets",
+            "vendor/wptrt/admin-notices/src": "test-plugin/vendor/wptrt/admin-notices/src"
         },
         "phpstorm": {
             "exclude_folders": {
