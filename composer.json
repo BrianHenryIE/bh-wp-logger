@@ -55,6 +55,7 @@
         "ext-json": "*",
         "brianhenryie/bh-wp-private-uploads": "dev-master",
         "brianhenryie/bh-wc-logger": "dev-main",
+        "brianhenryie/bh-wp-cli-logger": "*",
         "katzgrau/klogger": "dev-master",
         "psr/log": "^1.0.0",
         "spatie/backtrace": "^1.0.0",
@@ -101,6 +102,7 @@
             "assets": "test-plugin/vendor/brianhenryie/bh-wp-logger/assets",
             "vendor/brianhenryie/bh-wp-private-uploads/src": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/src",
             "vendor/brianhenryie/bh-wc-logger/src": "test-plugin/vendor/brianhenryie/bh-wc-logger/src",
+            "vendor/brianhenryie/bh-wp-cli-logger/src": "test-plugin/vendor/brianhenryie/bh-wp-cli-logger/src",
             "vendor/brianhenryie/bh-wp-private-uploads/assets": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/assets",
             "vendor/wptrt/admin-notices/src": "test-plugin/vendor/wptrt/admin-notices/src"
         },

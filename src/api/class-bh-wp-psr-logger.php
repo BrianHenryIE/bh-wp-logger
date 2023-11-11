@@ -9,13 +9,12 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_CLI_Logger\WP_CLI_Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use Spatie\Backtrace\Backtrace;
-use WP_CLI;
 
 /**
  * Functions to add context to logs and to record the time of logs.
@@ -23,6 +22,22 @@ use WP_CLI;
 class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	use LoggerTrait;
 	use LoggerAwareTrait; // To allow swapping out the logger at runtime.
+
+	protected ?WP_CLI_Logger $cli_logger = null;
+
+	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
+		parent::__construct( $settings, $logger );
+
+		/**
+		 * When WP CLI commands are appended with `--debug` or more specifically `--debug=plugin-slug` all messages will be output.
+		 *
+		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
+		 */
+		if ( defined( 'WP_CLI' ) && WP_CLI
+			&& class_exists( WP_CLI_Logger::class ) ) {
+				$this->cli_logger = new WP_CLI_Logger();
+		}
+	}
 
 	/**
 	 * Return the true (proxied) logger.
@@ -154,34 +169,8 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			);
 		}
 
-		/**
-		 * When WP CLI commands are appended with `--debug` or more specifically `--debug=plugin-slug` all messages will be output.
-		 *
-		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
-		 */
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-
-			WP_CLI::debug( $message, $this->settings->get_plugin_slug() );
-
-			switch ( $level ) {
-				case LogLevel::DEBUG:
-					// Addressed above. Allow WP_CLI to decide if it is printed.
-					break;
-				case LogLevel::INFO:
-					WP_CLI::line( $message );
-					break;
-				case LogLevel::NOTICE:
-					WP_CLI::line( WP_CLI::colorize( '%bNotice:%n  ' . $message ) );
-					break;
-				case LogLevel::WARNING:
-					WP_CLI::line( WP_CLI::colorize( '%yWarning:%n ' . $message ) );
-					break;
-				case LogLevel::ERROR:
-					WP_CLI::line( WP_CLI::colorize( '%rError:%n   ' . $message ) );
-					break;
-				default:
-					WP_CLI::error_multi_line( array( ucfirst( $level ) . ': ' . $message ) );
-			}
+		if ( $this->cli_logger instanceof LoggerInterface ) {
+			$this->cli_logger->$level( $message, $context );
 		}
 
 		$this->logger->$level( $message, $context );
@@ -191,5 +180,4 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		// the new value. This could also be run only in WordPress's 'shutdown' action.
 		delete_transient( $this->get_last_log_time_transient_name() );
 	}
-
 }
