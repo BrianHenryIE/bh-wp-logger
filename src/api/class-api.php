@@ -458,7 +458,7 @@ class API implements API_Interface {
 				} else {
 					$current_line = $character . $current_line;
 				}
-				$offset_position --;
+				--$offset_position;
 			}
 		}
 
@@ -509,7 +509,6 @@ class API implements API_Interface {
 		$atom_time_string = $date_time->format( DateTimeInterface::ATOM );
 
 		update_option( $option_name, $atom_time_string );
-
 	}
 
 	/**
@@ -598,6 +597,4 @@ class API implements API_Interface {
 
 		return $entry;
 	}
-
 }
-

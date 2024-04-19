@@ -127,7 +127,6 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 		$bound_to = $reflection->getClosureThis();
 
 		$this->assertInstanceOf( WC_PSR_Logger::class, $bound_to );
-
 	}
 
 	/**
@@ -179,7 +178,6 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 			}
 
 			public function emergency( $message, $context = array() ) {
-
 			}
 
 			public function alert( $message, $context = array() ) {
@@ -218,7 +216,7 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 		 */
 		add_filter(
 			'woocommerce_logging_class',
-			function( $class_name ) use ( $mock_logger ) {
+			function ( $class_name ) use ( $mock_logger ) {
 				return $mock_logger;
 			}
 		);
@@ -232,5 +230,4 @@ class WC_PSR_Logger_WPUnit_Test extends WPTestCase {
 
 		$this->assertEquals( 'error log message', $mock_logger->log_message );
 	}
-
 }

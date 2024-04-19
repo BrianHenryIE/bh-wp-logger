@@ -28,6 +28,9 @@
     <rule ref="Generic.Commenting.DocComment.MissingShort">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter.Found">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
     <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>

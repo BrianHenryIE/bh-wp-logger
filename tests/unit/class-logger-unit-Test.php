@@ -27,12 +27,12 @@ class Logger_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			array( BH_WP_PSR_Logger::class, '__construct' ),
-			function() {}
+			function () {}
 		);
 
 		\Patchwork\redefine(
 			array( Plugin_Logger_Actions::class, '__construct' ),
-			function() {}
+			function () {}
 		);
 
 		\WP_Mock::passthruFunction( 'wp_normalize_path' );
@@ -59,7 +59,5 @@ class Logger_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertInstanceOf( BH_WP_PSR_Logger::class, $logger );
 		$this->assertInstanceOf( LoggerInterface::class, $logger );
-
 	}
-
 }

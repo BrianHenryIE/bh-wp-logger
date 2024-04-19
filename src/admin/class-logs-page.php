@@ -5,6 +5,7 @@
  * E.g. /wp-admin/admin.php?page=bh-wp-logger-test-plugin-logs.
  *
  * TODO: Add "send to plugin developer" button.
+ * TODO: Add copy to clipboard button.
  *
  * @package brianhenryie/bh-wp-logger
  */
@@ -162,7 +163,7 @@ class Logs_Page {
 			LogLevel::DEBUG   => 0,
 		);
 		foreach ( $logs_table->get_data() as $datum ) {
-			$log_level_counts[ strtolower( $datum['level'] ) ]++;
+			++$log_level_counts[ strtolower( $datum['level'] ) ];
 		}
 
 		$checkboxes = array();
@@ -260,5 +261,4 @@ class Logs_Page {
 
 		wp_enqueue_style( $handle, $css_url, array(), $version, 'all' );
 	}
-
 }
