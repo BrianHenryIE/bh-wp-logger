@@ -172,7 +172,7 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 			array(
 				'logger'     => $color_logger,
 				'get_logger' => $color_logger,
-				'debug'      => function( $message, $context ) use ( $color_logger ) {
+				'debug'      => function ( $message, $context ) use ( $color_logger ) {
 					$color_logger->debug( $message, $context );
 				},
 			)
@@ -192,5 +192,4 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertTrue( $color_logger->hasDebug( 'Executing testing_cron cron job.' ) );
 	}
-
 }

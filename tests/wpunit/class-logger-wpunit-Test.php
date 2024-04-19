@@ -88,7 +88,6 @@ class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$logger = $sut->get_logger();
 
 		$this->assertInstanceOf( KLogger::class, $logger );
-
 	}
 
 
@@ -121,10 +120,10 @@ class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		// Remove WooCommerce from the active plugins list.
 		add_filter(
 			'active_plugins',
-			function( $active_plugins ) {
+			function ( $active_plugins ) {
 				return array_filter(
 					$active_plugins,
-					function( $element ) {
+					function ( $element ) {
 						return 'woocommerce/woocommerce.php' !== $element;
 					}
 				);
@@ -141,5 +140,4 @@ class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$this->assertInstanceOf( KLogger::class, $logger );
 	}
-
 }
