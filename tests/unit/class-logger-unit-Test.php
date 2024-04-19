@@ -54,6 +54,7 @@ class Logger_Unit_Test extends \Codeception\Test\Unit {
 				'return_arg' => 1,
 			)
 		);
+		\WP_Mock::passthruFunction( 'sanitize_key' );
 
 		$logger = Logger::instance();
 
