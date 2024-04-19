@@ -66,6 +66,7 @@ function instantiate_bh_wp_logger_test_plugin() {
 
 	$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface, WooCommerce_Logger_Settings_Interface {
 		use Logger_Settings_Trait;
+
 		public function get_log_level(): string {
 			return LogLevel::DEBUG;
 		}
@@ -85,7 +86,6 @@ function instantiate_bh_wp_logger_test_plugin() {
 	$plugin = new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
 
 	return $plugin;
-
 }
 $GLOBALS['bh_wp_logger_test_plugin'] = instantiate_bh_wp_logger_test_plugin();
 
@@ -103,7 +103,7 @@ function run_closure_in_plugin( $closure ) {
 
 add_filter(
 	'plugins_url',
-	function( $url ) {
+	function ( $url ) {
 		return str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-test-plugin/vendor/brianhenryie', $url );
 	}
 );

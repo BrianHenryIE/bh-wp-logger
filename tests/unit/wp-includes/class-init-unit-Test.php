@@ -371,5 +371,4 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 		// Currently not logging anything.
 		$this->assertEmpty( $logger->records );
 	}
-
 }

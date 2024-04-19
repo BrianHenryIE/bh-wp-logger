@@ -197,7 +197,6 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 		$result = $sut->discover_plugin_relative_directory( $normal_plugin_file );
 
 		$this->assertEquals( 'bh-wp-logger', $result );
-
 	}
 
 	/**

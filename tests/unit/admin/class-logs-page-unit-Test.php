@@ -76,7 +76,6 @@ class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
 		$sut = new Logs_Page( $api, $settings, $logger );
 
 		$sut->enqueue_styles();
-
 	}
 
 

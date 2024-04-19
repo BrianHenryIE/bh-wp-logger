@@ -168,5 +168,4 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 		parent::__construct( $settings, $logger );
 	}
-
 }

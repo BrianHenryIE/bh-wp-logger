@@ -62,7 +62,6 @@ class BH_WP_Logger_Test_Plugin {
 
 		$this->set_locale();
 		$this->define_admin_hooks();
-
 	}
 
 	/**
@@ -79,7 +78,6 @@ class BH_WP_Logger_Test_Plugin {
 		$plugin_i18n = new I18n();
 
 		add_action( 'plugins_loaded', array( $plugin_i18n, 'load_plugin_textdomain' ) );
-
 	}
 
 	/**
@@ -101,7 +99,5 @@ class BH_WP_Logger_Test_Plugin {
 		// Handle actions on the admin page.
 		$admin_ajax = new Admin_Ajax( $this->logger );
 		add_action( 'wp_ajax_log', array( $admin_ajax, 'handle_request' ) );
-
 	}
-
 }

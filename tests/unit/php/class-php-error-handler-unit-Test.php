@@ -33,7 +33,6 @@ class PHP_Error_Handler_Unit_Test extends \Codeception\Test\Unit {
 		$result = $method->invoke( $sut, $from );
 
 		$this->assertEquals( $to, $result );
-
 	}
 
 	public function error_levels(): array {
@@ -61,5 +60,4 @@ class PHP_Error_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertEquals( LogLevel::ERROR, $result );
 	}
-
 }

@@ -59,5 +59,4 @@ class Plugin_Installer {
 
 		return $install_actions;
 	}
-
 }

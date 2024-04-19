@@ -87,5 +87,4 @@ class Plugin_Installer_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertEmpty( $result );
 	}
-
 }

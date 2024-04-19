@@ -311,5 +311,4 @@ class Functions {
 
 		add_filter( 'deprecated_hook_trigger_error', '__return_false' );
 	}
-
 }

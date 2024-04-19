@@ -41,7 +41,6 @@ class Logs_List_Table_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$this->assertStringContainsString( "user-edit.php?user_id={$user_2_id}", $result );
 		$this->assertStringContainsString( 'username_2', $result );
-
 	}
 
 	/**

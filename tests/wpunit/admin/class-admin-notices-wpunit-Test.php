@@ -34,7 +34,5 @@ class Admin_Notices_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$sut = new Admin_Notices( $api, $settings, $logger );
 
 		$sut->admin_notices();
-
 	}
-
 }

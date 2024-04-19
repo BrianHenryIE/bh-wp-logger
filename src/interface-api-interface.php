@@ -151,5 +151,4 @@ interface API_Interface {
 	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}>
 	 */
 	public function parse_log( string $filepath ): array;
-
 }

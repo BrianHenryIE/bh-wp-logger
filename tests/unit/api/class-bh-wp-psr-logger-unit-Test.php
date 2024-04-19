@@ -54,6 +54,5 @@ class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertArrayHasKey( 'properties', $logged_exception );
 		$this->assertEquals( 123, $logged_exception['properties']['code'] );
-
 	}
 }

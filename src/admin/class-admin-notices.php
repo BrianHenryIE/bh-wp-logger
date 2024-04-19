@@ -140,7 +140,7 @@ class Admin_Notices extends Notices {
 			 *
 			 * @see update_option()
 			 */
-			$on_dismiss = function( $value, $old_value, $option ) use ( $error_detail_option_name ) {
+			$on_dismiss = function ( $value, $old_value, $option ) use ( $error_detail_option_name ) {
 				delete_option( $error_detail_option_name );
 				delete_option( $option );
 				return $old_value; // When new and old match, it short circuits.
@@ -150,7 +150,5 @@ class Admin_Notices extends Notices {
 			// wptrt_notice_dismissed_bh-wp-logger-test-plugin-recent-error
 
 		}
-
 	}
-
 }

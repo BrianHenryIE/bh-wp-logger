@@ -13,7 +13,7 @@ use BrianHenryIE\WP_Logger\Logger;
 /**
  * @coversNothing
  */
-class Functions_Integration_Test  extends \Codeception\TestCase\WPTestCase {
+class Functions_Integration_Test extends \Codeception\TestCase\WPTestCase {
 
 	/**
 	 * Execute a deprecated function and verify it is handled by our logger.
@@ -26,7 +26,7 @@ class Functions_Integration_Test  extends \Codeception\TestCase\WPTestCase {
 		$logger      = Logger::instance();
 		$logger->setLogger( $test_logger );
 
-		$closure = function() {
+		$closure = function () {
 			// phpcs:disable WordPress.WP.DeprecatedFunctions.documentation_linkFound
 			documentation_link();
 		};
@@ -35,5 +35,4 @@ class Functions_Integration_Test  extends \Codeception\TestCase\WPTestCase {
 
 		$this->assertTrue( $test_logger->hasWarningThatContains( 'documentation_link' ) );
 	}
-
 }

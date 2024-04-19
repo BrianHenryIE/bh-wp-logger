@@ -46,13 +46,13 @@ class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = new NullLogger();
 
-		$my_handler = function( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
 
 		set_error_handler( $my_handler );
 
 		new PHP_Error_Handler( $api, $settings, $logger );
 
-		$my_handler_2 = function( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler_2 = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
 
 		$previous = set_error_handler( $my_handler_2 );
 
@@ -71,7 +71,7 @@ class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = new NullLogger();
 
-		$my_handler = function( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
 
 		set_error_handler( $my_handler );
 
@@ -79,7 +79,7 @@ class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$sut->init();
 
-		$my_handler_2 = function( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler_2 = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
 
 		$previous = set_error_handler( $my_handler_2 );
 
@@ -104,7 +104,7 @@ class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = new NullLogger();
 
-		$my_handler = function( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
 
 		set_error_handler( $my_handler );
 
@@ -156,7 +156,6 @@ class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		// True means it has been handled.
 		$this->assertTrue( $result );
-
 	}
 
 	/**
@@ -195,8 +194,5 @@ class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		// True means it has been handled.
 		$this->assertFalse( $result );
-
 	}
-
-
 }

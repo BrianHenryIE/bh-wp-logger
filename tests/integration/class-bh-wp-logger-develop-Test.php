@@ -8,7 +8,7 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
-use BH_WP_Logger_Test_Plugin\includes\BH_WP_Logger_Test_Plugin;
+use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 
 /**
  * Verifies the plugin has been instantiated and added to PHP's $GLOBALS variable.
@@ -26,5 +26,4 @@ class Plugin_Develop_Test extends \Codeception\TestCase\WPTestCase {
 
 		$this->assertInstanceOf( BH_WP_Logger_Test_Plugin::class, $GLOBALS['bh_wp_logger_test_plugin'] );
 	}
-
 }

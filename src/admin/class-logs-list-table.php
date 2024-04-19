@@ -236,7 +236,7 @@ class Logs_List_Table extends WP_List_Table {
 	 */
 	public function replace_wp_user_id_with_link( string $message ): string {
 
-		$callback = function( array $matches ): string {
+		$callback = function ( array $matches ): string {
 
 			$user = get_user_by( 'ID', $matches[1] );
 
@@ -282,12 +282,12 @@ class Logs_List_Table extends WP_List_Table {
 		 */
 		$post_types_with_ui = array_filter(
 			$post_types,
-			function( WP_Post_Type $post_type ) {
+			function ( WP_Post_Type $post_type ) {
 				return $post_type->show_ui;
 			}
 		);
 
-		$callback = function( array $matches ) use ( $post_types_with_ui ): string {
+		$callback = function ( array $matches ) use ( $post_types_with_ui ): string {
 
 			if ( ! isset( $post_types_with_ui[ $matches[1] ] ) ) {
 				return $matches[0];

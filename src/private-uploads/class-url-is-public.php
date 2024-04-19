@@ -30,7 +30,7 @@ class URL_Is_Public {
 	 *
 	 * @return string
 	 */
-	public function change_warning_message( string $message, string $url ) : string {
+	public function change_warning_message( string $message, string $url ): string {
 
 		/* translators: %s: The URL where the log files are accessible. */
 		$new_message = sprintf( __( 'The logs directory is, and should not be, publicly accessible at the URL: %s. Please update your webserver configuration to block access to that folder.', 'bh-wp-logger' ), $url );

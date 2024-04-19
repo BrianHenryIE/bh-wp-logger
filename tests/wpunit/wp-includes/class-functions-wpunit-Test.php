@@ -132,7 +132,5 @@ class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		// `has_filter` function returns the priority.
 		$this->assertNotFalse( has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
-
 	}
-
 }

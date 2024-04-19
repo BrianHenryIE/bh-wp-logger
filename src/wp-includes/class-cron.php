@@ -93,5 +93,4 @@ class Cron {
 
 		$this->api->delete_old_logs();
 	}
-
 }

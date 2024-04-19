@@ -45,7 +45,6 @@ class Admin {
 		$url = WP_PLUGIN_URL . '/bh-wp-logger-test-plugin/Admin/css/bh-wp-logger-test-plugin-admin.css';
 
 		wp_enqueue_style( 'bh-wp-logger-test-plugin', $url, array(), $version, 'all' );
-
 	}
 
 	/**
@@ -60,7 +59,6 @@ class Admin {
 		$url = WP_PLUGIN_URL . '/bh-wp-logger-test-plugin/Admin/js/bh-wp-logger-test-plugin-admin.js';
 
 		wp_enqueue_script( 'bh-wp-logger-test-plugin', $url, array( 'jquery' ), $version, true );
-
 	}
 
 	/**
@@ -81,7 +79,6 @@ class Admin {
 			$icon_url,
 			2
 		);
-
 	}
 
 	/**
@@ -110,5 +107,4 @@ class Admin {
 
 		include wp_normalize_path( __DIR__ . '/partials/bh-wp-logger-test-plugin-admin-display.php' );
 	}
-
 }

@@ -4,4 +4,3 @@
  *
  * @package           BH_WP_Logger
  */
-

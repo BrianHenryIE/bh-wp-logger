@@ -107,7 +107,6 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 		);
 
 		new Plugin_Logger_Actions( $api, $settings, $logger );
-
 	}
 
 	/**

@@ -23,7 +23,7 @@ class I18n_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$called        = false;
 		$actual_domain = null;
 
-		$filter = function( $locale, $domain ) use ( &$called, &$actual_domain ) {
+		$filter = function ( $locale, $domain ) use ( &$called, &$actual_domain ) {
 
 			$called        = true;
 			$actual_domain = $domain;
@@ -39,6 +39,5 @@ class I18n_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$this->assertTrue( $called, 'plugin_locale filter not called within load_plugin_textdomain() suggesting it has not been set by the plugin.' );
 		$this->assertEquals( 'bh-wp-logger-test-plugin', $actual_domain );
-
 	}
 }

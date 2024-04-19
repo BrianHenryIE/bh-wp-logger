@@ -82,7 +82,6 @@ class AJAX {
 		} else {
 			wp_send_json_error( $result );
 		}
-
 	}
 
 	/**
@@ -119,7 +118,5 @@ class AJAX {
 		} else {
 			wp_send_json_error( $result );
 		}
-
 	}
-
 }

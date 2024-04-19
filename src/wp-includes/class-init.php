@@ -101,7 +101,6 @@ class Init {
 		$file = $files[ $date ];
 
 		$this->send_private_file( $file );
-
 	}
 
 	/**
@@ -112,6 +111,7 @@ class Init {
 	 * @see Serve_Private_File::send_private_file()
 	 *
 	 * Nonce was checked above.
+	 *
 	 * phpcs:disable WordPress.Security.NonceVerification.Recommended
 	 */
 	protected function send_private_file( string $filepath ): void {
@@ -156,7 +156,5 @@ class Init {
 		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_read_readfile
 		readfile( $filepath );
 		die();
-
 	}
-
 }

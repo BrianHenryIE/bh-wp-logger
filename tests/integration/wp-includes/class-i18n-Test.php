@@ -30,7 +30,5 @@ class BH_WP_Logger_I18n_Test extends \Codeception\TestCase\WPTestCase {
 
 		// Seems to fail because there are no translations to load.
 		$this->assertTrue( is_textdomain_loaded( 'bh-wp-logger' ), 'i18n text domain not loaded.' );
-
 	}
-
 }

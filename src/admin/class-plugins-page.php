@@ -94,5 +94,4 @@ class Plugins_Page {
 
 		return $action_links;
 	}
-
 }

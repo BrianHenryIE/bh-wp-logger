@@ -52,5 +52,4 @@ interface Logger_Settings_Interface {
 	 * @return string
 	 */
 	public function get_plugin_basename(): string;
-
 }

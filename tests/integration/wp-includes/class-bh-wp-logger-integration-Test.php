@@ -46,7 +46,6 @@ class BH_WP_Logger_Integration_Test extends \Codeception\TestCase\WPTestCase {
 		$this->assertNotEmpty( $hooked_methods, "No methods on an instance of $class_type hooked to $action_name" );
 
 		$this->assertContains( $method_name, $hooked_methods, "$method_name for $class_type class not hooked to $action_name" );
-
 	}
 
 	/**
@@ -80,7 +79,6 @@ class BH_WP_Logger_Integration_Test extends \Codeception\TestCase\WPTestCase {
 		$this->assertNotNull( $hooked_method, "No methods on an instance of $class_type hooked to $action_name" );
 
 		$this->assertEquals( $method_name, $hooked_method, "Unexpected method name for $class_type class hooked to $action_name" );
-
 	}
 
 	/**
@@ -114,6 +112,5 @@ class BH_WP_Logger_Integration_Test extends \Codeception\TestCase\WPTestCase {
 		$this->assertNotNull( $hooked_method, "No methods on an instance of $class_type hooked to $action_name" );
 
 		$this->assertEquals( $method_name, $hooked_method, "Unexpected method name for $class_type class hooked to $action_name" );
-
 	}
 }

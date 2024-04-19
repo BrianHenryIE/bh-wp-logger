@@ -28,6 +28,9 @@
     <rule ref="Generic.Commenting.DocComment.MissingShort">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
     <rule ref="Internal.NoCodeFound">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
@@ -74,6 +77,9 @@
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
     <rule ref="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
     <rule ref="WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents">

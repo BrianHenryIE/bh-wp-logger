@@ -219,6 +219,5 @@ class PHP_Error_Handler {
 		} else {
 			return LogLevel::ERROR;
 		}
-
 	}
 }

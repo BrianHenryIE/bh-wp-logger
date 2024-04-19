@@ -51,7 +51,6 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$sut->error( 'error log message' );
 
 		$this->assertArrayHasKey( 'debug_backtrace', $logger->context );
-
 	}
 
 	/**
@@ -91,7 +90,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		 */
 		add_filter(
 			'plugin-slug_bh_wp_logger_log',
-			function( array $log_data, $settings, $bh_wp_psr_logger ) {
+			function ( array $log_data, $settings, $bh_wp_psr_logger ) {
 				return null;
 			},
 			10,
@@ -99,7 +98,5 @@ class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		);
 
 		$sut->log( LogLevel::ERROR, 'Trying to access array offset on value of type bool', $context );
-
 	}
-
 }

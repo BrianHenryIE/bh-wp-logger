@@ -35,7 +35,7 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 		// Prevents code-coverage counting, and removes the need to define the WordPress functions that are used in that class.
 		\Patchwork\redefine(
 			array( BH_WP_Logger_Test_Plugin::class, '__construct' ),
-			function( $settings, $logger ) {}
+			function ( $settings, $logger ) {}
 		);
 
 		$plugin_root_dir = dirname( __DIR__, 2 ) . '/test-plugin';
@@ -118,5 +118,4 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertInstanceOf( BH_WP_Logger_Test_Plugin::class, $GLOBALS['bh_wp_logger_test_plugin'] );
 	}
-
 }

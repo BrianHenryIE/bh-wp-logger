@@ -74,7 +74,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			'error_get_last',
-			function() {
+			function () {
 				return array(
 					'file'    => __FILE__,
 					'message' => 'error message',
@@ -100,7 +100,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			'error_get_last',
-			function() {
+			function () {
 				return null;
 			}
 		);
@@ -129,7 +129,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			'error_get_last',
-			function() {
+			function () {
 				return array(
 					'file'    => __FILE__,
 					'message' => 'error message',
@@ -141,5 +141,4 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		$this->assertFalse( $logger->hasErrorThatContains( 'error message' ) );
 	}
-
 }
