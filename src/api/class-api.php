@@ -262,7 +262,8 @@ class API implements API_Interface {
 	 *
 	 * TODO: Check is WordPress's own backtrace a good replacement for Spatie.
 	 *
-	 * @param ?int $steps The number of backtrace entries to return. e.g. with debug enabled, we don't need the full backtrace for every log entry.
+	 * @param ?string $source_hash A unique identifier for the source of the log entry. Used to cache the backtrace. The backtrace will not be cached if this is absent.
+	 * @param ?int    $steps The number of backtrace entries to return.
 	 *
 	 * @return Frame[]
 	 */
@@ -281,12 +282,12 @@ class API implements API_Interface {
 			}
 		}
 
-		$starting_from_frame_closure = function( Frame $frame ): bool {
+		$starting_from_frame_closure = function ( Frame $frame ): bool {
 			if ( __FILE__ === $frame->file
 				|| 'call_user_func_array' === $frame->method
 				|| basename( $frame->file ) === 'class-php-error-handler.php'
 				|| basename( $frame->file ) === 'class-functions.php'
-				|| false !== stripos( $frame->file, 'brianhenryie/bh-wp-logger/src' )
+				|| false !== stripos( $frame->file, 'bh-wp-logger/src' )
 				|| false !== stripos( $frame->file, 'psr/log/Psr/Log/' )
 				|| false !== strpos( $frame->file, 'php-http/logger-plugin' )
 			) {
@@ -297,11 +298,45 @@ class API implements API_Interface {
 
 		$backtrace_frames = Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->limit( $steps ?? 0 )->frames();
 
-		if ( ! empty( $source_hash ) ) {
-			wp_cache_set( $backtrace_cache_key, $backtrace_frames, self::CACHE_GROUP_KEY, DAY_IN_SECONDS );
+		if ( isset( $backtrace_cache_key ) ) {
+			wp_cache_set(
+				$backtrace_cache_key,
+				$this->recursively_remove_closures( $backtrace_frames ),
+				self::CACHE_GROUP_KEY,
+				DAY_IN_SECONDS
+			);
 		}
 
 		return $backtrace_frames;
+	}
+
+	/**
+	 * Remove closures from the backtrace before caching it.
+	 *
+	 * Pressable's memcache was throwing an exception when the backtrace contained a closure.
+	 *
+	 * @see https://github.com/BrianHenryIE/bh-wp-autologin-urls/issues/23
+	 *
+	 * @param object|array<mixed> $elements The array or object whose elements should be inspected.
+	 *
+	 * @return object|array<mixed> A copy of the input with closures removed.
+	 */
+	protected function recursively_remove_closures( $elements ) {
+		foreach ( $elements as $index => $element ) {
+			if ( is_object( $element ) && $element instanceof \Closure ) {
+				$updated = 'Closure';
+			} elseif ( is_array( $element ) || is_object( $element ) ) {
+				$updated = $this->recursively_remove_closures( $element );
+			} else {
+				$updated = $element;
+			}
+			if ( is_object( $elements ) ) {
+				$elements->$index = $updated;
+			} else {
+				$elements[ $index ] = $updated;
+			}
+		}
+		return $elements;
 	}
 
 	/**
