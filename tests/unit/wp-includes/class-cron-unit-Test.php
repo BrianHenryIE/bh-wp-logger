@@ -6,7 +6,8 @@ use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
+use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
+use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use Codeception\Stub\Expected;
 
 /**
@@ -117,7 +118,7 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 	public function test_do_not_schedule_for_woocommerce_logger(): void {
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty(
-			Logger_Settings_Interface::class,
+			WooCommerce_Logger_Settings_Interface::class,
 			array(
 				'get_plugin_slug' => 'test-plugin',
 			)

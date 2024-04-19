@@ -2,7 +2,7 @@
 
 namespace BrianHenryIE\WP_Logger;
 
-use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
+use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LogLevel;

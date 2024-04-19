@@ -7,10 +7,10 @@
 
 namespace BrianHenryIE\WP_Logger\WP_Includes;
 
+use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
 use Psr\Log\LoggerAwareTrait;
 
 /**
