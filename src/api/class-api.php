@@ -21,8 +21,6 @@ use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Spatie\Backtrace\Backtrace;
-use Spatie\Backtrace\Frame;
 
 /**
  * BH_WP_PSR_Logger extends this, then Logger extends that.
@@ -265,7 +263,7 @@ class API implements API_Interface {
 	 * @param ?string $source_hash A unique identifier for the source of the log entry. Used to cache the backtrace. The backtrace will not be cached if this is absent.
 	 * @param ?int    $steps The number of backtrace entries to return.
 	 *
-	 * @return Frame[]
+	 * @return array
 	 */
 	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array {
 
@@ -282,32 +280,41 @@ class API implements API_Interface {
 			}
 		}
 
-		$starting_from_frame_closure = function ( Frame $frame ): bool {
-			if ( __FILE__ === $frame->file
-				|| 'call_user_func_array' === $frame->method
-				|| basename( $frame->file ) === 'class-php-error-handler.php'
-				|| basename( $frame->file ) === 'class-functions.php'
-				|| false !== stripos( $frame->file, 'bh-wp-logger/src' )
-				|| false !== stripos( $frame->file, 'psr/log/Psr/Log/' )
-				|| false !== strpos( $frame->file, 'php-http/logger-plugin' )
-			) {
-				return false;
+		$backtrace = debug_backtrace( false );
+
+		$ignore_starting_frame = function ( array $frame ): bool {
+			switch ( true ) {
+				case isset($frame['file']) && __FILE__ === $frame['file']:
+				case 'call_user_func_array' === $frame['function']:
+				case isset($frame['file']) && basename( $frame['file'] ) === 'class-php-error-handler.php':
+				case isset($frame['file']) && basename( $frame['file'] ) === 'class-functions.php':
+				case isset($frame['file']) && false !== stripos( $frame['file'], 'bh-wp-logger/src' ):
+				case isset($frame['file']) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
+				case isset($frame['file']) && false !== strpos( $frame['file'], 'php-http/logger-plugin' ):
+					return true;
+				default:
+					return false;
 			}
-			return true;
 		};
 
-		$backtrace_frames = Backtrace::create()->withArguments()->startingFromFrame( $starting_from_frame_closure )->limit( $steps ?? 0 )->frames();
+		foreach ( $backtrace as $key => $trace ) {
+			if ( $ignore_starting_frame( $trace ) ) {
+				unset( $trace[ $key ] );
+			} else {
+				break;
+			}
+		}
 
 		if ( isset( $backtrace_cache_key ) ) {
 			wp_cache_set(
 				$backtrace_cache_key,
-				$this->recursively_remove_closures( $backtrace_frames ),
+				$this->recursively_remove_closures( $backtrace ),
 				self::CACHE_GROUP_KEY,
 				DAY_IN_SECONDS
 			);
 		}
 
-		return $backtrace_frames;
+		return $backtrace;
 	}
 
 	/**
@@ -367,7 +374,7 @@ class API implements API_Interface {
 
 		foreach ( $frames as $frame ) {
 
-			if ( $this->is_file_from_plugin( $frame->file ) ) {
+			if ( isset( $frame['file'] ) && $this->is_file_from_plugin( $frame['file'] ) ) {
 				$is_file_from_plugin = true;
 				break;
 			}
