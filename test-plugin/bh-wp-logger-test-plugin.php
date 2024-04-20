@@ -64,7 +64,7 @@ define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
  */
 function instantiate_bh_wp_logger_test_plugin() {
 
-	$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface, WooCommerce_Logger_Settings_Interface {
+	$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface { //}, WooCommerce_Logger_Settings_Interface {
 		use Logger_Settings_Trait;
 
 		public function get_log_level(): string {
