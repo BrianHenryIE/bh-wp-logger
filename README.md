@@ -51,24 +51,11 @@ Similarly, any post type can be linked with `` `post_type_name:123` ``, e.g. `` 
 
 ### Composer
 
-This library is not on Packagist yet.
-
 ```
-composer config minimum-stability dev
-composer config prefer-stable true
-
-composer config allow-plugins.cweagans/composer-patches true
-composer require --dev cweagans/composer-patches
-composer config extra.enable-patching true
-
-composer config repositories.brianhenryie/bh-wp-logger git https://github.com/brianhenryie/bh-wp-logger
-composer config repositories.brianhenryie/bh-wp-private-uploads git https://github.com/brianhenryie/bh-wp-private-uploads
-
 composer require brianhenryie/bh-wp-logger
 ```
 
-It is using [wptrt/admin-notices](https://github.com/WPTT/admin-notices) which has [a race condition in Firefox](https://github.com/WPTT/admin-notices/issues/14) that need to be patched. And it uses [brianhenryie/bh-wp-private-uploads](https://github.com/BrianHenryIE/bh-wp-private-uploads) to ensure the logs directory is not publicly accessible.
-
+Expect breaking changes with every release until v1.0.0.
 
 ### Instantiate
 
@@ -257,7 +244,7 @@ Minor concerns:
 
 # Status
 
-To date I think it has been used mostly by me, i.e. internal projects. There are no egrarious issues. It _should_ work for everyone but I would like some feedback from others on how well it works for you. 
+To date I think it has been used mostly by me, i.e. internal projects. There are no egregious issues. It _should_ work for everyone but I would like some feedback from others on how well it works for you. 
 
 I'll start at Semver 1.0.0 once I've caught up with WPCS, PhpStan and PhpUnit. There's about 65 tests and 43% coverage. WPCS + PHPStan are both pretty good.
 
