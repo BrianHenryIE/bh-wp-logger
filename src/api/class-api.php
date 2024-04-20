@@ -7,6 +7,7 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\API_Interface;
@@ -372,8 +373,6 @@ class API implements API_Interface {
 	 * @see Plugins::get_plugin_data_from_slug()
 	 *
 	 * @param string $filepath Path to the file to be checked.
-	 *
-	 * @return bool
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
 		return 0 === strpos( plugin_basename( realpath( $filepath ) ), $this->settings->get_plugin_slug() );
@@ -517,14 +516,19 @@ class API implements API_Interface {
 
 		$entries = array();
 
+		if ( $this->logger instanceof WC_PSR_Logger ) {
+			$pattern = '/^(?P<time>[^\s]*)\s(?P<level>\w*)\s(?P<message>.*?)\sCONTEXT:\s(?P<context>.*)/';
+		} else {
+			$pattern = '/(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s(?P<level>\w*)\s(?P<message>.*)/im';
+		}
+
 		// TODO: This will fail if the first line does not parse.
 		foreach ( $file_lines as $input_line ) {
-
 			$output_array = array();
-			if ( 1 === preg_match( '/(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s(?P<level>\w*)\s(?P<message>.*)/im', $input_line, $output_array ) ) {
+			if ( 1 === preg_match( $pattern, $input_line, $output_array ) ) {
 				$entries[] = array(
 					'line_one_parsed' => $output_array,
-					'lines'           => array(),
+					'lines'           => array( $output_array['context'] ?? '' ),
 				);
 			} else {
 				$entries[ count( $entries ) - 1 ]['lines'][] = $input_line;
@@ -552,20 +556,22 @@ class API implements API_Interface {
 		$time_string = $input_lines['line_one_parsed']['time'];
 		$str_time    = strtotime( $time_string );
 		// E.g. "2020-10-23T17:39:36+00:00".
-		$datetime = DateTime::createFromFormat( 'U', "{$str_time}" );
-		if ( false === $datetime ) {
-			$datetime = null; }
+		$datetime = DateTime::createFromFormat( 'U', "{$str_time}" ) ?: null;
 
 		$level = $input_lines['line_one_parsed']['level'];
 
 		$message = $input_lines['line_one_parsed']['message'];
 
-		$context = null;
-
-		foreach ( $input_lines['lines'] as $input_line ) {
-			$context = json_decode( $input_line );
-			if ( is_null( $context ) ) {
-				$message .= $input_line;
+		// Assume all lines that do not begin with a date should be joined together as context object.
+		$context = json_decode( implode( PHP_EOL, $input_lines['lines'] ) );
+		if ( is_null( $context ) ) {
+			foreach ( $input_lines['lines'] as $input_line ) {
+				// This is a bug but I'm not going to fix it until I see the problem exist.
+				// What happens if there is multiple lines that for some reason are valid JSON? Data will be lost in display.
+				$context = json_decode( $input_line );
+				if ( is_null( $context ) ) {
+					$message .= $input_line;
+				}
 			}
 		}
 
