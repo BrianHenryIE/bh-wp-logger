@@ -268,14 +268,9 @@ class API implements API_Interface {
 	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array {
 
 		if ( ! empty( $source_hash ) ) {
-			$source_hash = sanitize_key( $source_hash );
+			$backtrace_cached = $this->get_cached_backtrace( $source_hash );
 
-			// Maybe another plugin has already run this backtrace and we can use the cached version.
-			$backtrace_cache_key = "backtrace_$source_hash";
-
-			$backtrace_cached = wp_cache_get( $backtrace_cache_key, self::CACHE_GROUP_KEY );
-
-			if ( false !== $backtrace_cached && is_array( $backtrace_cached ) ) {
+			if ( is_array( $backtrace_cached ) ) {
 				return $backtrace_cached;
 			}
 		}
@@ -305,45 +300,45 @@ class API implements API_Interface {
 			}
 		}
 
-		if ( isset( $backtrace_cache_key ) ) {
-			wp_cache_set(
-				$backtrace_cache_key,
-				$this->recursively_remove_closures( $backtrace ),
-				self::CACHE_GROUP_KEY,
-				DAY_IN_SECONDS
-			);
+		if ( ! is_null( $source_hash ) ) {
+			$this->set_cached_backtrace( $source_hash, $backtrace );
 		}
 
 		return $backtrace;
 	}
 
 	/**
-	 * Remove closures from the backtrace before caching it.
+	 * Save the backtrace to a global cache.
 	 *
-	 * Pressable's memcache was throwing an exception when the backtrace contained a closure.
+	 * @see PHP_Error_Handler::is_related_error()
 	 *
-	 * @see https://github.com/BrianHenryIE/bh-wp-autologin-urls/issues/23
+	 * If other plugins are using bh-wp-logger, they can use this cache to avoid rerunning the backtrace.
 	 *
-	 * @param object|array<mixed> $elements The array or object whose elements should be inspected.
+	 * @see debug_backtrace()
 	 *
-	 * @return object|array<mixed> A copy of the input with closures removed.
+	 * @param string                                                                                          $source_hash A unique identifier for backtrace – `implode(func_get_args())` of the error handler is used.
+	 * @param array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}> $backtrace The PHP backtrace, presumably filtered to remove irrelevant frames.
 	 */
-	protected function recursively_remove_closures( $elements ) {
-		foreach ( $elements as $index => $element ) {
-			if ( is_object( $element ) && $element instanceof \Closure ) {
-				$updated = 'Closure';
-			} elseif ( is_array( $element ) || is_object( $element ) ) {
-				$updated = $this->recursively_remove_closures( $element );
-			} else {
-				$updated = $element;
-			}
-			if ( is_object( $elements ) ) {
-				$elements->$index = $updated;
-			} else {
-				$elements[ $index ] = $updated;
-			}
+	protected function set_cached_backtrace( string $source_hash, array $backtrace ): void {
+		if ( ! isset( $GLOBALS['bh_wp_logger_cache'] ) ) {
+			$GLOBALS['bh_wp_logger_cache'] = array();
 		}
-		return $elements;
+		$source_hash                                   = sanitize_key( $source_hash );
+		$GLOBALS['bh_wp_logger_cache'][ $source_hash ] = $backtrace;
+	}
+
+	/**
+	 * Check if the backtrace for this error already been run.
+	 *
+	 * @param string $source_hash A unique identifier for backtrace.
+	 *
+	 * @return ?array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}>
+	 */
+	protected function get_cached_backtrace( string $source_hash ): ?array {
+		$source_hash = sanitize_key( $source_hash );
+		return isset( $GLOBALS['bh_wp_logger_cache'], $GLOBALS['bh_wp_logger_cache'][ $source_hash ] )
+			? $GLOBALS['bh_wp_logger_cache'][ $source_hash ]
+			: null;
 	}
 
 	/**
@@ -353,22 +348,7 @@ class API implements API_Interface {
 	 */
 	public function is_backtrace_contains_plugin( ?string $source_hash = null ): bool {
 
-		// TODO: What's the longest allowed cache key?
-		if ( ! empty( $source_hash ) ) {
-			$source_hash                            = sanitize_key( $source_hash );
-			$is_backtrace_contains_plugin_cache_key = "{$this->settings->get_plugin_slug()}_{$source_hash}";
-
-			$is_backtrace_contains_plugin_cached = wp_cache_get( $is_backtrace_contains_plugin_cache_key, self::CACHE_GROUP_KEY );
-
-			if ( false !== $is_backtrace_contains_plugin_cached ) {
-				return 'yes' === $is_backtrace_contains_plugin_cached;
-			}
-
-			$frames = $this->get_backtrace( $source_hash, null );
-
-		} else {
-			$frames = $this->get_backtrace( null, null );
-		}
+		$frames = $this->get_backtrace( $source_hash, null );
 
 		$is_file_from_plugin = false;
 
@@ -378,9 +358,6 @@ class API implements API_Interface {
 				$is_file_from_plugin = true;
 				break;
 			}
-		}
-		if ( ! empty( $source_hash ) ) {
-			wp_cache_set( $is_backtrace_contains_plugin_cache_key, $is_file_from_plugin ? 'yes' : 'no', self::CACHE_GROUP_KEY, DAY_IN_SECONDS );
 		}
 
 		return $is_file_from_plugin;
