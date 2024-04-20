@@ -2,7 +2,7 @@
     "name": "brianhenryie/bh-wp-logger",
     "description": "A PSR logger for WordPress plugins, with a nice WP_List_Table UI.",
     "type": "library",
-    "license": "GPL-2.0+-or-later",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Brian Henry",
@@ -12,14 +12,17 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "process-timeout": 0,
-        "sort-packages": true,
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "phpstan/extension-installer": true,
             "composer/installers": true,
-            "cweagans/composer-patches": true
-        }
+            "cweagans/composer-patches": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        },
+        "platform": {
+            "php": "7.4"
+        },
+        "process-timeout": 0,
+        "sort-packages": true
     },
     "autoload": {
         "classmap": [
@@ -32,34 +35,29 @@
             "test-plugin/"
         ]
     },
-    "repositories": [
-        {
-            "url": "https://github.com/WordPress/wordpress-develop",
-            "type": "git"
-        },
-        {
+    "repositories": {
+        "brianhenryie/composer-phpstorm": {
             "url": "https://github.com/BrianHenryIE/composer-phpstorm",
             "type": "git"
         },
-        {
-            "type":"composer",
-            "url":"https://wpackagist.org"
+        "outlandishideas/wpackagist": {
+            "type": "composer",
+            "url": "https://wpackagist.org"
         },
-        {
-            "type": "git",
-            "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads"
+        "wordpress/wordpress": {
+            "url": "https://github.com/WordPress/wordpress-develop",
+            "type": "git"
         }
-    ],
+    },
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "brianhenryie/bh-wp-private-uploads": "dev-master",
-        "brianhenryie/bh-wc-logger": "dev-main",
-        "brianhenryie/bh-wp-cli-logger": "*",
+        "brianhenryie/bh-wp-private-uploads": "^0.1.0",
+        "brianhenryie/bh-wc-logger": "^0.1.0",
+        "brianhenryie/bh-wp-cli-logger": "^1.0",
         "katzgrau/klogger": "dev-master",
         "psr/log": "^1.0",
-        "spatie/backtrace": "^1.0",
-        "wptrt/admin-notices": "dev-master"
+        "wptrt/admin-notices": "^1.0"
     },
     "require-dev": {
         "10up/wp_mock": "^1.0",
@@ -76,13 +74,13 @@
         "cweagans/composer-patches": "*",
         "jaschilz/php-coverage-badger": "^2.0",
         "kporras07/composer-symlinks": "dev-master",
-        "lucatume/wp-browser": "^3.0|^4.0",
+        "lucatume/wp-browser": "^3.0",
         "php-stubs/woocommerce-stubs": "*",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpstan/extension-installer": "*",
         "phpunit/phpcov": "*",
-        "squizlabs/php_codesniffer": "*",
-        "szepeviktor/phpstan-wordpress": "*",
+        "squizlabs/php_codesniffer": "^3.7",
+        "szepeviktor/phpstan-wordpress": "^1.3",
         "woocommerce/woocommerce-sniffs": "*",
         "wordpress/wordpress": "*",
         "wp-cli/wp-cli-bundle": "*",
@@ -142,7 +140,8 @@
         ],
         "setup-wordpress": [
             "wp core download --path=wordpress --allow-root || true",
-            "export $(grep -v '^#' .env.testing | xargs); wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root --extra-php=\"\ndefine( 'WP_DEBUG_LOG', true );\ndefine( 'SCRIPT_DEBUG', true );\" || true",
+            "export $(grep -v '^#' .env.testing | xargs); wp config create --dbname=$TEST_SITE_DB_NAME --dbuser=$TEST_SITE_DB_USER --dbpass=$TEST_SITE_DB_PASSWORD --allow-root || true",
+            "wp config set WP_DEBUG true --raw; wp config set WP_DEBUG_LOG true --raw; wp config set SCRIPT_DEBUG true --raw; wp config set DISABLE_WP_CRON true --raw;",
             "export $(grep -v '^#' .env.testing | xargs); vendor/bin/wp core install --url=\"localhost:8080/$PLUGIN_SLUG\" --title=\"$PLUGIN_NAME\" --admin_user=admin --admin_password=password --admin_email=admin@example.org || true; wp plugin activate $PLUGIN_SLUG || true;",
             "wp user create bob bob@example.org --user_pass=password || true;",
             "wp core update --allow-root || true",
