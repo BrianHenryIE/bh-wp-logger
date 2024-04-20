@@ -264,7 +264,7 @@ class API implements API_Interface {
 	 * @param ?string $source_hash A unique identifier for the source of the log entry. Used to cache the backtrace. The backtrace will not be cached if this is absent.
 	 * @param ?int    $steps The number of backtrace entries to return.
 	 *
-	 * @return array
+	 * @return array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}>
 	 */
 	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array {
 
@@ -276,26 +276,28 @@ class API implements API_Interface {
 			}
 		}
 
+		// This is critical to the library.
+		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
 		$backtrace = debug_backtrace( false );
 
 		$ignore_starting_frame = function ( array $frame ): bool {
 			switch ( true ) {
-				case isset($frame['file']) && __FILE__ === $frame['file']:
+				case isset( $frame['file'] ) && __FILE__ === $frame['file']:
 				case 'call_user_func_array' === $frame['function']:
-				case isset($frame['file']) && basename( $frame['file'] ) === 'class-php-error-handler.php':
-				case isset($frame['file']) && basename( $frame['file'] ) === 'class-functions.php':
-				case isset($frame['file']) && false !== stripos( $frame['file'], 'bh-wp-logger/src' ):
-				case isset($frame['file']) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
-				case isset($frame['file']) && false !== strpos( $frame['file'], 'php-http/logger-plugin' ):
+				case isset( $frame['file'] ) && basename( $frame['file'] ) === 'class-php-error-handler.php':
+				case isset( $frame['file'] ) && basename( $frame['file'] ) === 'class-functions.php':
+				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'bh-wp-logger/src' ):
+				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
+				case isset( $frame['file'] ) && false !== strpos( $frame['file'], 'php-http/logger-plugin' ):
 					return true;
 				default:
 					return false;
 			}
 		};
 
-		foreach ( $backtrace as $key => $trace ) {
-			if ( $ignore_starting_frame( $trace ) ) {
-				unset( $trace[ $key ] );
+		foreach ( $backtrace as $index => $frame ) {
+			if ( $ignore_starting_frame( $frame ) ) {
+				unset( $backtrace[ $index ] );
 			} else {
 				break;
 			}
@@ -345,7 +347,7 @@ class API implements API_Interface {
 	/**
 	 * Checks each file in the backtrace and if it contains WP_PLUGINS_DIR/plugin-slug then return true.
 	 *
-	 * @return bool
+	 * @param ?string $source_hash A unique identifier for the source of the log entry.
 	 */
 	public function is_backtrace_contains_plugin( ?string $source_hash = null ): bool {
 
