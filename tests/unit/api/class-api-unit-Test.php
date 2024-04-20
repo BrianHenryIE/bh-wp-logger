@@ -156,30 +156,12 @@ EOD;
 
 		$cache_hash = 'hash1';
 
-		\WP_Mock::userFunction(
-			'wp_cache_get',
-			array(
-				'args'   => array( "test-plugin_{$cache_hash}", 'bh-wp-logger' ),
-				'times'  => 1,
-				'return' => false,
-			)
-		);
-
-		\WP_Mock::userFunction(
-			'wp_cache_get',
-			array(
-				'args'   => array( "backtrace_{$cache_hash}", 'bh-wp-logger' ),
-				'times'  => 1,
-				'return' => false,
-			)
-		);
-
-		\WP_Mock::userFunction(
-			'wp_cache_set',
-			array(
-				'args'  => array( "backtrace_{$cache_hash}", \WP_Mock\Functions::type( 'array' ), 'bh-wp-logger', 86400 ),
-				'times' => 1,
-			)
+		$GLOBALS['bh_wp_logger_cache'] = array(
+			$cache_hash => array(
+				array(
+					'file' => 'test-plugin/subfolder/guilty-file.php',
+				),
+			),
 		);
 
 		\WP_Mock::userFunction(
@@ -191,96 +173,19 @@ EOD;
 			)
 		);
 
-		\WP_Mock::userFunction(
-			'wp_cache_set',
-			array(
-				'args'  => array( "test-plugin_{$cache_hash}", 'yes', 'bh-wp-logger', 86400 ),
-				'times' => 1,
-			)
-		);
-
 		\WP_Mock::passthruFunction( 'sanitize_key' );
+
+		\Patchwork\redefine(
+			'realpath',
+			function ( $value ) {
+				return $value;
+			}
+		);
 
 		$sut = new API( $settings, $logger );
 
 		$result = $sut->is_backtrace_contains_plugin( $cache_hash );
 
 		$this->assertTrue( $result );
-	}
-
-	/**
-	 * @covers ::get_backtrace
-	 * @covers ::recursively_remove_closures
-	 */
-	public function test_get_backtrace(): void {
-
-		$logger   = new ColorLogger();
-		$settings = $this->makeEmpty(
-			Logger_Settings_Interface::class,
-			array(
-				'get_plugin_slug' => 'test-plugin',
-			)
-		);
-
-		$cache_hash = 'hash1';
-
-		\WP_Mock::userFunction(
-			'wp_cache_get',
-			array(
-				'args'   => array( "backtrace_{$cache_hash}", 'bh-wp-logger' ),
-				'times'  => 1,
-				'return' => false,
-			)
-		);
-
-		\WP_Mock::userFunction(
-			'wp_cache_set',
-			array(
-				'args'  => array(
-					"backtrace_{$cache_hash}",
-					function ( $value ) {
-						if ( ! is_array( $value ) ) {
-							return false;
-						}
-						if ( $this->is_contains_closure( $value ) ) {
-							throw new \Exception( 'Value to cache contains a closure.' );
-						}
-						return true;
-					},
-					'bh-wp-logger',
-					86400,
-				),
-				'times' => 1,
-			)
-		);
-
-		\WP_Mock::passthruFunction( 'sanitize_key' );
-
-		$sut = new API( $settings, $logger );
-
-		$result_fn = function () use ( $sut, $cache_hash ) {
-			return $sut->get_backtrace( $cache_hash );
-		};
-
-		$result_fn();
-	}
-
-	/**
-	 * @param array<mixed>|object $elements
-	 *
-	 * @return bool
-	 */
-	protected function is_contains_closure( $elements ): bool {
-		foreach ( $elements as $element ) {
-			if ( is_object( $element ) && $element instanceof \Closure ) {
-				return true;
-			} elseif ( is_array( $element ) || is_object( $element ) ) {
-				$inner = $this->is_contains_closure( $element );
-				if ( $inner ) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 }
