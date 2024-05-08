@@ -52,7 +52,7 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "brianhenryie/bh-wp-private-uploads": "^0.1.0",
+        "brianhenryie/bh-wp-private-uploads": "^0.1.1",
         "brianhenryie/bh-wc-logger": "^0.1.0",
         "brianhenryie/bh-wp-cli-logger": "^1.0",
         "katzgrau/klogger": "dev-master",
