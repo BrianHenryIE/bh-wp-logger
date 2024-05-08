@@ -1,5 +1,9 @@
 # Changelog
 
+== 0.x ==
+
+* Fix fatal error in brianhenryie/bh-wp-private-uploads
+
 == 0.3 == 2023-04-11 ==
 
 * Use new WPTT Admin Notices bugfix patch https://github.com/WPTT/admin-notices/pull/15
