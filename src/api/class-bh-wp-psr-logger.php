@@ -15,6 +15,8 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
+use WP_CLI;
 
 /**
  * Functions to add context to logs and to record the time of logs.
@@ -23,7 +25,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	use LoggerTrait;
 	use LoggerAwareTrait; // To allow swapping out the logger at runtime.
 
-	protected ?WP_CLI_Logger $cli_logger = null;
+	protected WP_CLI_Logger $cli_logger;
 
 	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 		parent::__construct( $settings, $logger );
@@ -33,10 +35,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		 *
 		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
 		 */
-		if ( defined( 'WP_CLI' ) && WP_CLI
-			&& class_exists( WP_CLI_Logger::class ) ) {
-				$this->cli_logger = new WP_CLI_Logger();
-		}
+		$this->cli_logger = ( defined( 'WP_CLI' ) && WP_CLI
+			&& class_exists( WP_CLI_Logger::class ) )
+						? new WP_CLI_Logger()
+						: new NullLogger();
 	}
 
 	/**
@@ -169,11 +171,18 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			);
 		}
 
-		if ( $this->cli_logger instanceof LoggerInterface ) {
-			$this->cli_logger->$level( $message, $context );
+		// Add WP CLI command to context.
+		if(defined('WP_CLI') && constant('WP_CLI')) {
+			$context['wp_cli'] = array(
+				array(
+					'command'    => 'wp ' . implode( ' ', WP_CLI::get_runner()->arguments ),
+					'assoc_args' => WP_CLI::get_runner()->assoc_args,
+				)
+			);
 		}
 
 		$this->logger->$level( $message, $context );
+		$this->cli_logger->$level( $message, $context );
 
 		// We store the last log time in a transient to avoid reading the file from disk. When a new log is written,
 		// that transient is expired. TODO: We're deleting here on the assumption deleting is more performant than writing
