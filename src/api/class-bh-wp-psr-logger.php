@@ -25,7 +25,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	use LoggerTrait;
 	use LoggerAwareTrait; // To allow swapping out the logger at runtime.
 
-	protected WP_CLI_Logger $cli_logger;
+	/**
+	 * @see WP_CLI_Logger
+	 */
+	protected LoggerInterface $cli_logger;
 
 	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
 		parent::__construct( $settings, $logger );
