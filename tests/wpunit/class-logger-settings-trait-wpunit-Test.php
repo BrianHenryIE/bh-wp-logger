@@ -74,10 +74,12 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 		};
 
 		$plugins_array = array(
-			'test-plugin/test-plugin.php' =>
-				array(
-					'Name' => 'BH WP Logger Test Plugin',
-				),
+			'' => array(
+				'test-plugin/test-plugin.php' =>
+										array(
+											'Name' => 'BH WP Logger Test Plugin',
+										),
+			),
 		);
 
 		wp_cache_set( 'plugins', $plugins_array, 'plugins' );
