@@ -50,7 +50,7 @@ trait Logger_Settings_Trait {
 	 */
 	public function get_plugin_name(): string {
 		// should this be get_plugin_data() ?
-		return get_plugins( $this->get_plugin_basename() )['Name'];
+		return get_plugins()[$this->get_plugin_basename()]['Name'];
 	}
 
 	/**
