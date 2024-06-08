@@ -90,6 +90,6 @@ class CLI {
 			WP_CLI::error( $e->getMessage() );
 		}
 
-		WP_CLI::success('Deleted ' . count($result['deleted_files']) . ' log files.' );
+		WP_CLI::success( 'Deleted ' . count( $result['deleted_files'] ) . ' log files.' );
 	}
 }
