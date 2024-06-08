@@ -1,8 +1,11 @@
 # Changelog
 
-== 0.x ==
+== 0.4 ==
 
-* Fix fatal error in brianhenryie/bh-wp-private-uploads
+* Fix: fatal error in brianhenryie/bh-wp-private-uploads
+* Fix: fatal error when using `Logger_Settings_Trait` default plugin name
+* Add: WP CLI command to log context
+* Add: WP CLI commands to delete logs
 
 == 0.3 == 2023-04-11 ==
 
