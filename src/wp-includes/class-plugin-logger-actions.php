@@ -70,6 +70,7 @@ class Plugin_Logger_Actions {
 		$this->add_cron_hooks();
 		$this->add_private_uploads_hooks();
 		$this->define_init_hooks();
+		$this->define_cli_hooks();
 
 		if ( ! $this->is_wp_debug() ) {
 			return;
@@ -210,5 +211,26 @@ class Plugin_Logger_Actions {
 		$init = new Init( $this->api, $this->settings, $this->wrapped_real_logger );
 
 		add_action( 'init', array( $init, 'maybe_download_log' ) );
+	}
+
+	/**
+	 * Add CLI commands to delete logs.
+	 *
+	 * Use `null` to disable CLI commands.
+	 * The settings trait uses the plugin slug as the default CLI base.
+	 *
+	 * @see Logger_Settings_Trait::get_cli_base()
+	 */
+	protected function define_cli_hooks(): void {
+
+		$cli_base = $this->settings->get_cli_base();
+
+		if ( is_null( $cli_base ) ) {
+			return;
+		}
+
+		$cli = new CLI( $this->api, $this->settings, $this->wrapped_real_logger );
+
+		add_action( 'cli_init', array( $cli, 'register_commands' ) );
 	}
 }

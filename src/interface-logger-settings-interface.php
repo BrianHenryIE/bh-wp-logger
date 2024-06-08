@@ -52,4 +52,9 @@ interface Logger_Settings_Interface {
 	 * @return string
 	 */
 	public function get_plugin_basename(): string;
+
+	/**
+	 * An optional CLI command name to add commands for deleting logs.
+	 */
+	public function get_cli_base(): ?string;
 }

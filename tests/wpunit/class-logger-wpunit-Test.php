@@ -40,6 +40,10 @@ class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 			public function get_plugin_basename(): string {
 				return 'test/test.php';
 			}
+
+			public function get_cli_base(): ?string {
+				return null;
+			}
 		};
 
 		$sut = new Logger( $settings );
@@ -75,6 +79,10 @@ class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 			public function get_plugin_basename(): string {
 				return 'test/test.php';
+			}
+
+			public function get_cli_base(): ?string {
+				return null;
 			}
 		};
 
@@ -114,6 +122,10 @@ class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 			public function get_plugin_basename(): string {
 				return 'test/test.php';
+			}
+
+			public function get_cli_base(): ?string {
+				return null;
 			}
 		};
 

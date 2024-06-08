@@ -16,6 +16,7 @@
 
 namespace BrianHenryIE\WP_Logger;
 
+use BrianHenryIE\WP_Logger\WP_Includes\CLI;
 use Exception;
 use Psr\Log\LogLevel;
 
@@ -81,5 +82,14 @@ trait Logger_Settings_Trait {
 		return array_key_first( $plugin_filename );
 
 		throw new Exception( 'Plugin installed in an unusual directory.' );
+	}
+
+	/**
+	 * Default CLI commands to use the plugin slug as the base for commands.
+	 *
+	 * @see CLI
+	 */
+	public function get_cli_base(): ?string {
+		return $this->get_plugin_slug();
 	}
 }
