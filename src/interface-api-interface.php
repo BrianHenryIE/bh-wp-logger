@@ -14,7 +14,6 @@ use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
 use BrianHenryIE\WP_Logger\WP_Includes\Cron;
 use DateTime;
 use DateTimeInterface;
-use Spatie\Backtrace\Frame;
 use stdClass;
 
 interface API_Interface {
