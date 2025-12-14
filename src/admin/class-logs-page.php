@@ -47,9 +47,9 @@ class Logs_Page {
 	 *
 	 * @param API_Interface             $api The main functions of the logger.
 	 * @param Logger_Settings_Interface $settings The configuration used to set up the logger.
-	 * @param BH_WP_PSR_Logger          $logger The logger itself, for logging.
+	 * @param ?BH_WP_PSR_Logger         $logger The logger itself, for logging.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, BH_WP_PSR_Logger $logger = null ) {
+	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?BH_WP_PSR_Logger $logger = null ) {
 
 		$this->setLogger( $logger ?? new NullLogger() );
 		$this->settings = $settings;
