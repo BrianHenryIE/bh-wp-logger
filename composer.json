@@ -85,7 +85,7 @@
         "jaschilz/php-coverage-badger": "^2.0",
         "johnpbloch/wordpress": "*",
         "kporras07/composer-symlinks": "dev-master",
-        "lucatume/wp-browser": "^3.0",
+        "lucatume/wp-browser": "^4.5",
         "php-stubs/woocommerce-stubs": "*",
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpstan/extension-installer": "*",
