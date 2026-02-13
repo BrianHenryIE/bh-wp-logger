@@ -47,7 +47,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 *
 	 * @param ?Logger_Settings_Interface $settings The loglevel, plugin name, slug, and basename.
 	 *
-	 * @return Logger
+	 * @return LoggerInterface|Logger
 	 * @see Logger_Settings
 	 * @see Plugins
 	 */
@@ -56,7 +56,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 		if ( ! isset( self::$instance ) ) {
 
 			// Zero-config.
-			$settings = $settings ?? new class() implements Logger_Settings_Interface {
+			$settings ??= new class() implements Logger_Settings_Interface {
 				use Logger_Settings_Trait;
 			};
 
@@ -130,19 +130,16 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 				use Private_Uploads_Settings_Trait;
 
 				/**
-				 * The settings provided for the logger. We need the plugin slug as a uid for the private uploads instance.
-				 *
-				 * @var Logger_Settings_Interface
-				 */
-				protected Logger_Settings_Interface $logger_settings;
-
-				/**
 				 * Constructor.
 				 *
 				 * @param Logger_Settings_Interface $logger_settings The plugin logger settings, whose plugin slug we need.
 				 */
-				public function __construct( Logger_Settings_Interface $logger_settings ) {
-					$this->logger_settings = $logger_settings;
+				public function __construct(
+					/**
+					 * The settings provided for the logger. We need the plugin slug as a uid for the private uploads instance.
+					 */
+					protected Logger_Settings_Interface $logger_settings
+				) {
 				}
 
 				/**

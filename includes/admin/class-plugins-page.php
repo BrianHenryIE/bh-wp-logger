@@ -26,31 +26,18 @@ class Plugins_Page {
 	use LoggerAwareTrait;
 
 	/**
-	 * Needed for the plugin slug.
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
-	 * Needed for the log file path.
-	 *
-	 * @var API_Interface
-	 */
-	protected $api;
-
-	/**
 	 * Plugins_Page constructor.
 	 *
-	 * @param API_Interface             $api The logger's main functions.
-	 * @param Logger_Settings_Interface $settings The logger settings.
+	 * @param API_Interface             $api The logger's main functions. Needed for the log file path.
+	 * @param Logger_Settings_Interface $settings The logger settings. Needed for the plugin slug.
 	 * @param ?LoggerInterface          $logger The logger itself.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		?LoggerInterface $logger = null
+	) {
 		$this->setLogger( $logger ?? new NullLogger() );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**

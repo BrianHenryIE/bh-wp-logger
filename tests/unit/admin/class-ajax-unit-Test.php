@@ -31,8 +31,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 			API_Interface::class,
 			array(
 				'delete_all_logs' => Expected::once(
-					function () {
-						return array( 'success' => true ); }
+					fn() => array( 'success' => true )
 				),
 			)
 		);
@@ -41,8 +40,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 			Logger_Settings_Interface::class,
 			array(
 				'get_plugin_slug' => Expected::once(
-					function () {
-						return 'development-plugin-slug';}
+					fn() => 'development-plugin-slug'
 				),
 			)
 		);
@@ -90,8 +88,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 			API_Interface::class,
 			array(
 				'delete_log' => Expected::once(
-					function ( string $ymd_date ) {
-						return array( 'success' => true ); }
+					fn( string $ymd_date ) => array( 'success' => true )
 				),
 			)
 		);
@@ -100,9 +97,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 			Logger_Settings_Interface::class,
 			array(
 				'get_plugin_slug' => Expected::once(
-					function () {
-						return 'development-plugin-slug';
-					}
+					fn() => 'development-plugin-slug'
 				),
 			)
 		);

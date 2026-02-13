@@ -21,39 +21,25 @@ use Psr\Log\NullLogger;
 
 /**
  * Functions for registering a "hidden menu" item, to add the wp-admin page to display the logs.
+ *
+ * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
  */
 class Logs_Page {
-
 	use LoggerAwareTrait;
-
-	/**
-	 * The logger settings. i.e. what is the plugin slug this logger is for?
-	 *
-	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
-	 * Used to get the list of log files.
-	 * Needed to instantiate the table.
-	 *
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
 
 	/**
 	 * Logs_Page constructor.
 	 *
-	 * @param API_Interface             $api The main functions of the logger.
-	 * @param Logger_Settings_Interface $settings The configuration used to set up the logger.
+	 * @param API_Interface             $api The main functions of the logger. Used to get the list of log files. Needed to instantiate the table.
+	 * @param Logger_Settings_Interface $settings The configuration used to set up the logger. The logger settings. i.e. what is the plugin slug this logger is for?
 	 * @param ?BH_WP_PSR_Logger         $logger The logger itself, for logging.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?BH_WP_PSR_Logger $logger = null ) {
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		?BH_WP_PSR_Logger $logger = null
+	) {
 		$this->setLogger( $logger ?? new NullLogger() );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**
@@ -207,7 +193,7 @@ class Logs_Page {
 		 *
 		 * @see Logs_Page::add_page()
 		 */
-		if ( is_null( $current_page ) || substr( $current_page->id, -strlen( $page_suffix ) ) !== $page_suffix ) {
+		if ( is_null( $current_page ) || ! str_ends_with( $current_page->id, $page_suffix ) ) {
 			return;
 		}
 
@@ -248,7 +234,7 @@ class Logs_Page {
 		 *
 		 * @see Logs_Page::add_page()
 		 */
-		if ( is_null( $current_page ) || substr( $current_page->id, -strlen( $page_suffix ) ) !== $page_suffix ) {
+		if ( is_null( $current_page ) || ! str_ends_with( $current_page->id, $page_suffix ) ) {
 			return;
 		}
 

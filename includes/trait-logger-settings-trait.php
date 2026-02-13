@@ -39,7 +39,7 @@ trait Logger_Settings_Trait {
 	public function get_log_level(): string {
 		try {
 			return get_option( $this->get_plugin_slug() . '_log_level', LogLevel::INFO );
-		} catch ( \Exception $exception ) {
+		} catch ( \Exception ) {
 			return 'none';
 		}
 	}
@@ -77,9 +77,12 @@ trait Logger_Settings_Trait {
 
 		$wp_plugin_basename = plugin_basename( __DIR__ );
 
-		$plugin_filename = get_plugins( explode( '/', $wp_plugin_basename )[0] );
+		/** @var array<string, array<string>> $plugin_data */
+		$plugin_data = get_plugins( explode( '/', $wp_plugin_basename )[0] );
 
-		return array_key_first( $plugin_filename );
+		if ( 1 === count( $plugin_data ) ) {
+			return array_key_first( $plugin_data );
+		}
 
 		throw new Exception( 'Plugin installed in an unusual directory.' );
 	}

@@ -49,7 +49,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 		$e = null;
 		try {
 			$sut->init();
-		} catch ( \Exception $exception ) {
+		} catch ( \Exception ) {
 			$this->fail();
 		}
 
@@ -74,12 +74,10 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			'error_get_last',
-			function () {
-				return array(
-					'file'    => __FILE__,
-					'message' => 'error message',
-				);
-			}
+			fn() => array(
+				'file'    => __FILE__,
+				'message' => 'error message',
+			)
 		);
 
 		$sut->handle();
@@ -100,9 +98,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			'error_get_last',
-			function () {
-				return null;
-			}
+			fn() => null
 		);
 
 		$sut->handle();
@@ -129,12 +125,10 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			'error_get_last',
-			function () {
-				return array(
-					'file'    => __FILE__,
-					'message' => 'error message',
-				);
-			}
+			fn() => array(
+				'file'    => __FILE__,
+				'message' => 'error message',
+			)
 		);
 
 		$sut->handle();
