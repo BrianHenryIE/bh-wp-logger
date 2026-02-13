@@ -175,12 +175,12 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		}
 
 		// Add WP CLI command to context.
-		if(defined('WP_CLI') && constant('WP_CLI')) {
+		if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) ) {
 			$context['wp_cli'] = array(
 				array(
 					'command'    => 'wp ' . implode( ' ', WP_CLI::get_runner()->arguments ),
 					'assoc_args' => WP_CLI::get_runner()->assoc_args,
-				)
+				),
 			);
 		}
 
