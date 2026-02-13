@@ -203,7 +203,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 
 		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-good-nonce';
-		$_GET['page']         = 'bh-wp-logger-test-plugin-logs';
+		$_GET['page']         = 'bh-wp-logger-development-plugin-logs';
 		unset( $_GET['date'] );
 
 		$init->maybe_download_log();
@@ -221,7 +221,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => Expected::once( 'bh-wp-logger-test-plugin' ),
+				'get_plugin_slug' => Expected::once( 'bh-wp-logger-development-plugin' ),
 			)
 		);
 		$api      = $this->makeEmpty( API_Interface::class );
@@ -254,7 +254,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 
 		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-good-nonce';
-		$_GET['page']         = 'not-bh-wp-logger-test-plugin-logs';
+		$_GET['page']         = 'not-bh-wp-logger-development-plugin-logs';
 		$_GET['date']         = '2022-05-27';
 
 		$init->maybe_download_log();
@@ -273,7 +273,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => Expected::once( 'bh-wp-logger-test-plugin' ),
+				'get_plugin_slug' => Expected::once( 'bh-wp-logger-development-plugin' ),
 			)
 		);
 		$api      = $this->makeEmpty( API_Interface::class );
@@ -306,7 +306,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 
 		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-good-nonce';
-		$_GET['page']         = 'bh-wp-logger-test-plugin-logs';
+		$_GET['page']         = 'bh-wp-logger-development-plugin-logs';
 		$_GET['date']         = '05-27-2022';
 
 		$init->maybe_download_log();
@@ -325,7 +325,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => Expected::once( 'bh-wp-logger-test-plugin' ),
+				'get_plugin_slug' => Expected::once( 'bh-wp-logger-development-plugin' ),
 			)
 		);
 		$api      = $this->makeEmpty(
@@ -363,7 +363,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 
 		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-good-nonce';
-		$_GET['page']         = 'bh-wp-logger-test-plugin-logs';
+		$_GET['page']         = 'bh-wp-logger-development-plugin-logs';
 		$_GET['date']         = '2022-05-27';
 
 		$init->maybe_download_log();

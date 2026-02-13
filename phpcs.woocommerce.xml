@@ -7,7 +7,7 @@
 
     <!-- Exclude paths -->
     <exclude-pattern>tests/</exclude-pattern>
-    <exclude-pattern>test-plugin/</exclude-pattern>
+    <exclude-pattern>development-plugin/</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
     <exclude-pattern>/dist-archive/</exclude-pattern>
     <exclude-pattern>/scratch/</exclude-pattern>

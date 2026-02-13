@@ -211,9 +211,9 @@ If using WP_Mock for your tests, and you are instantiating this logger, the foll
 
 ### Test Plugin
 
-The `test-plugin` folder contains a small plugin with buttons to trigger the types of errors that can be logged.
+The `development-plugin` folder contains a small plugin with buttons to trigger the types of errors that can be logged.
 
-![Test Plugin](./.github/test-plugin.png "Test Plugin")
+![Test Plugin](./.github/development-plugin.png "Test Plugin")
 
 ### Best Practice
 

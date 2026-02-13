@@ -19,7 +19,7 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 
 			public function get_plugin_basename(): string {
-				return 'test-plugin/test-plugin.php';
+				return 'development-plugin/development-plugin.php';
 			}
 		};
 
@@ -35,11 +35,11 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 
 			public function get_plugin_basename(): string {
-				return 'test-plugin/test-plugin.php';
+				return 'development-plugin/development-plugin.php';
 			}
 		};
 
-		update_option( 'test-plugin_log_level', 'error' );
+		update_option( 'development-plugin_log_level', 'error' );
 
 		self::assertEquals( 'error', $sut->get_log_level() );
 	}
@@ -69,13 +69,13 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 
 			public function get_plugin_basename(): string {
-				return 'test-plugin/test-plugin.php';
+				return 'development-plugin/development-plugin.php';
 			}
 		};
 
 		$plugins_array = array(
 			'' => array(
-				'test-plugin/test-plugin.php' =>
+				'development-plugin/development-plugin.php' =>
 										array(
 											'Name' => 'BH WP Logger Test Plugin',
 										),
@@ -96,11 +96,11 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 
 			public function get_plugin_basename(): string {
-				return 'test-plugin/test-plugin.php';
+				return 'development-plugin/development-plugin.php';
 			}
 		};
 
-		self::assertEquals( 'test-plugin', $sut->get_plugin_slug() );
+		self::assertEquals( 'development-plugin', $sut->get_plugin_slug() );
 	}
 
 	/**
@@ -114,7 +114,7 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			'bh-wp-logger/bh-wp-logger'   =>
 				array(
 					'Name'        => 'BH WP Logger Test Plugin',
-					'PluginURI'   => 'http://github.com/username/bh-wp-logger-test-plugin/',
+					'PluginURI'   => 'http://github.com/username/bh-wp-logger-development-plugin/',
 					'Version'     => '1.0.0',
 					'Description' => 'This is a short description of what the plugin does. It\'s displayed in the WordPress admin area.',
 					'Title'       => 'BH WP Logger Test Plugin',
@@ -163,17 +163,17 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 		$this->markTestIncomplete( 'TODO' );
 
 		global $wp_plugin_paths;
-		$wp_plugin_paths['/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger-test-plugin'] = realpath( '/Users/brianhenry/Sites/bh-wp-logger/test-plugin' );
+		$wp_plugin_paths['/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger-development-plugin'] = realpath( '/Users/brianhenry/Sites/bh-wp-logger/development-plugin' );
 
-		$test_file = '/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger-test-plugin/admin/class-admin.php';
+		$test_file = '/Users/brianhenry/Sites/bh-wp-logger/wordpress/wp-content/plugins/bh-wp-logger-development-plugin/admin/class-admin.php';
 
 		$realpath_test_file = realpath( $test_file );
 
-		// Returns `bh-wp-logger-test-plugin/admin/class-admin.php`.
+		// Returns `bh-wp-logger-development-plugin/admin/class-admin.php`.
 		$plugin_basename = plugin_basename( $realpath_test_file );
 
 		$plugin_slug = explode( '/', $plugin_basename )[0];
-		self::assertEquals( 'bh-wp-logger-test-plugin', $plugin_slug );
+		self::assertEquals( 'bh-wp-logger-development-plugin', $plugin_slug );
 	}
 
 

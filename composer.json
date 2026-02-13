@@ -40,7 +40,7 @@
             ]
         },
         "classmap": [
-            "test-plugin/",
+            "development-plugin/",
             "tests/_support"
         ]
     },
@@ -112,7 +112,7 @@
                     "vendor/php-stubs/woocommerce-stubs",
                     "vendor/wordpress/wordpress/includes",
                     "vendor/wordpress/wordpress/build",
-                    "wp-content/plugins/bh-wp-logger-test-plugin",
+                    "wp-content/plugins/bh-wp-logger-development-plugin",
                     "wordpress/wp-content"
                 ],
                 "include_folders": [

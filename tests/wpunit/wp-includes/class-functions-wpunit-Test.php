@@ -39,14 +39,14 @@ class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_slug' => 'development-plugin',
 			)
 		);
 		$logger   = new ColorLogger();
 
 		$sut = new Functions( $api, $settings, $logger );
 
-		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_test-plugin' ) );
+		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
 		assert( false === has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
 
 		$sut->log_deprecated_functions_only_once_per_day( 'my_deprecated_function', 'my_replacement_function', '5.9.0' );
@@ -55,7 +55,7 @@ class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 		$this->assertTrue( $logger->hasWarning( $log_message ) );
 
-		$this->assertNotFalse( get_transient( 'log_deprecated_function_my_deprecated_function_test-plugin' ) );
+		$this->assertNotFalse( get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
 
 		// `has_filter` function returns the priority.
 		$this->assertNotFalse( has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
@@ -105,21 +105,21 @@ class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_slug' => 'development-plugin',
 			)
 		);
 		$logger   = new ColorLogger();
 
 		$sut = new Functions( $api, $settings, $logger );
 
-		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_test-plugin' ) );
+		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
 
 		$sut->log_deprecated_functions_only_once_per_day( 'my_deprecated_function', 'my_replacement_function', '5.9.0' );
 
 		remove_filter( 'deprecated_function_trigger_error', '__return_false' );
 
 		assert( false === has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
-		assert( false !== get_transient( 'log_deprecated_function_my_deprecated_function_test-plugin' ) );
+		assert( false !== get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
 
 		$logger = new ColorLogger();
 		$sut->setLogger( $logger );

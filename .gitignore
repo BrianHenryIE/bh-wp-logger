@@ -47,7 +47,7 @@ wp-content/mu-plugins/*
 !wp-content/mu-plugins/bh-plugin-outside-dir.php
 /vendor/
 
-test-plugin/vendor/
+development-plugin/vendor/
 
 *.zip
 *.phar

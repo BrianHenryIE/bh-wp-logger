@@ -38,6 +38,6 @@ class I18n_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 		$i18n->load_plugin_textdomain();
 
 		$this->assertTrue( $called, 'plugin_locale filter not called within load_plugin_textdomain() suggesting it has not been set by the plugin.' );
-		$this->assertEquals( 'bh-wp-logger-test-plugin', $actual_domain );
+		$this->assertEquals( 'bh-wp-logger-development-plugin', $actual_domain );
 	}
 }

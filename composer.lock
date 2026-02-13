@@ -118,7 +118,7 @@
                             "vendor/php-stubs/woocommerce-stubs",
                             "vendor/wordpress/wordpress/src",
                             "vendor/wordpress/wordpress/build",
-                            "wp-content/plugins/bh-wp-cli-logger-test-plugin",
+                            "wp-content/plugins/bh-wp-cli-logger-development-plugin",
                             "wordpress/wp-content"
                         ],
                         "include_folders": [
@@ -129,7 +129,7 @@
                 },
                 "symlinks": {
                     "wp-content": "wordpress/wp-content",
-                    "test-plugin": "wp-content/plugins/bh-wp-cli-logger-test-plugin"
+                    "development-plugin": "wp-content/plugins/bh-wp-cli-logger-development-plugin"
                 }
             },
             "autoload": {

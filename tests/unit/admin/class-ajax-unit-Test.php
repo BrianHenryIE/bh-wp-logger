@@ -42,7 +42,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 			array(
 				'get_plugin_slug' => Expected::once(
 					function () {
-						return 'test-plugin-slug';}
+						return 'development-plugin-slug';}
 				),
 			)
 		);
@@ -73,7 +73,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 		$sut = new AJAX( $api, $settings );
 
 		// $_POST['action'] is handled by WordPress, not by our function.
-		$_POST['plugin_slug'] = 'test-plugin-slug';
+		$_POST['plugin_slug'] = 'development-plugin-slug';
 		$_POST['_wpnonce']    = 'nonce_value';
 
 		$sut->delete_all();
@@ -101,7 +101,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 			array(
 				'get_plugin_slug' => Expected::once(
 					function () {
-						return 'test-plugin-slug';
+						return 'development-plugin-slug';
 					}
 				),
 			)
@@ -133,7 +133,7 @@ class AJAX_Unit_Test extends \Codeception\Test\Unit {
 		$sut = new AJAX( $api, $settings );
 
 		// $_POST['action'] is handled by WordPress, not by our function.
-		$_POST['plugin_slug']    = 'test-plugin-slug';
+		$_POST['plugin_slug']    = 'development-plugin-slug';
 		$_POST['_wpnonce']       = 'nonce_value';
 		$_POST['date_to_delete'] = '2022-03-02';
 

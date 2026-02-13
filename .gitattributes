@@ -1,7 +1,7 @@
 /.github                export-ignore
 /.run                   export-ignore
 /tests                  export-ignore
-/test-plugin            export-ignore
+/development-plugin     export-ignore
 /.editorconfig          export-ignore
 /.env.testing           export-ignore
 /.env.secret            export-ignore

@@ -16,7 +16,7 @@
 * Removed `Logger_Settings` and `Plugins` classes in favour of much improved/simplified `Logger_Settings_Trait` to infer defaults (WIP)
 * Performance: Conditionally add WordPress `doing_it_wrong`, `deprecated_function`, etc. logging
 * Performance: Cache all backtraces, and share caches between all `bh-wp-logger` instances
-* Add: WordPress `doing_it_wrong`, `deprecated_function` etc. test buttons in test-plugin
+* Add: WordPress `doing_it_wrong`, `deprecated_function` etc. test buttons in development-plugin
 * Improved WPCS, PhpStan
 
 74 PhpUnit tests, ~48% coverage.

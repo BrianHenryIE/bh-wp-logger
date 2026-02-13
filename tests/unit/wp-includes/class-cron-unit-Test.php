@@ -47,14 +47,14 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_slug' => 'development-plugin',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		$cron = new Cron( $api, $settings, $logger );
 
-		$cron_hook = 'delete_logs_test-plugin';
+		$cron_hook = 'delete_logs_development-plugin';
 
 		\WP_Mock::userFunction(
 			'wp_get_scheduled_event',
@@ -84,14 +84,14 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_slug' => 'development-plugin',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		$cron = new Cron( $api, $settings, $logger );
 
-		$cron_hook = 'delete_logs_test-plugin';
+		$cron_hook = 'delete_logs_development-plugin';
 
 		\WP_Mock::userFunction(
 			'wp_get_scheduled_event',
@@ -120,7 +120,7 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 		$settings = $this->makeEmpty(
 			WooCommerce_Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_slug' => 'development-plugin',
 			)
 		);
 		$logger   = $this->makeEmpty(
@@ -132,7 +132,7 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 
 		$cron = new Cron( $api, $settings, $logger );
 
-		$cron_hook = 'delete_logs_test-plugin';
+		$cron_hook = 'delete_logs_development-plugin';
 
 		\WP_Mock::userFunction(
 			'wp_get_scheduled_event',

@@ -2,7 +2,7 @@
 /**
  * The UI around the logs table.
  *
- * E.g. /wp-admin/admin.php?page=bh-wp-logger-test-plugin-logs.
+ * E.g. /wp-admin/admin.php?page=bh-wp-logger-development-plugin-logs.
  *
  * TODO: Add "send to plugin developer" button.
  * TODO: Add copy to clipboard button.

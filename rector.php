@@ -16,7 +16,7 @@ return RectorConfig::configure()
 	->withPaths(
 		array(
 			__DIR__ . '/includes',
-			__DIR__ . '/test-plugin',
+			__DIR__ . '/development-plugin',
 			__DIR__ . '/tests/integration',
 			__DIR__ . '/tests/unit',
 			__DIR__ . '/tests/wpunit',
