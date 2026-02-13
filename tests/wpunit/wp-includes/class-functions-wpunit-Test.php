@@ -3,15 +3,14 @@
 namespace BrianHenryIE\WP_Logger\WP_Includes;
 
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use Psr\Log\NullLogger;
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\API_Interface;
-use Codeception\TestCase\WPTestCase;
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Functions
  */
-class Functions_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class Functions_WPUnit_Test extends WPUnit_Testcase {
 
 	/**
 	 * Happy path. Test:

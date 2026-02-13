@@ -4,10 +4,8 @@ namespace BrianHenryIE\WP_Logger\API;
 
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\WooCommerce\WC_PSR_Logger;
-use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
 use Codeception\Stub\Expected;
-use Katzgrau\KLogger\Logger as KLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
@@ -15,7 +13,7 @@ use Psr\Log\Test\TestLogger;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger
  */
-class BH_WP_PSR_Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 
 	/**
 	 * When the log level is regular (notice, info), and the level of the error being logged is 'error', the backtrace

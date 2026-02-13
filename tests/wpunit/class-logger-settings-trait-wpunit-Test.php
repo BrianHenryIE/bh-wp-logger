@@ -5,10 +5,12 @@
  * @package brianhenryie/bh-wp-logger
  */
 
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
+
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Logger_Settings_Trait
  */
-class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 
 	/**
 	 * @covers ::get_log_level
@@ -84,7 +86,7 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 
 		wp_cache_set( 'plugins', $plugins_array, 'plugins' );
 
-		self::assertEquals( 'BH WP Logger Test Plugin', $sut->get_plugin_name() );
+		$this->assertEquals( 'BH WP Logger Test Plugin', $sut->get_plugin_name() );
 	}
 
 	/**

@@ -5,11 +5,12 @@ namespace BrianHenryIE\WP_Logger\Admin;
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Admin_Notices
  */
-class Admin_Notices_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class Admin_Notices_WPUnit_Test extends WPUnit_Testcase {
 
 	/**
 	 * Date should be displayed in UTC and in local time.
