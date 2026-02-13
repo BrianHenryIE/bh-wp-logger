@@ -44,7 +44,7 @@
                     var data = {};
 
 					// $_GET['page'] has the slug.
-                    // e.g. ?page=bh-wp-logger-test-plugin-logs
+                    // e.g. ?page=bh-wp-logger-development-plugin-logs
                     var urlParams = new URLSearchParams(window.location.search);
                     let slug_log = urlParams.get('page');
                     if( false === slug_log.endsWith('-logs') ) {

@@ -5,7 +5,7 @@
  * Adds a Logs link to the plugin's entry.
  * Formats that link <strong> if there are unviewed logs.
  *
- * e.g. /wp-admin/admin.php?page=bh-wp-logger-test-plugin-logs.
+ * e.g. /wp-admin/admin.php?page=bh-wp-logger-development-plugin-logs.
  *
  * @package brianhenryie/bh-wp-logger
  */

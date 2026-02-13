@@ -53,13 +53,13 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 		$api = $this->makeEmpty(
 			API_Interface::class,
 			array(
-				'get_log_url' => 'admin.php?page=bh-wp-logger-test-plugin-logs',
+				'get_log_url' => 'admin.php?page=bh-wp-logger-development-plugin-logs',
 			)
 		);
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-test-plugin' )
+			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
 		);
 		$logger   = new ColorLogger();
 
@@ -84,7 +84,7 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 		// To distinguish this from the later test.
 		$this->assertStringNotContainsString( '<strong>', $link_html );
 
-		$this->assertStringContainsString( 'href="admin.php?page=bh-wp-logger-test-plugin-logs', $link_html );
+		$this->assertStringContainsString( 'href="admin.php?page=bh-wp-logger-development-plugin-logs', $link_html );
 	}
 
 
@@ -103,13 +103,13 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 		$api = $this->makeEmpty(
 			API_Interface::class,
 			array(
-				'get_log_url' => 'admin.php?page=bh-wp-logger-test-plugin-logs',
+				'get_log_url' => 'admin.php?page=bh-wp-logger-development-plugin-logs',
 			)
 		);
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-test-plugin' )
+			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
 		);
 		$logger   = new ColorLogger();
 
@@ -158,7 +158,7 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-test-plugin' )
+			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
 		);
 		$logger   = new ColorLogger();
 
@@ -166,14 +166,14 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 		\WP_Mock::userFunction(
 			'get_option',
 			array(
-				'args'   => array( 'bh-wp-logger-test-plugin-last-log-time', 0 ),
+				'args'   => array( 'bh-wp-logger-development-plugin-last-log-time', 0 ),
 				'return' => time(),
 			)
 		);
 		\WP_Mock::userFunction(
 			'get_option',
 			array(
-				'args'   => array( 'bh-wp-logger-test-plugin-last-logs-view-time', 0 ),
+				'args'   => array( 'bh-wp-logger-development-plugin-last-logs-view-time', 0 ),
 				'return' => time() - 60 * 60, // HOUR_IN_SECONDS.
 			)
 		);

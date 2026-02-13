@@ -44,7 +44,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_plugins_page_hooks(): void {
 
-		$basename = 'test-plugin/test-plugin.php';
+		$basename = 'development-plugin/development-plugin.php';
 
 		\WP_Mock::expectFilterAdded(
 			"plugin_action_links_{$basename}",
@@ -70,7 +70,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_plugins_installer_page_hooks(): void {
 
-		$basename = 'test-plugin/test-plugin.php';
+		$basename = 'development-plugin/development-plugin.php';
 
 		\WP_Mock::expectFilterAdded(
 			'install_plugin_complete_actions',

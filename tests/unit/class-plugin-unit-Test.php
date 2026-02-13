@@ -9,6 +9,7 @@
 namespace BH_WP_Logger_Test_Plugin;
 
 use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
+use BrianHenryIE\WP_Logger\Logger;
 
 /**
  * Class Plugin_WP_Mock_Test
@@ -38,7 +39,14 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 			function ( $settings, $logger ) {}
 		);
 
-		$plugin_root_dir = dirname( __DIR__, 2 ) . '/test-plugin';
+		\Patchwork\redefine(
+			array( Logger::class, 'instance' ),
+			function () {
+				return $this->make( \BrianHenryIE\WP_Logger\Logger::class );
+			}
+		);
+
+		$plugin_root_dir = dirname( __DIR__, 2 ) . '/development-plugin';
 
 		\WP_Mock::userFunction(
 			'plugin_dir_path',
@@ -52,7 +60,7 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 			'plugin_basename',
 			array(
 				'args'   => array( \WP_Mock\Functions::type( 'string' ) ),
-				'return' => 'bh-wp-logger-test-plugin/bh-wp-logger-test-plugin.php',
+				'return' => 'bh-wp-logger-development-plugin/bh-wp-logger-development-plugin.php',
 			)
 		);
 
@@ -106,7 +114,7 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 
 		ob_start();
 
-		include $plugin_root_dir . '/bh-wp-logger-test-plugin.php';
+		include $plugin_root_dir . '/development-plugin.php';
 
 		$printed_output = ob_get_contents();
 

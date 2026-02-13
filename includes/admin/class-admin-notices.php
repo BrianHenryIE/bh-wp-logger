@@ -95,7 +95,7 @@ class Admin_Notices extends Notices {
 
 			$is_dismissed_option_name = "wptrt_notice_dismissed_{$this->settings->get_plugin_slug()}-recent-error";
 
-			// wptrt_notice_dismissed_bh-wp-logger-test-plugin-recent-error
+			// wptrt_notice_dismissed_bh-wp-logger-development-plugin-recent-error
 
 			$error_text = isset( $last_error['message'] ) ? trim( $last_error['message'] ) : '';
 			$error_time = isset( $last_error['timestamp'] ) ? (int) $last_error['timestamp'] : '';
@@ -147,7 +147,7 @@ class Admin_Notices extends Notices {
 			};
 			add_filter( "pre_update_option_{$is_dismissed_option_name}", $on_dismiss, 10, 3 );
 
-			// wptrt_notice_dismissed_bh-wp-logger-test-plugin-recent-error
+			// wptrt_notice_dismissed_bh-wp-logger-development-plugin-recent-error
 
 		}
 	}

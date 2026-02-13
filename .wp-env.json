@@ -1,0 +1,27 @@
+{
+  "config": {
+    "WP_DEBUG_LOG": "/var/www/html/wp-content/debug.log"
+  },
+  "env": {
+    "development": {
+      "plugins": [
+        "."
+      ]
+    },
+    "tests": {
+      "mysqlPort": 33066
+    }
+  },
+  "lifecycleScripts": {
+    "afterStart": "bash 'tests/_wp-env/initialize-external.sh'"
+  },
+  "mappings": {
+    "../setup": "./tests/_wp-env",
+    "wp-content/plugins/development-plugin": "./development-plugin",
+    "wp-content/plugins/includes": "./includes",
+    "wp-content/plugins/assets": "./assets",
+    "wp-content/plugins/query-monitor": "./wp-content/plugins/query-monitor",
+    "wp-content/plugins/woocommerce": "./wp-content/plugins/woocommerce"
+  },
+  "phpVersion": "8.4"
+}

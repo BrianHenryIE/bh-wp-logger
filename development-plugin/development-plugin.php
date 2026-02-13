@@ -13,14 +13,14 @@
  *
  * @wordpress-plugin
  * Plugin Name:       BH WP Logger Test Plugin
- * Plugin URI:        http://github.com/username/bh-wp-logger-test-plugin/
+ * Plugin URI:        http://github.com/username/bh-wp-logger-development-plugin/
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:           1.0.0
  * Author:            Brian Henry
  * Author URI:        http://example.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       bh-wp-logger-test-plugin
+ * Text Domain:       bh-wp-logger-development-plugin
  * Domain Path:       /languages
  */
 
@@ -64,17 +64,17 @@ define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
  */
 function instantiate_bh_wp_logger_test_plugin() {
 
-	$logger_settings = new class( 'bh-wp-logger-test-plugin' ) implements Logger_Settings_Interface { //}, WooCommerce_Logger_Settings_Interface {
+	$logger_settings = new class( 'bh-wp-logger-development-plugin' ) implements Logger_Settings_Interface { // }, WooCommerce_Logger_Settings_Interface {
 		use Logger_Settings_Trait;
 
 		public function get_log_level(): string {
 			return LogLevel::DEBUG;
 		}
 		public function get_plugin_slug(): string {
-			return 'bh-wp-logger-test-plugin';
+			return 'bh-wp-logger-development-plugin';
 		}
 		public function get_plugin_basename(): string {
-			return 'bh-wp-logger-test-plugin/bh-wp-logger-test-plugin.php';
+			return 'bh-wp-logger-development-plugin/bh-wp-logger-development-plugin.php';
 		}
 		public function get_plugin_name(): string {
 			return 'BH WP Logger Test Plugin';
@@ -104,6 +104,6 @@ function run_closure_in_plugin( $closure ) {
 add_filter(
 	'plugins_url',
 	function ( $url ) {
-		return str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-test-plugin/vendor/brianhenryie', $url );
+		return str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url );
 	}
 );

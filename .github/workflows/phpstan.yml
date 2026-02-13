@@ -1,0 +1,57 @@
+name: Run PHPStan
+
+# Run PHPStan to annotate the code
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: [ '8.0' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer, cs2pr
+          extensions: zip
+
+      - name: Install sponge
+        run: sudo apt-get install moreutils
+
+      - name: Run composer install
+        run: composer install
+
+      - name: Run PHPStan to add annotations to the code
+        continue-on-error: true
+        run: vendor/bin/phpstan analyse -c phpstan.neon --level max --memory-limit 1G --error-format=checkstyle | cs2pr
+
+      # On merge to main, fail for any error in `includes`.
+      - name: Run PHPStan to add annotations to the code (main)
+        run: vendor/bin/phpstan analyse includes -c phpstan.neon --memory-limit 1G
+        if: ${{ github.event_name != 'pull_request' }}
+
+      - name: Get changed files
+        if: ${{ github.event_name == 'pull_request' }}
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          separator: ' '
+          files: 'includes/**/**.php'
+
+      # On PRs, only fail for errors in modified files.
+      - name: Run PHPStan to add annotations to the code (PR)
+        run: vendor/bin/phpstan analyse ${{ steps.changed-files.outputs.all_changed_files }} -c phpstan.neon --memory-limit 1G
+        if: ${{ github.event_name == 'pull_request' }}

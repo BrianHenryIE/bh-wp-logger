@@ -10,7 +10,7 @@ use Psr\Log\LogLevel;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Logger
  */
-class Logger_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 	/**
 	 * When WooCommerce is active and the plugin uses the WooCommerce_Logger_Interface marker to indicate we should

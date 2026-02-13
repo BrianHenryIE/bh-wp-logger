@@ -2,16 +2,16 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\API\API;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Logs_List_Table
  */
-class Logs_List_Table_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class Logs_List_Table_WPUnit_Test extends WPUnit_Testcase {
 
 
 	/**

@@ -4,13 +4,14 @@ namespace BrianHenryIE\WP_Logger\PHP;
 
 use BrianHenryIE\WP_Logger\API\API;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\PHP\PHP_Error_Handler
  */
-class PHP_Error_Handler_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
+class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 
 	/**
 	 * PHPUnit's error handler was throwing an exception when it wasn't wanted.
