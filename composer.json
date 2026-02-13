@@ -20,7 +20,7 @@
             "phpstan/extension-installer": true
         },
         "platform": {
-            "php": "7.4"
+            "php": "8.0"
         },
         "process-timeout": 0,
         "sort-packages": true
@@ -59,9 +59,9 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "ext-json": "*",
-        "brianhenryie/bh-wp-private-uploads": "^0.1.1",
+        "brianhenryie/bh-wp-private-uploads": "^0.2",
         "brianhenryie/bh-wc-logger": "^0.1.0",
         "brianhenryie/bh-wp-cli-logger": "^1.0",
         "katzgrau/klogger": "dev-master",
