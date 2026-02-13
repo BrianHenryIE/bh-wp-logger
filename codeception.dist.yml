@@ -21,14 +21,14 @@ params:
 coverage:
     enabled: true
     include:
-        - src/*
+        - includes/*
     exclude:
-        - src/dependencies/*
-        - src/vendor/*
+        - includes/dependencies/*
+        - includes/vendor/*
         - /*/interface*.php
         - /*/index.php
         - /*/*.txt
-        - src/autoload.php
+        - includes/autoload.php
         - /*/*.css
         - /*/*.js
 bootstrap: bootstrap.php

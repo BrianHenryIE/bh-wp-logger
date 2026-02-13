@@ -286,7 +286,7 @@ class API implements API_Interface {
 				case 'call_user_func_array' === $frame['function']:
 				case isset( $frame['file'] ) && basename( $frame['file'] ) === 'class-php-error-handler.php':
 				case isset( $frame['file'] ) && basename( $frame['file'] ) === 'class-functions.php':
-				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'bh-wp-logger/src' ):
+				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'bh-wp-logger/includes' ):
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
 				case isset( $frame['file'] ) && false !== strpos( $frame['file'], 'php-http/logger-plugin' ):
 					return true;

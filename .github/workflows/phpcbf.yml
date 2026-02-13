@@ -44,7 +44,7 @@ jobs:
         run: vendor/bin/phpcs -q -n --report=checkstyle | cs2pr
 
       - name: Fail if there are still phpcs errors in the production code
-        run: vendor/bin/phpcs src
+        run: vendor/bin/phpcs includes
 
       - name: Commit PHPCBF changes
         if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}

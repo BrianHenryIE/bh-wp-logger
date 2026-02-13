@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06fa4d65eeb60268828f688ac283ad07",
+    "content-hash": "5997b705c65c091f5a204770f4520000",
     "packages": [
         {
             "name": "brianhenryie/bh-wc-logger",

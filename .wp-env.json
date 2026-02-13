@@ -18,7 +18,7 @@
   "mappings": {
     "../setup": "./tests/_wp-env",
     "wp-content/plugins/bh-wp-logger-test-plugin": "./test-plugin",
-    "wp-content/plugins/bh-wp-logger-test-plugin/vendor/brianhenryie/bh-wp-logger/src": "./src",
+    "wp-content/plugins/bh-wp-logger-test-plugin/vendor/brianhenryie/bh-wp-logger/includes": "./includes",
     "wp-content/plugins/bh-wp-logger-test-plugin/vendor/brianhenryie/bh-wp-logger/assets": "./assets",
     "wp-content/plugins/query-monitor": "./wp-content/plugins/query-monitor",
     "wp-content/plugins/woocommerce": "./wp-content/plugins/woocommerce"

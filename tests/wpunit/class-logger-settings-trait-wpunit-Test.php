@@ -212,7 +212,7 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 		};
 
-		// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/src/WP_Includes.
+		// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/includes/WP_Includes.
 		// And $wp_plugin_paths is empty.
 
 		$result = $sut->discover_plugin_data();
@@ -237,7 +237,7 @@ class Logger_Settings_Trait_WPUnit_Test extends \Codeception\TestCase\WPTestCase
 			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
 		};
 
-			// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/src/WP_Includes.
+			// __DIR__ is /Users/brianhenry/Sites/bh-wp-logger/includes/WP_Includes.
 
 		$cache_plugins = array(
 			'bh-wp-logger' => array(),

@@ -27,7 +27,7 @@
     },
     "autoload": {
         "classmap": [
-            "src/",
+            "includes/",
             "assets"
         ]
     },
@@ -106,22 +106,11 @@
                 "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
             }
         },
-        "symlinks": {
-            "wp-content": "wordpress/wp-content",
-            "test-plugin": "wp-content/plugins/bh-wp-logger-test-plugin",
-            "src": "test-plugin/vendor/brianhenryie/bh-wp-logger/src",
-            "assets": "test-plugin/vendor/brianhenryie/bh-wp-logger/assets",
-            "vendor/brianhenryie/bh-wp-private-uploads/src": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/src",
-            "vendor/brianhenryie/bh-wc-logger/src": "test-plugin/vendor/brianhenryie/bh-wc-logger/src",
-            "vendor/brianhenryie/bh-wp-cli-logger/src": "test-plugin/vendor/brianhenryie/bh-wp-cli-logger/src",
-            "vendor/brianhenryie/bh-wp-private-uploads/assets": "test-plugin/vendor/brianhenryie/bh-wp-private-uploads/assets",
-            "vendor/wptrt/admin-notices/src": "test-plugin/vendor/wptrt/admin-notices/src"
-        },
         "phpstorm": {
             "exclude_folders": {
                 "folders": [
                     "vendor/php-stubs/woocommerce-stubs",
-                    "vendor/wordpress/wordpress/src",
+                    "vendor/wordpress/wordpress/includes",
                     "vendor/wordpress/wordpress/build",
                     "wp-content/plugins/bh-wp-logger-test-plugin",
                     "wordpress/wp-content"

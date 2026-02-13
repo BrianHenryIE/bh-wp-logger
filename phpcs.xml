@@ -18,7 +18,7 @@
     <exclude-pattern>/dist-archive/</exclude-pattern>
     <exclude-pattern>/node_modules/</exclude-pattern>
     <exclude-pattern>/scratch/</exclude-pattern>
-    <exclude-pattern>/src/strauss/*</exclude-pattern>
+    <exclude-pattern>/includes/strauss/*</exclude-pattern>
     <exclude-pattern>/tests/_data/</exclude-pattern>
     <exclude-pattern>/tests/_output/</exclude-pattern>
     <exclude-pattern>/tests/_support/</exclude-pattern>
