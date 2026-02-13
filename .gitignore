@@ -38,17 +38,37 @@ intermediate
 .idea
 cache
 
+node_modules
+scratch
+wordpress
+wp-content/*
+!wp-content/mu-plugins/
+wp-content/mu-plugins/*
+!wp-content/mu-plugins/bh-plugin-outside-dir.php
 /vendor/
 
-wordpress
 test-plugin/vendor/
-wp-content/
 
-
-scratch
+*.zip
+*.phar
 
 # Generated from GitHub Secrets in the workflows.
 .env.secret
 auth.json
 
-*.zip
+# GitHub Actions
+pcov.sh
+xdebug.sh
+7.4linux.sh
+DOCKER_ENV
+docker_tag
+
+dist-archive
+.env.wordpress.secret
+
+*.min.*
+*.pot
+
+.claude/settings.local.json
+.phpunit.result.cache
+patches.lock.json

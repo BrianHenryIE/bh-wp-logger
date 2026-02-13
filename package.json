@@ -1,0 +1,21 @@
+{
+  "name": "bh-wp-logger",
+  "version": "1.0.0",
+  "description": "A PSR logger for WordPress plugins, with a nice WP_List_Table UI.",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "wp-env": "wp-env start"
+  },
+  "keywords": [],
+  "author": "BrianHenryIE",
+  "license": "GPL-2.0+",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrianHenryIE/bh-wp-logger.git"
+  },
+  "devDependencies": {
+    "@wordpress/env": "^10.39.0"
+  }
+}

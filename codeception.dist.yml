@@ -24,8 +24,8 @@ coverage:
         - src/*
     exclude:
         - src/dependencies/*
-        - /*/interface*.php
         - src/vendor/*
+        - /*/interface*.php
         - /*/index.php
         - /*/*.txt
         - src/autoload.php
