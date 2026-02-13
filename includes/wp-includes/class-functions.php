@@ -55,13 +55,13 @@ class Functions {
 	 *
 	 * @hooked deprecated_function_run
 	 *
-	 * @param string $function    The function that was called.
+	 * @param string $function_name    The function that was called.
 	 * @param string $replacement_function Optional. The function that should have been called. Default empty.
 	 * @param string $version     The version of WordPress that deprecated the function.
 	 *
 	 * @see _deprecated_function()
 	 */
-	public function log_deprecated_functions_only_once_per_day( $function, $replacement_function, $version ): void {
+	public function log_deprecated_functions_only_once_per_day( $function_name, $replacement_function, $version ): void {
 
 		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
@@ -69,7 +69,7 @@ class Functions {
 
 		$plugin_slug = $this->settings->get_plugin_slug();
 
-		$transient_name = "log_deprecated_function_{$function}_{$plugin_slug}";
+		$transient_name = "log_deprecated_function_{$function_name}_{$plugin_slug}";
 
 		$recently_logged = get_transient( $transient_name );
 
@@ -80,7 +80,7 @@ class Functions {
 					sprintf(
 					/* translators: 1: PHP function name, 2: Version number, 3: Alternative function name. */
 						__( '%1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.' ),
-						$function,
+						$function_name,
 						$version,
 						$replacement_function
 					);
@@ -89,13 +89,13 @@ class Functions {
 					sprintf(
 					/* translators: 1: PHP function name, 2: Version number. */
 						__( '%1$s is <strong>deprecated</strong> since version %2$s with no alternative available.' ),
-						$function,
+						$function_name,
 						$version
 					);
 			}
 
 			$context = array(
-				'function'             => $function,
+				'function'             => $function_name,
 				'replacement_function' => $replacement_function,
 				'version'              => $version,
 			);
@@ -115,13 +115,13 @@ class Functions {
 	 *
 	 * @hooked deprecated_function_run
 	 *
-	 * @param string $function The function that was called.
+	 * @param string $function_name The function that was called.
 	 * @param string $message  A message regarding the change.
 	 * @param string $version  The version of WordPress that deprecated the argument used.
 	 *
 	 * @see _deprecated_argument()
 	 */
-	public function log_deprecated_arguments_only_once_per_day( $function, $message, $version ): void {
+	public function log_deprecated_arguments_only_once_per_day( $function_name, $message, $version ): void {
 
 		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
@@ -129,7 +129,7 @@ class Functions {
 
 		$plugin_slug = $this->settings->get_plugin_slug();
 
-		$transient_name = "log_deprecated_argument_{$function}_{$plugin_slug}";
+		$transient_name = "log_deprecated_argument_{$function_name}_{$plugin_slug}";
 
 		$recently_logged = get_transient( $transient_name );
 
@@ -140,7 +140,7 @@ class Functions {
 					sprintf(
 					/* translators: 1: PHP function name, 2: Version number, 3: Optional message regarding the change. */
 						__( '%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s! %3$s' ),
-						$function,
+						$function_name,
 						$version,
 						$message
 					);
@@ -149,13 +149,13 @@ class Functions {
 					sprintf(
 					/* translators: 1: PHP function name, 2: Version number. */
 						__( '%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s with no alternative available.' ),
-						$function,
+						$function_name,
 						$version
 					);
 			}
 
 			$context = array(
-				'function' => $function,
+				'function' => $function_name,
 				'message'  => $message,
 				'version'  => $version,
 			);
@@ -178,11 +178,11 @@ class Functions {
 	 *
 	 * @hooked doing_it_wrong_run
 	 *
-	 * @param string $function The function that was called.
+	 * @param string $function_name The function that was called.
 	 * @param string $message  A message explaining what has been done incorrectly.
 	 * @param string $version  The version of WordPress where the message was added.
 	 */
-	public function log_doing_it_wrong_only_once_per_day( $function, $message, $version ): void {
+	public function log_doing_it_wrong_only_once_per_day( $function_name, $message, $version ): void {
 
 		if ( ! $this->api->is_backtrace_contains_plugin( implode( '', func_get_args() ) ) ) {
 			return;
@@ -190,7 +190,7 @@ class Functions {
 
 		$plugin_slug = $this->settings->get_plugin_slug();
 
-		$transient_name = "log_doing_it_wrong_run_{$function}_{$plugin_slug}";
+		$transient_name = "log_doing_it_wrong_run_{$function_name}_{$plugin_slug}";
 
 		$recently_logged = get_transient( $transient_name );
 
@@ -211,13 +211,13 @@ class Functions {
 				sprintf(
 				/* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: WordPress version number. */
 					__( '%1$s was called <strong>incorrectly</strong>. %2$s %3$s' ),
-					$function,
+					$function_name,
 					$message,
 					$version
 				);
 
 			$context = array(
-				'function' => $function,
+				'function' => $function_name,
 				'message'  => $message,
 				'version'  => $version,
 			);

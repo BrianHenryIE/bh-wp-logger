@@ -47,7 +47,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 *
 	 * @param ?Logger_Settings_Interface $settings The loglevel, plugin name, slug, and basename.
 	 *
-	 * @return Logger
+	 * @return LoggerInterface|Logger
 	 * @see Logger_Settings
 	 * @see Plugins
 	 */

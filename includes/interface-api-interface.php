@@ -91,7 +91,7 @@ interface API_Interface {
 	 *
 	 * @param ?int $steps The number of entries to return.
 	 *
-	 * @return Frame[]
+	 * @return array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}>
 	 */
 	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array;
 

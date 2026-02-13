@@ -271,7 +271,7 @@ class API implements API_Interface {
 
 		// This is critical to the library.
 		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
-		$backtrace = debug_backtrace( false );
+		$backtrace = debug_backtrace();
 
 		$ignore_starting_frame = function ( array $frame ): bool {
 			switch ( true ) {
@@ -478,7 +478,7 @@ class API implements API_Interface {
 		if ( is_null( $date_time ) ) {
 			try {
 				$date_time = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
-			} catch ( Exception ) {
+			} catch (Exception) {
 				// This will never happen.
 				return;
 			}
