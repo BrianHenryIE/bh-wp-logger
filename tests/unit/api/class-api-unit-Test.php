@@ -178,9 +178,7 @@ EOD;
 
 		\Patchwork\redefine(
 			'realpath',
-			function ( $value ) {
-				return $value;
-			}
+			fn( $value ) => $value
 		);
 
 		$sut = new API( $settings, $logger );

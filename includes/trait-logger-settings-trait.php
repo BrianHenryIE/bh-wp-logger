@@ -39,7 +39,7 @@ trait Logger_Settings_Trait {
 	public function get_log_level(): string {
 		try {
 			return get_option( $this->get_plugin_slug() . '_log_level', LogLevel::INFO );
-		} catch ( \Exception $exception ) {
+		} catch ( \Exception ) {
 			return 'none';
 		}
 	}

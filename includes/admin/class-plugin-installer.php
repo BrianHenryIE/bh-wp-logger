@@ -15,21 +15,13 @@ use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 class Plugin_Installer {
 
 	/**
-	 * Settings used to generate the href.
-	 *
-	 * @uses Settings_Interface::get_plugin_basename()
-	 * @uses Settings_Interface::get_plugin_slug()
-	 * @uses Settings_Interface::get_plugin_name()
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param Logger_Settings_Interface $settings The plugin settings.
 	 */
-	public function __construct( Logger_Settings_Interface $settings ) {
-		$this->settings = $settings;
+	public function __construct(
+		protected Logger_Settings_Interface $settings
+	) {
 	}
 
 	/**

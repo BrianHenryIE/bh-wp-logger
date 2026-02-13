@@ -38,7 +38,7 @@ class I18n {
 		load_plugin_textdomain(
 			'bh-wp-logger-development-plugin',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			dirname( plugin_basename( __FILE__ ), 2 ) . '/languages/'
 		);
 	}
 }

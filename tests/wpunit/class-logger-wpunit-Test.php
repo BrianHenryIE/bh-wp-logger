@@ -132,14 +132,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 		// Remove WooCommerce from the active plugins list.
 		add_filter(
 			'active_plugins',
-			function ( $active_plugins ) {
-				return array_filter(
-					$active_plugins,
-					function ( $element ) {
-						return 'woocommerce/woocommerce.php' !== $element;
-					}
-				);
-			},
+			fn( $active_plugins ) => array_filter(
+				$active_plugins,
+				fn( $element ) => 'woocommerce/woocommerce.php' !== $element
+			),
 			999
 		);
 

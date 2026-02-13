@@ -41,9 +41,7 @@ class Plugin_Unit_Test extends \Codeception\Test\Unit {
 
 		\Patchwork\redefine(
 			array( Logger::class, 'instance' ),
-			function () {
-				return $this->make( \BrianHenryIE\WP_Logger\Logger::class );
-			}
+			fn() => $this->make( \BrianHenryIE\WP_Logger\Logger::class )
 		);
 
 		$plugin_root_dir = dirname( __DIR__, 2 ) . '/development-plugin';

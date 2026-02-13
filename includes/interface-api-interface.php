@@ -76,7 +76,7 @@ interface API_Interface {
 	 * @param string $key The entry's key to save. This will overwrite any existing entry.
 	 * @param mixed  $value The new value.
 	 */
-	public function set_common_context( string $key, $value ): void;
+	public function set_common_context( string $key, mixed $value ): void;
 
 	/**
 	 * Get context to add to each log message.

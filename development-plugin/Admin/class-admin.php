@@ -24,13 +24,10 @@ use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
  */
 class Admin {
 
-	protected Logger_Settings_Interface $logger_settings;
-
-	protected BH_Logger $logger;
-
-	public function __construct( Logger_Settings_Interface $logger_settings, BH_Logger $logger ) {
-		$this->logger_settings = $logger_settings;
-		$this->logger          = $logger;
+	public function __construct(
+		protected Logger_Settings_Interface $logger_settings,
+		protected BH_Logger $logger
+	) {
 	}
 
 	/**

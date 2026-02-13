@@ -23,26 +23,6 @@ use WP_Post_Type;
  */
 class Logs_List_Table extends WP_List_Table {
 	/**
-	 * Passed into the `plugin-slug_bh_wp_logger_column` filter.
-	 */
-	protected BH_WP_PSR_Logger $logger;
-
-	/**
-	 * Used for the `plugin-slug_bh_wp_logger_column` filter name, and is also passed into the filter.
-	 *
-	 * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
-	 * Logger functions.
-	 *
-	 * @uses \BrianHenryIE\WP_Logger\API_Interface::get_log_files()
-	 * @uses \BrianHenryIE\WP_Logger\API_Interface::parse_log()
-	 */
-	protected API_Interface $api;
-
-	/**
 	 * The logs are displayed one day at a time. The most recent day's log file, or the optionally specified date.
 	 *
 	 * @used-by Logs_List_Table::get_data()
@@ -61,12 +41,13 @@ class Logs_List_Table extends WP_List_Table {
 	 * @param BH_WP_PSR_Logger                                                    $logger The logger itself, to use for actual logging. Also passed into a filter.
 	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args Arguments array from parent class.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, BH_WP_PSR_Logger $logger, array $args = array() ) {
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		protected BH_WP_PSR_Logger $logger,
+		array $args = array()
+	) {
 		parent::__construct( $args );
-
-		$this->logger   = $logger;
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**
@@ -179,7 +160,7 @@ class Logs_List_Table extends WP_List_Table {
 					$date_formatted = $datetime->format( 'H:i, l, d F, Y (T)' );
 					$column_output .= $date_formatted;
 					$column_output .= '<br/>';
-				} catch ( \Exception $e ) {
+				} catch ( \Exception ) {
 					$column_output .= 'Could not parse date: ';
 				}
 				$column_output .= $time;
@@ -282,9 +263,7 @@ class Logs_List_Table extends WP_List_Table {
 		 */
 		$post_types_with_ui = array_filter(
 			$post_types,
-			function ( WP_Post_Type $post_type ) {
-				return $post_type->show_ui;
-			}
+			fn( WP_Post_Type $post_type ) => $post_type->show_ui
 		);
 
 		$callback = function ( array $matches ) use ( $post_types_with_ui ): string {

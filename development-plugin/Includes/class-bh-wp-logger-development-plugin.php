@@ -36,15 +36,6 @@ use Psr\Log\LoggerInterface;
 class BH_WP_Logger_Test_Plugin {
 
 	/**
-	 * The logger we're testing!
-	 *
-	 * @var LoggerInterface
-	 */
-	protected BH_Logger $logger;
-
-	protected $settings;
-
-	/**
 	 * Define the core functionality of the plugin.
 	 *
 	 * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -53,12 +44,12 @@ class BH_WP_Logger_Test_Plugin {
 	 *
 	 * @since    1.0.0
 	 *
-	 * @param LoggerInterface $logger A PSR Logger.
+	 * @param LoggerInterface $logger The logger we're testing!
 	 */
-	public function __construct( $settings, BH_Logger $logger ) {
-
-		$this->settings = $settings;
-		$this->logger   = $logger;
+	public function __construct(
+		protected $settings,
+		protected BH_Logger $logger
+	) {
 
 		$this->set_locale();
 		$this->define_admin_hooks();

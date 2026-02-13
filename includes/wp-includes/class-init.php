@@ -20,31 +20,18 @@ class Init {
 	use LoggerAwareTrait;
 
 	/**
-	 * Used to get the log file filepath for the requested date.
-	 *
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
-
-	/**
-	 * Used to check the request is for a log file from this plugin.
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param API_Interface             $api The logger's main functions.
-	 * @param Logger_Settings_Interface $settings The logger settings.
+	 * @param API_Interface             $api The logger's main functions, used to get the log file filepath for the requested date.
+	 * @param Logger_Settings_Interface $settings The logger settings. Used to check the request is for a log file from this plugin.
 	 * @param LoggerInterface           $logger The logger itself for logging.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		LoggerInterface $logger
+	) {
 		$this->setLogger( $logger );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**
@@ -82,7 +69,7 @@ class Init {
 
 		$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 
-		if ( 0 !== strpos( $page, $this->settings->get_plugin_slug() ) ) {
+		if ( ! str_starts_with( $page, $this->settings->get_plugin_slug() ) ) {
 			return;
 		}
 

@@ -30,7 +30,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 */
 	protected LoggerInterface $cli_logger;
 
-	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
+	public function __construct(
+		Logger_Settings_Interface $settings,
+		?LoggerInterface $logger = null
+	) {
 		parent::__construct( $settings, $logger );
 
 		/**
@@ -119,10 +122,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		if ( isset( $context['exception'] ) && $context['exception'] instanceof \Exception ) {
 			$exception                    = $context['exception'];
 			$exception_details            = array();
-			$exception_details['class']   = get_class( $exception );
+			$exception_details['class']   = $exception::class;
 			$exception_details['message'] = $exception->getMessage();
 
-			$reflect = new \ReflectionClass( get_class( $exception ) );
+			$reflect = new \ReflectionClass( $exception::class );
 			$props   = array();
 			foreach ( $reflect->getProperties() as $property ) {
 				$property->setAccessible( true );
@@ -162,7 +165,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			return;
 		}
 
-		list( $level, $message, $context ) = array_values( $log_data );
+		[$level, $message, $context] = array_values( $log_data );
 
 		if ( LogLevel::ERROR === $level ) {
 			update_option(

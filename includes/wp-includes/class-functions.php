@@ -34,32 +34,19 @@ class Functions {
 	use LoggerAwareTrait;
 
 	/**
-	 * Used to check the backtrace to see is it relevant to this plugin.
-	 *
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
-
-	/**
-	 * Not used here.
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
 	 * Constructor.
 	 * No logic, just assignments.
 	 *
-	 * @param API_Interface             $api The logger's utility functions.
-	 * @param Logger_Settings_Interface $settings The logger settings.
+	 * @param API_Interface             $api The logger's utility functions. Used to check the backtrace to see is it relevant to this plugin.
+	 * @param Logger_Settings_Interface $settings The logger settings. Not used here.
 	 * @param ?LoggerInterface          $logger PSR logger.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		LoggerInterface $logger
+	) {
 		$this->setLogger( $logger );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**
