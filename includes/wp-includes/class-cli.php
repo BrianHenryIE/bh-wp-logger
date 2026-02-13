@@ -23,23 +23,17 @@ use WP_CLI;
 class CLI {
 	use LoggerAwareTrait;
 
-	protected Logger_Settings_Interface $settings;
-
-	protected API_Interface $api;
-
 	/**
 	 * Constructor.
 	 *
 	 * @param API_Interface $api The main API class where the functionality is implemented.
 	 */
 	public function __construct(
-		API_Interface $api,
-		Logger_Settings_Interface $settings,
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
 		LoggerInterface $logger
 	) {
 		$this->setLogger( $logger );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**

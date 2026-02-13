@@ -36,15 +36,6 @@ class API implements API_Interface {
 	const CACHE_GROUP_KEY = 'bh-wp-logger';
 
 	/**
-	 * Needed for the plugin slug to link correctly.
-	 *
-	 * @uses Logger_Settings_Interface::get_plugin_slug()
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
 	 *
 	 * TODO: IS getmypid() reliable?
 	 * TODO: Add current user id.
@@ -61,12 +52,14 @@ class API implements API_Interface {
 	 * BH_WP_PSR_Logger needs and API instance and API needs a PSR logger instance if it is to log. LoggerAwareTrait
 	 * allows setting the logger after instantiation.
 	 *
-	 * @param Logger_Settings_Interface $settings The settings provided by the plugin to instantiate the logger.
+	 * @param Logger_Settings_Interface $settings The settings provided by the plugin to instantiate the logger. Needed for the plugin slug to link correctly.
 	 * @param ?LoggerInterface          $logger A PSR logger, presumably later a BH_WP_PSR_Logger.
 	 */
-	public function __construct( Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
+	public function __construct(
+		protected Logger_Settings_Interface $settings,
+		?LoggerInterface $logger = null
+	) {
 		$this->setLogger( $logger ?? new NullLogger() );
-		$this->settings = $settings;
 	}
 
 	/**
@@ -278,7 +271,7 @@ class API implements API_Interface {
 
 		// This is critical to the library.
 		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
-		$backtrace = debug_backtrace( false );
+		$backtrace = debug_backtrace();
 
 		$ignore_starting_frame = function ( array $frame ): bool {
 			switch ( true ) {
@@ -288,7 +281,7 @@ class API implements API_Interface {
 				case isset( $frame['file'] ) && basename( $frame['file'] ) === 'class-functions.php':
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'bh-wp-logger/includes' ):
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
-				case isset( $frame['file'] ) && false !== strpos( $frame['file'], 'php-http/logger-plugin' ):
+				case isset( $frame['file'] ) && str_contains( $frame['file'], 'php-http/logger-plugin' ):
 					return true;
 				default:
 					return false;
@@ -377,7 +370,7 @@ class API implements API_Interface {
 	 * @param string $filepath Path to the file to be checked.
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
-		return 0 === strpos( plugin_basename( realpath( $filepath ) ), $this->settings->get_plugin_slug() );
+		return str_starts_with( plugin_basename( realpath( $filepath ) ), $this->settings->get_plugin_slug() );
 	}
 
 	/**
@@ -485,7 +478,7 @@ class API implements API_Interface {
 		if ( is_null( $date_time ) ) {
 			try {
 				$date_time = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
-			} catch ( Exception $exception ) {
+			} catch ( Exception ) {
 				// This will never happen.
 				return;
 			}

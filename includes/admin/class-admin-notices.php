@@ -23,22 +23,17 @@ class Admin_Notices extends Notices {
 
 	use LoggerAwareTrait;
 
-	/** @var Logger_Settings_Interface  */
-	protected Logger_Settings_Interface $settings;
-
-	/** @var API_Interface  */
-	protected API_Interface $api;
-
 	/**
 	 * @param API_Interface             $api
 	 * @param Logger_Settings_Interface $settings
 	 * @param ?LoggerInterface          $logger
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, ?LoggerInterface $logger = null ) {
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		?LoggerInterface $logger = null
+	) {
 		$this->setLogger( $logger ?? new NullLogger() );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	protected function get_error_detail_option_name(): string {

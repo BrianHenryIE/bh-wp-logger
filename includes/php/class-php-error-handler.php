@@ -26,20 +26,6 @@ class PHP_Error_Handler {
 	use LoggerAwareTrait;
 
 	/**
-	 * Used here for backtrace functions.
-	 *
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
-
-	/**
-	 * Used here for slug and basename to name and to compare data.
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
 	 * Only one error handler can be added at a time, so we chain them.
 	 *
 	 * @var ?callable with signature ( int $errno, string $errstr, ?string $errfile, ?int $errline  )
@@ -49,14 +35,16 @@ class PHP_Error_Handler {
 	/**
 	 * Constructor.
 	 *
-	 * @param API_Interface             $api The class that determines if the errors are relevant.
-	 * @param Logger_Settings_Interface $settings The settings, used here for identifiers (slug,basename).
+	 * @param API_Interface             $api The class that determines if the errors are relevant. Used here for backtrace functions.
+	 * @param Logger_Settings_Interface $settings The settings, used here for identifiers (slug,basename). Used here for slug and basename to name and to compare data.
 	 * @param LoggerInterface           $logger The logger for actually recording the errors as we wish.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, LoggerInterface $logger ) {
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		LoggerInterface $logger
+	) {
 		$this->setLogger( $logger );
-		$this->api      = $api;
-		$this->settings = $settings;
 	}
 
 	/**
@@ -170,11 +158,11 @@ class PHP_Error_Handler {
 		$plugin_dir          = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $this->settings->get_plugin_slug();
 		$plugin_dir_realpath = realpath( $plugin_dir );
 
-		if ( false !== strpos( $errfile, $plugin_dir ) || ( false !== $plugin_dir_realpath && false !== strpos( $errfile, $plugin_dir_realpath ) ) ) {
+		if ( str_contains( $errfile, $plugin_dir ) || ( false !== $plugin_dir_realpath && str_contains( $errfile, $plugin_dir_realpath ) ) ) {
 			return true;
 		}
 
-		if ( false !== strpos( $errstr, $this->settings->get_plugin_slug() ) ) {
+		if ( str_contains( $errstr, $this->settings->get_plugin_slug() ) ) {
 			// If the plugin slug is outright named in the error message.
 			return true;
 		}

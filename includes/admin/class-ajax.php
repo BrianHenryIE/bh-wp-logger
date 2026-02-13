@@ -12,37 +12,23 @@ use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * Handle delete and delete-all actions.
+ *
+ * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_log()
+ * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_all_logs()
+ * @uses Logger_Settings_Interface::get_plugin_slug()
  */
 class AJAX {
-
-	/**
-	 * Settings describing the plugin this logger is for.
-	 *
-	 * @uses Logger_Settings_Interface::get_plugin_slug()
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
-	 * The plugin's main functions.
-	 *
-	 * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_log()
-	 * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_all_logs()
-	 *
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
 
 	/**
 	 * AJAX constructor.
 	 *
 	 * @param API_Interface             $api Implementation of the plugin's main functions.
-	 * @param Logger_Settings_Interface $settings The current settings for the logger.
+	 * @param Logger_Settings_Interface $settings The current settings for the logger / Settings describing the plugin this logger is for.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings ) {
-		$this->api      = $api;
-		$this->settings = $settings;
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings
+	) {
 	}
 
 	/**

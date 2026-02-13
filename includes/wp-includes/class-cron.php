@@ -15,39 +15,27 @@ use Psr\Log\LoggerAwareTrait;
 
 /**
  * Functions to register the cron job and handle the action to execute the job to delete old logs.
+ *
+ * @see API_Interface::delete_old_logs()
+ * @see Logger_Settings_Interface::get_plugin_slug()
  */
 class Cron {
 
 	use LoggerAwareTrait;
 
 	/**
-	 * The logger settings are used to determine which plugin we're working with.
-	 *
-	 * @see Logger_Settings_Interface::get_plugin_slug()
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
-	 * The API instance will delete the old logs.
-	 *
-	 * @see API_Interface::delete_old_logs()
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
-
-	/**
 	 * Cron constructor.
 	 *
-	 * @param API_Interface             $api The logger's main functions.
-	 * @param Logger_Settings_Interface $settings The logger settings.
+	 * @param API_Interface             $api The logger's main functions. The API instance will delete the old logs.
+	 * @param Logger_Settings_Interface $settings he logger settings are used to determine which plugin we're working with.
 	 * @param BH_WP_PSR_Logger          $logger The logger itself for logging.
 	 */
-	public function __construct( $api, $settings, BH_WP_PSR_Logger $logger ) {
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		BH_WP_PSR_Logger $logger
+	) {
 		$this->setLogger( $logger );
-		$this->settings = $settings;
-		$this->api      = $api;
 	}
 
 	/**

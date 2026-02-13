@@ -28,38 +28,17 @@ use BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public;
 class Plugin_Logger_Actions {
 
 	/**
-	 * The library object that acts as a facade to the true logger.
-	 *
-	 * @var BH_WP_PSR_Logger
-	 */
-	protected BH_WP_PSR_Logger $wrapped_real_logger;
-
-	/**
-	 * Settings object for instantiating classes.
-	 *
-	 * @var Logger_Settings_Interface
-	 */
-	protected Logger_Settings_Interface $settings;
-
-	/**
-	 * API object for instantiating classes.
-	 *
-	 * @var API_Interface
-	 */
-	protected API_Interface $api;
-
-	/**
 	 * Logger constructor.
 	 *
-	 * @param API_Interface             $api The main utility class.
-	 * @param Logger_Settings_Interface $settings The log level etc. for this plugin.
-	 * @param BH_WP_PSR_Logger          $wrapped_real_logger A facade of the real logger.
+	 * @param API_Interface             $api The main utility class. API object for instantiating classes.
+	 * @param Logger_Settings_Interface $settings The log level etc. for this plugin. Settings object for instantiating classes.
+	 * @param BH_WP_PSR_Logger          $wrapped_real_logger A facade of the real logger. The library object that acts as a facade to the true logger.
 	 */
-	public function __construct( API_Interface $api, Logger_Settings_Interface $settings, BH_WP_PSR_Logger $wrapped_real_logger ) {
-		$this->wrapped_real_logger = $wrapped_real_logger;
-		$this->settings            = $settings;
-		$this->api                 = $api;
-
+	public function __construct(
+		protected API_Interface $api,
+		protected Logger_Settings_Interface $settings,
+		protected BH_WP_PSR_Logger $wrapped_real_logger
+	) {
 		$this->add_error_handler_hooks();
 
 		$this->add_admin_ui_logs_page_hooks();

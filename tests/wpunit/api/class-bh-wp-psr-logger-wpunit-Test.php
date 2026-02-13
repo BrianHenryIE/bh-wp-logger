@@ -88,9 +88,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		 */
 		add_filter(
 			'plugin-slug_bh_wp_logger_log',
-			function ( array $log_data, $settings, $bh_wp_psr_logger ) {
-				return null;
-			},
+			fn( array $log_data, $settings, $bh_wp_psr_logger ) => null,
 			10,
 			3
 		);
