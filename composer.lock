@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5997b705c65c091f5a204770f4520000",
+    "content-hash": "d6dc05734e2044ac18329316e3c9beec",
     "packages": [
         {
             "name": "brianhenryie/bh-wc-logger",
@@ -118,7 +118,7 @@
                             "vendor/php-stubs/woocommerce-stubs",
                             "vendor/wordpress/wordpress/src",
                             "vendor/wordpress/wordpress/build",
-                            "wp-content/plugins/bh-wp-cli-logger-development-plugin",
+                            "wp-content/plugins/bh-wp-cli-logger-test-plugin",
                             "wordpress/wp-content"
                         ],
                         "include_folders": [
@@ -129,7 +129,7 @@
                 },
                 "symlinks": {
                     "wp-content": "wordpress/wp-content",
-                    "development-plugin": "wp-content/plugins/bh-wp-cli-logger-development-plugin"
+                    "test-plugin": "wp-content/plugins/bh-wp-cli-logger-test-plugin"
                 }
             },
             "autoload": {
