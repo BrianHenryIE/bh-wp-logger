@@ -73,21 +73,10 @@
         "antecedent/patchwork": "^2.1",
         "alleyinteractive/wordpress-autoloader": "^1.1",
         "brianhenryie/color-logger": "^1.0",
-        "codeception/module-asserts": "*",
-        "codeception/module-cli": "*",
-        "codeception/module-db": "*",
-        "codeception/module-filesystem": "*",
-        "codeception/module-phpbrowser": "*",
-        "codeception/module-webdriver": "*",
-        "codeception/util-universalframework": "*",
-        "cweagans/composer-patches": "*",
         "brianhenryie/php-codecoverage-markdown": "*",
-        "jaschilz/php-coverage-badger": "^2.0",
         "johnpbloch/wordpress": "*",
-        "kporras07/composer-symlinks": "dev-master",
-        "lucatume/wp-browser": "^3.0",
+        "lucatume/wp-browser": "^4.0",
         "php-stubs/woocommerce-stubs": "*",
-        "phpcompatibility/phpcompatibility-wp": "*",
         "phpstan/extension-installer": "*",
         "phpunit/phpcov": "*",
         "rector/rector": "*",
@@ -101,11 +90,6 @@
         "wpackagist-plugin/woocommerce": "*"
     },
     "extra": {
-        "patches": {
-            "jaschilz/php-coverage-badger": {
-                "Allow customising the text": "https://github.com/JASchilz/PHPCoverageBadge/pull/1.patch"
-            }
-        },
         "phpstorm": {
             "exclude_folders": {
                 "folders": [
@@ -117,8 +101,7 @@
                 ],
                 "include_folders": [
                     "vendor/wordpress/wordpress/"
-                ],
-                "composer-symlinks": false
+                ]
             }
         }
     },
