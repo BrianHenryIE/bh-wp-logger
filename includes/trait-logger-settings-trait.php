@@ -50,7 +50,7 @@ trait Logger_Settings_Trait {
 	 * @throws Exception When the basename cannot be determined.
 	 */
 	public function get_plugin_name(): string {
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
+		$plugin_data = get_plugin_data( $this->get_plugin_basename() );
 		return $plugin_data['Name'];
 	}
 
