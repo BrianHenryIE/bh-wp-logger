@@ -478,7 +478,7 @@ class API implements API_Interface {
 		if ( is_null( $date_time ) ) {
 			try {
 				$date_time = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
-			} catch (Exception) {
+			} catch ( Exception ) {
 				// This will never happen.
 				return;
 			}
