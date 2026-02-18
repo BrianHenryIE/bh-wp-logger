@@ -124,7 +124,7 @@ class Plugin_Logger_Actions {
 		add_action( 'admin_menu', array( $logs_page, 'add_page' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_styles' ) );
-		add_action( 'plugins_loaded', array( $logs_page, 'set_page_title' ) );
+		add_action( 'admin_init', array( $logs_page, 'set_page_title' ) );
 	}
 
 	/**
