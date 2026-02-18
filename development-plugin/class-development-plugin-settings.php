@@ -1,4 +1,11 @@
 <?php
+/**
+ * An example implementation of `Logger_Settings_Interface`
+ *
+ * Also visible in the admin UI.
+ *
+ * @package brianhenryie/bh-wp-logger
+ */
 
 namespace BH_WP_Logger_Test_Plugin;
 
@@ -10,7 +17,7 @@ use Psr\Log\LogLevel;
  * We should also test `WooCommerce_Logger_Settings_Interface`.
  */
 class Development_Plugin_Settings implements Logger_Settings_Interface {
-		use Logger_Settings_Trait;
+	use Logger_Settings_Trait;
 
 	/**
 	 * Debug for testing.

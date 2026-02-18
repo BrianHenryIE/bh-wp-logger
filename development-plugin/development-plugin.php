@@ -63,11 +63,9 @@ new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
  *
  * This may have changed since using wp-env.
  *
- * @param callable $closure
- *
- * @return void
+ * @param callable $closure The closure we're going to run whose backtrace will now contain this plugin.
  */
-function run_closure_in_plugin( $closure ) {
+function run_closure_in_plugin( callable $closure ): void {
 	$closure();
 }
 

@@ -35,14 +35,13 @@ class BH_WP_Logger_Test_Plugin {
 	/**
 	 * Add actions and filters.
 	 *
-	 * @param LoggerInterface           $logger The logger we're testing!
-	 * @param BH_Logger|LoggerInterface $logger The logger to log.
+	 * @param Logger_Settings_Interface $settings The configuration the consuming pluing passed to bh-wp-logger for initilisation.
+	 * @param BH_Logger|LoggerInterface $logger PSR3.
 	 */
 	public function __construct(
 		protected Logger_Settings_Interface $settings,
 		protected BH_Logger|LoggerInterface $logger
 	) {
-
 		$this->define_admin_hooks();
 	}
 

@@ -65,8 +65,13 @@ class Logs_Page {
 			return;
 		}
 
-		global $title;
-		$title = $this->settings->get_plugin_name() . ' Logs page';
+		/**
+		 * @see strip_tags()
+		 *
+		 * phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited
+		 */
+		// global $title;
+		// $title = $this->settings->get_plugin_name() . ' Logs page';
 	}
 
 	/**
