@@ -116,6 +116,7 @@ class Plugin_Logger_Actions {
 	/**
 	 * Add an admin UI page to display the logs table.
 	 * Enqueue the JavaScript for handling the buttons.
+	 * Set the page title.
 	 */
 	protected function add_admin_ui_logs_page_hooks(): void {
 
@@ -123,6 +124,7 @@ class Plugin_Logger_Actions {
 		add_action( 'admin_menu', array( $logs_page, 'add_page' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $logs_page, 'enqueue_styles' ) );
+		add_action( 'plugins_loaded', array( $logs_page, 'set_page_title' ) );
 	}
 
 	/**
