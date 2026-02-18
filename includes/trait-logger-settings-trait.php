@@ -72,8 +72,11 @@ trait Logger_Settings_Trait {
 	 */
 	public function get_plugin_basename(): string {
 
-		// TODO: The following might work but there are known issues around symlinks that need to be tested and handled correctly.
-		// @see  https://core.trac.wordpress.org/ticket/42670
+		/**
+		 * TODO: The following might work but there are known issues around symlinks that need to be tested and handled correctly.
+		 *
+		 * @see  https://core.trac.wordpress.org/ticket/42670
+		 */
 
 		$wp_plugin_basename = plugin_basename( __DIR__ );
 
