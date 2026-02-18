@@ -55,10 +55,10 @@ class Admin_Ajax {
 			$result['error']['missing-log-test-action'] = 'Missing log-test-action parameter.';
 
 		} else {
-			$log_test_action = sanitize_key( wp_unslash( $_POST['log-test-action'] ) );
+			$log_test_action = sanitize_text_field( wp_unslash( $_POST['log-test-action'] ) );
 
-			$message = isset( $_POST['message'] ) ? esc_html( sanitize_key( wp_unslash( $_POST['message'] ) ) ) : null;
-			$context = isset( $_POST['context'] ) ? explode( ',', esc_html( sanitize_key( wp_unslash( $_POST['context'] ) ) ) ) : array();
+			$message = isset( $_POST['message'] ) ? esc_html( sanitize_text_field( wp_unslash( $_POST['message'] ) ) ) : null;
+			$context = isset( $_POST['context'] ) ? explode( ',', esc_html( sanitize_text_field( wp_unslash( $_POST['context'] ) ) ) ) : array();
 
 			switch ( $log_test_action ) {
 				case 'debug-message':
