@@ -35,7 +35,7 @@ class BH_WP_Logger_Test_Plugin {
 	/**
 	 * Add actions and filters.
 	 *
-	 * @param Logger_Settings_Interface $settings The configuration the consuming pluing passed to bh-wp-logger for initilisation.
+	 * @param Logger_Settings_Interface $settings The configuration the consuming plugin passed to bh-wp-logger for initialisation.
 	 * @param BH_Logger|LoggerInterface $logger PSR3.
 	 */
 	public function __construct(
