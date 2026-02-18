@@ -27,6 +27,7 @@
 namespace BH_WP_Logger_Test_Plugin;
 
 use Alley_Interactive\Autoloader\Autoloader;
+use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\Logger;
 use Exception;
 
@@ -59,11 +60,15 @@ $logger_settings = new Development_Plugin_Settings();
 $logger          = Logger::instance( $logger_settings );
 
 
+new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
+
 /**
  * Pass in a closure to be executed, so the backtrace will contain the plugin.
  * For integration tests.
  *
- * @param $closure
+ * This may have changed since using wp-env.
+ *
+ * @param callable $closure
  *
  * @return void
  */
@@ -73,5 +78,5 @@ function run_closure_in_plugin( $closure ) {
 
 add_filter(
 	'plugins_url',
-	fn( $url ) => str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url )
+	fn( string $url ) => str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url )
 );
