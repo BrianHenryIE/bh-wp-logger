@@ -2,30 +2,23 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * @coversDefaultClass  \BrianHenryIE\WP_Logger\API\API
  */
-class API_Unit_Test extends \Codeception\Test\Unit {
+class API_Unit_Test extends Unit_Testcase {
 
-	protected function setup(): void {
-		parent::setup();
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::get_backtrace
 	 */
 	public function test_backtrace_excludes_logger_files(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 
 		$api = new API( $settings, $logger );
@@ -51,7 +44,7 @@ class API_Unit_Test extends \Codeception\Test\Unit {
 			self::markTestSkipped( 'Test data file not found at: ' . $simple_log_file );
 		}
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 
 		$sut = new API( $settings, $logger );
@@ -77,7 +70,7 @@ class API_Unit_Test extends \Codeception\Test\Unit {
 			self::markTestSkipped( 'Test data file not found at: ' . $multiline_message_log_file );
 		}
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 
 		$sut = new API( $settings, $logger );
@@ -92,7 +85,7 @@ class API_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_get_last_log_time(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
@@ -147,7 +140,7 @@ EOD;
 	 */
 	public function test_is_backtrace_contains_plugin(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(

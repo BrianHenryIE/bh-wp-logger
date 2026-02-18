@@ -1,4 +1,4 @@
-[![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-logger/) ![PHP 8.0](https://img.shields.io/badge/PHP-8.0-8892BF.svg)
+![PHP](https://img.shields.io/badge/PHP-8.0-777BB4?logo=php&logoColor=white) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-logger/)
 
 # BH WP Logger
 

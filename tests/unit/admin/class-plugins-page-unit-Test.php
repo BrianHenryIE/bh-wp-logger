@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use DateTime;
@@ -10,19 +11,12 @@ use DateTime;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Plugins_Page
  */
-class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
+class Plugins_Page_Unit_Test extends Unit_Testcase {
 
-	protected function setUp(): void {
-		\WP_Mock::setUp();
-	}
 
 	/**
 	 * Without this, WP_Mock userFunctions might stick around for the next test.
 	 */
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::__construct
@@ -61,7 +55,7 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 			Logger_Settings_Interface::class,
 			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
 		);
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new Plugins_Page( $api, $settings, $logger );
 
@@ -111,7 +105,7 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 			Logger_Settings_Interface::class,
 			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
 		);
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new Plugins_Page( $api, $settings, $logger );
 
@@ -160,7 +154,7 @@ class Plugins_Page_Unit_Test extends \Codeception\Test\Unit {
 			Logger_Settings_Interface::class,
 			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
 		);
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		// When the latest log time is more recent than the last logs view time...
 		\WP_Mock::userFunction(

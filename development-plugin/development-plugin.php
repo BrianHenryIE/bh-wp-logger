@@ -29,10 +29,6 @@ namespace BH_WP_Logger_Test_Plugin;
 use Alley_Interactive\Autoloader\Autoloader;
 use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\Logger;
-use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
-use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
-use Psr\Log\LogLevel;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -53,40 +49,30 @@ Autoloader::generate(
  */
 define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
 
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
-function instantiate_bh_wp_logger_test_plugin() {
 
-	$logger_settings = new Development_Plugin_Settings();
+$logger_settings = new Development_Plugin_Settings();
+$logger          = Logger::instance( $logger_settings );
 
-	$logger = Logger::instance( $logger_settings );
 
-	$plugin = new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
-
-	return $plugin;
-}
-$GLOBALS['bh_wp_logger_test_plugin'] = instantiate_bh_wp_logger_test_plugin();
+new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
 
 /**
  * Pass in a closure to be executed, so the backtrace will contain the plugin.
  * For integration tests.
  *
- * @param $closure
+ * This may have changed since using wp-env.
  *
- * @return void
+ * @param callable $closure The closure we're going to run whose backtrace will now contain this plugin.
  */
-function run_closure_in_plugin( $closure ) {
+function run_closure_in_plugin( callable $closure ): void {
 	$closure();
 }
 
+
 add_filter(
 	'plugins_url',
-	fn( $url ) => str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url )
+	fn( string $url ) => str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url )
 );
+
+// `wp-env` fixes.
+( new WP_Env() )->register_hooks();

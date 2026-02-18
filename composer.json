@@ -14,7 +14,6 @@
     "config": {
         "allow-plugins": {
             "composer/installers": true,
-            "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "johnpbloch/wordpress-core-installer": true,
             "phpstan/extension-installer": true
@@ -45,10 +44,6 @@
         ]
     },
     "repositories": {
-        "brianhenryie/composer-phpstorm": {
-            "url": "https://github.com/BrianHenryIE/composer-phpstorm",
-            "type": "git"
-        },
         "outlandishideas/wpackagist": {
             "type": "composer",
             "url": "https://wpackagist.org"
@@ -89,26 +84,17 @@
         "wpackagist-theme/twentytwenty": "*",
         "wpackagist-plugin/woocommerce": "*"
     },
-    "extra": {
-        "phpstorm": {
-            "exclude_folders": {
-                "folders": [
-                    "vendor/php-stubs/woocommerce-stubs",
-                    "vendor/wordpress/wordpress/includes",
-                    "vendor/wordpress/wordpress/build",
-                    "wp-content/plugins/bh-wp-logger-development-plugin",
-                    "wordpress/wp-content"
-                ],
-                "include_folders": [
-                    "vendor/wordpress/wordpress/"
-                ]
-            }
-        }
-    },
+    "extra": {},
     "scripts": {
         "post-install-cmd": [
+            "@sync-composer-wpenv"
         ],
         "post-update-cmd": [
+            "@sync-composer-wpenv"
+        ],
+        "sync-composer-wpenv": [
+            "for name in $(cat .wp-env.json | jq '.mappings | values[]' | sed -r 's/^\\\"|\\\"$//g'); do [ ! -d $name ] && [ ! -f $name ] && echo $name && jq 'del(.. | select(. ==\"'$name'\"))' .wp-env.json | sponge .wp-env.json || true; done",
+            "find wp-content/plugins -type d -depth 1 ! -type l | sort -h | jq -Rn '[inputs]' | jq 'reduce .[] as $item ({}; . + {$item:$item})' | jq '.[] |= \"./\\(.)\"' | jq '. | {mappings: .}' | jq --sort-keys -s '.[] * $existing[]' --slurpfile existing .wp-env.json | sponge .wp-env.json"
         ],
         "test": [
             "codecept run unit",

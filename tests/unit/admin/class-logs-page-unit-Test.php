@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
@@ -10,17 +11,9 @@ use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Logs_Page
  */
-class Logs_Page_Unit_Test extends \Codeception\Test\Unit {
+class Logs_Page_Unit_Test extends Unit_Testcase {
 
-	protected function setup(): void {
-		parent::setup();
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * Verifies enqueue_styles() calls wp_enqueue_style() with appropriate parameters.

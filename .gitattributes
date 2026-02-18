@@ -21,6 +21,7 @@
 /phpstan-bootstrap.php  export-ignore
 /rector.php             export-ignore
 /README.md              export-ignore
+/playwright.config.ts   export-ignore
 /wp-cli.yml             export-ignore
 
 # When merging into a branch, ignore the coverage percentage, that should be re-calculated immediately anyway.

@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\WP_Includes;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Codeception\Stub\Expected;
@@ -10,23 +11,16 @@ use Codeception\Stub\Expected;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Init
  */
-class Init_Unit_Test extends \Codeception\Test\Unit {
+class Init_Unit_Test extends Unit_Testcase {
 
-	protected function setUp(): void {
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::maybe_download_log
 	 */
 	public function test_return_immediately_when_totally_not_relevant(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 
@@ -43,7 +37,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_nonce_fails(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 
@@ -80,7 +74,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_download_log_malformed(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 
@@ -124,7 +118,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_page_missing(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 
@@ -171,7 +165,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_date_missing(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$api      = $this->makeEmpty( API_Interface::class );
 
@@ -217,7 +211,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_page_does_not_match_plugin(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
@@ -269,7 +263,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_date_malformed(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
@@ -321,7 +315,7 @@ class Init_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_quickly_when_file_does_not_exist(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(

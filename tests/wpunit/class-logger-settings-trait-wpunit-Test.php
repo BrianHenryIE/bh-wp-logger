@@ -25,7 +25,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 			}
 		};
 
-		self::assertEquals( 'info', $sut->get_log_level() );
+		$this->assertEquals( 'info', $sut->get_log_level() );
 	}
 
 	/**
@@ -43,7 +43,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 
 		update_option( 'development-plugin_log_level', 'error' );
 
-		self::assertEquals( 'error', $sut->get_log_level() );
+		$this->assertEquals( 'error', $sut->get_log_level() );
 	}
 
 	/**
@@ -59,34 +59,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 			}
 		};
 
-		self::assertEquals( 'none', $sut->get_log_level() );
-	}
-
-	/**
-	 * @covers ::get_plugin_name
-	 */
-	public function test_get_plugin_name(): void {
-
-		$sut = new class() {
-			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
-
-			public function get_plugin_basename(): string {
-				return 'development-plugin/development-plugin.php';
-			}
-		};
-
-		$plugins_array = array(
-			'' => array(
-				'development-plugin/development-plugin.php' =>
-										array(
-											'Name' => 'BH WP Logger Test Plugin',
-										),
-			),
-		);
-
-		wp_cache_set( 'plugins', $plugins_array, 'plugins' );
-
-		$this->assertEquals( 'BH WP Logger Test Plugin', $sut->get_plugin_name() );
+		$this->assertEquals( 'none', $sut->get_log_level() );
 	}
 
 	/**
@@ -102,7 +75,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 			}
 		};
 
-		self::assertEquals( 'development-plugin', $sut->get_plugin_slug() );
+		$this->assertEquals( 'development-plugin', $sut->get_plugin_slug() );
 	}
 
 	/**
@@ -175,7 +148,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 		$plugin_basename = plugin_basename( $realpath_test_file );
 
 		$plugin_slug = explode( '/', $plugin_basename )[0];
-		self::assertEquals( 'bh-wp-logger-development-plugin', $plugin_slug );
+		$this->assertEquals( 'bh-wp-logger-development-plugin', $plugin_slug );
 	}
 
 

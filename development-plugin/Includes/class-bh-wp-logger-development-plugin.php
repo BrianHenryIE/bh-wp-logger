@@ -5,11 +5,7 @@
  * A class definition that includes attributes and functions used across both the
  * frontend-facing side of the site and the admin area.
  *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    BH_WP_Logger_Test_Plugin
- * @subpackage BH_WP_Logger_Test_Plugin/includes
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BH_WP_Logger_Test_Plugin\WP_Includes;
@@ -17,6 +13,7 @@ namespace BH_WP_Logger_Test_Plugin\WP_Includes;
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
 use BH_WP_Logger_Test_Plugin\Admin\Admin;
 use BH_WP_Logger_Test_Plugin\Admin\Admin_Ajax;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -36,49 +33,23 @@ use Psr\Log\LoggerInterface;
 class BH_WP_Logger_Test_Plugin {
 
 	/**
-	 * Define the core functionality of the plugin.
+	 * Add actions and filters.
 	 *
-	 * Set the plugin name and the plugin version that can be used throughout the plugin.
-	 * Load the dependencies, define the locale, and set the hooks for the admin area and
-	 * the frontend-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 *
-	 * @param LoggerInterface $logger The logger we're testing!
+	 * @param Logger_Settings_Interface $settings The configuration the consuming plugin passed to bh-wp-logger for initialisation.
+	 * @param BH_Logger|LoggerInterface $logger PSR3.
 	 */
 	public function __construct(
-		protected $settings,
-		protected BH_Logger $logger
+		protected Logger_Settings_Interface $settings,
+		protected BH_Logger|LoggerInterface $logger
 	) {
-
-		$this->set_locale();
 		$this->define_admin_hooks();
-	}
-
-	/**
-	 * Define the locale for this plugin for internationalization.
-	 *
-	 * Uses the i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	protected function set_locale() {
-
-		$plugin_i18n = new I18n();
-
-		add_action( 'plugins_loaded', array( $plugin_i18n, 'load_plugin_textdomain' ) );
 	}
 
 	/**
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
 	 */
-	protected function define_admin_hooks() {
+	protected function define_admin_hooks(): void {
 
 		$plugin_admin = new Admin( $this->settings, $this->logger );
 

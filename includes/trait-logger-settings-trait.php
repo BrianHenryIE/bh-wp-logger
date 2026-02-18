@@ -50,7 +50,7 @@ trait Logger_Settings_Trait {
 	 * @throws Exception When the basename cannot be determined.
 	 */
 	public function get_plugin_name(): string {
-		$plugin_data = get_plugin_data( $this->get_plugin_basename() );
+		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
 		return $plugin_data['Name'];
 	}
 
@@ -72,8 +72,11 @@ trait Logger_Settings_Trait {
 	 */
 	public function get_plugin_basename(): string {
 
-		// TODO: The following might work but there are known issues around symlinks that need to be tested and handled correctly.
-		// @see  https://core.trac.wordpress.org/ticket/42670
+		/**
+		 * TODO: The following might work but there are known issues around symlinks that need to be tested and handled correctly.
+		 *
+		 * @see  https://core.trac.wordpress.org/ticket/42670
+		 */
 
 		$wp_plugin_basename = plugin_basename( __DIR__ );
 

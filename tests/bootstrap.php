@@ -15,6 +15,11 @@ $GLOBALS['wordpress_root_dir'] = $project_root_dir . '/wordpress';
 
 Autoloader::generate(
 	'BrianHenryIE\\WP_Logger',
+	__DIR__ . '/unit',
+)->register();
+
+Autoloader::generate(
+	'BrianHenryIE\\WP_Logger',
 	__DIR__ . '/wpunit',
 )->register();
 

@@ -8,6 +8,8 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
+
 use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 
 /**
@@ -15,7 +17,7 @@ use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
  *
  * @coversNothing
  */
-class Plugin_Develop_Test extends \Codeception\TestCase\WPTestCase {
+class Plugin_Develop_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 	/**
 	 * Test the main plugin object is added to PHP's GLOBALS and that it is the correct class.

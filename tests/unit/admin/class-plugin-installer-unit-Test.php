@@ -7,26 +7,20 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Codeception\Stub\Expected;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Plugin_Installer
  */
-class Plugin_Installer_Unit_Test extends \Codeception\Test\Unit {
+class Plugin_Installer_Unit_Test extends Unit_Testcase {
 
-	protected function setUp(): void {
-		\WP_Mock::setUp();
-	}
 
 	/**
 	 * Without this, WP_Mock userFunctions might stick around for the next test.
 	 */
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::add_logs_link
@@ -77,7 +71,7 @@ class Plugin_Installer_Unit_Test extends \Codeception\Test\Unit {
 				'get_plugin_name'     => Expected::never( 'My Plugin' ),
 			)
 		);
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new Plugin_Installer( $settings, $logger );
 

@@ -2,22 +2,16 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger
  */
-class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
+class BH_WP_PSR_Logger_Unit_Test extends Unit_Testcase {
 
-	protected function setUp(): void {
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * When an exception is passed in the context, it normally just gets logged as `{}`, so let's instead log the
@@ -27,7 +21,7 @@ class BH_WP_PSR_Logger_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_exception(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 
 		$sut = new BH_WP_PSR_Logger( $settings, $logger );
