@@ -13,10 +13,13 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
+use BrianHenryIE\WP_Logger\Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use DateTime;
+use Psr\Log\LoggerInterface;
 use WP_List_Table;
 use WP_Post_Type;
+use WP_User;
 
 /**
  * WordPress list table for displaying the logs.
@@ -38,13 +41,13 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * @param API_Interface                                                       $api The logger API.
 	 * @param Logger_Settings_Interface                                           $settings The logger settings.
-	 * @param BH_WP_PSR_Logger                                                    $logger The logger itself, to use for actual logging. Also passed into a filter.
+	 * @param BH_WP_PSR_Logger|LoggerInterface                                    $logger The logger itself, to use for actual logging. Also passed into a filter.
 	 * @param array{plural?:string, singular?:string, ajax?:bool, screen?:string} $args Arguments array from parent class.
 	 */
 	public function __construct(
 		protected API_Interface $api,
 		protected Logger_Settings_Interface $settings,
-		protected BH_WP_PSR_Logger $logger,
+		protected BH_WP_PSR_Logger|LoggerInterface $logger,
 		array $args = array()
 	) {
 		parent::__construct( $args );
@@ -135,8 +138,8 @@ class Logs_List_Table extends WP_List_Table {
 	/**
 	 * Get the HTML for a column.
 	 *
-	 * @param array{time:string, level:string, message:string, context:array<mixed>} $item ...whatever type get_data returns.
-	 * @param string                                                                 $column_name The specified column.
+	 * @param array{time:string, level:string, message:string, context:array<string, mixed>} $item ...whatever type get_data returns.
+	 * @param string                                                                         $column_name The specified column.
 	 *
 	 * @return string|true|void
 	 * @see WP_List_Table::column_default()
@@ -171,7 +174,14 @@ class Logs_List_Table extends WP_List_Table {
 					$pretty_context = wp_json_encode( $item['context'], JSON_PRETTY_PRINT );
 					// phpcs:disable WordPress.PHP.DisallowShortTernary.Found
 					$un_pretty_context = wp_json_encode( $item['context'] ) ?: '';
-					$column_output     = $pretty_context ? '<pre data-json="' . esc_html( $un_pretty_context ) . '" class="log-context-pre">' . esc_html( trim( $pretty_context, "'\"" ) ) . '</pre>' : esc_html( print_r( $item['context'], true ) );
+					$column_output     = $pretty_context
+						? sprintf(
+							'<pre data-json="%s" class="log-context-pre">%s</pre>',
+							esc_html( $un_pretty_context ),
+							esc_html( trim( $pretty_context, "'\"" ) )
+						)
+						/** phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r Is there a better option to print an array? */
+						: esc_html( print_r( $item['context'], true ) );
 				}
 				break;
 			case 'message':
@@ -188,9 +198,10 @@ class Logs_List_Table extends WP_List_Table {
 				break;
 		}
 
-		$logger_settings = $this->settings;
-		$logger          = $this->logger;
+		$logger_settings  = $this->settings;
+		$bh_wp_psr_logger = $this->logger;
 
+		$plugin_slug_bh_wp_logger_column = $this->settings->get_plugin_slug() . '_bh_wp_logger_column';
 		/**
 		 * Filter to modify what is printed for the column.
 		 * e.g. find and replace wc_order:123 with a link to the order.
@@ -198,10 +209,10 @@ class Logs_List_Table extends WP_List_Table {
 		 * @param string $column_output
 		 * @param array{time:string, level:string, message:string, context:array<string,mixed>} $item The log entry row.
 		 * @param string $column_name
-		 * @param Logger_Settings_Interface $settings
-		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
+		 * @param Logger_Settings_Interface $logger_settings
+		 * @param BH_WP_PSR_Logger|LoggerInterface $bh_wp_psr_logger
 		 */
-		$column_output = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_column', $column_output, $item, $column_name, $logger_settings, $logger );
+		$column_output = apply_filters( $plugin_slug_bh_wp_logger_column, $column_output, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
 
 		return $column_output;
 	}
@@ -218,10 +229,11 @@ class Logs_List_Table extends WP_List_Table {
 	public function replace_wp_user_id_with_link( string $message ): string {
 
 		$callback = function ( array $matches ): string {
+			/** @var array{0:string,1:numeric-string} $matches */
 
 			$user = get_user_by( 'ID', $matches[1] );
 
-			if ( $user instanceof \WP_User ) {
+			if ( $user instanceof WP_User ) {
 				// TODO: wpcs.
 				$url  = admin_url( "user-edit.php?user_id={$matches[1]}" );
 				$link = "<a href=\"{$url}\">{$user->user_nicename}</a>";
@@ -266,18 +278,30 @@ class Logs_List_Table extends WP_List_Table {
 			fn( WP_Post_Type $post_type ) => $post_type->show_ui
 		);
 
+		/** @param string[] $matches */
 		$callback = function ( array $matches ) use ( $post_types_with_ui ): string {
+			/** @var array{0:string,1:string,2:numeric-string} $matches} */
 
 			if ( ! isset( $post_types_with_ui[ $matches[1] ] ) ) {
 				return $matches[0];
 			}
 
-			$post_id        = $matches[2];
-			$post_type      = $post_types_with_ui[ $matches[1] ];
+			$post_id   = (int) $matches[2];
+			$post_type = $post_types_with_ui[ $matches[1] ];
+			/** @var string $post_type_name */
 			$post_type_name = $post_type->labels->singular_name;
 
-			$url  = get_edit_post_link( $post_id );
-			$link = "<a href=\"{$url}\">{$post_type_name} {$post_id}</a>";
+			$url = get_edit_post_link( $post_id );
+			if ( is_null( $url ) ) {
+				return $matches[0];
+			}
+
+			$link = sprintf(
+				'<a href="%s">%s %s</a>',
+				esc_url( $url, null, 'href' ),
+				$post_type_name,
+				$post_id,
+			);
 
 			return $link;
 		};
@@ -285,5 +309,16 @@ class Logs_List_Table extends WP_List_Table {
 		$message = preg_replace_callback( '/`(\w+):(\d+)`/', $callback, $column_output ) ?? $column_output;
 
 		return $message;
+	}
+
+	/**
+	 * Print message to when there are no items to display.
+	 *
+	 * We add a span here to add padding via CSS.
+	 */
+	public function no_items(): void {
+		echo '<span class="no-items-message">';
+		echo esc_html( __( 'No items found.' ) );
+		echo '</span>';
 	}
 }

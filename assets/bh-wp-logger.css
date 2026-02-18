@@ -7,6 +7,8 @@
     padding: 0;
 }
 
+/* The resizable columns JS removes any padding that may have been there. */
+.no-items-message { padding-left: 20px; }
 
 /* the td */
 .level.column-level {
