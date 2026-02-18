@@ -50,7 +50,7 @@ class Logs_Page {
 	 *
 	 * `Deprecated: strip_tags(): Passing null to parameter #1 ($string) of type string is deprecated in /.../wp-admin/admin-header.php on line 41`
 	 *
-	 * @hooked plugins_loaded
+	 * @hooked admin_init
 	 */
 	public function set_page_title(): void {
 		/**
@@ -70,8 +70,8 @@ class Logs_Page {
 		 *
 		 * phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited
 		 */
-		// global $title;
-		// $title = $this->settings->get_plugin_name() . ' Logs page';
+		global $title;
+		$title = $this->settings->get_plugin_name() . ' Logs page';
 	}
 
 	/**
