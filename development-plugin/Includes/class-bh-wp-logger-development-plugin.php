@@ -13,6 +13,7 @@ namespace BH_WP_Logger_Test_Plugin\WP_Includes;
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
 use BH_WP_Logger_Test_Plugin\Admin\Admin;
 use BH_WP_Logger_Test_Plugin\Admin\Admin_Ajax;
+use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -32,17 +33,14 @@ use Psr\Log\LoggerInterface;
 class BH_WP_Logger_Test_Plugin {
 
 	/**
-	 * Define the core functionality of the plugin.
+	 * Add actions and filters.
 	 *
-	 * Set the plugin name and the plugin version that can be used throughout the plugin.
-	 * Load the dependencies, define the locale, and set the hooks for the admin area and
-	 * the frontend-facing side of the site.
-	 *
-	 * @param LoggerInterface $logger The logger we're testing!
+	 * @param LoggerInterface           $logger The logger we're testing!
+	 * @param BH_Logger|LoggerInterface $logger The logger to log.
 	 */
 	public function __construct(
-		protected $settings,
-		protected BH_Logger $logger
+		protected Logger_Settings_Interface $settings,
+		protected BH_Logger|LoggerInterface $logger
 	) {
 
 		$this->define_admin_hooks();
@@ -52,7 +50,7 @@ class BH_WP_Logger_Test_Plugin {
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 */
-	protected function define_admin_hooks() {
+	protected function define_admin_hooks(): void {
 
 		$plugin_admin = new Admin( $this->settings, $this->logger );
 
