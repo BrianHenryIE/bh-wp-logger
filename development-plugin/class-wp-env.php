@@ -9,7 +9,7 @@
  *
  * @see https://github.com/WordPress/gutenberg/issues/20569
  *
- * @package brianhenryie/bh-wp-plugin-updater
+ * @package brianhenryie/bh-wp-logger
  */
 
 namespace BH_WP_Logger_Test_Plugin;
