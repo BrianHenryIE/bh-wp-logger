@@ -201,7 +201,7 @@ class Logs_List_Table extends WP_List_Table {
 		$logger_settings  = $this->settings;
 		$bh_wp_psr_logger = $this->logger;
 
-		$plugin_slug_bh_wp_logger_column = $this->settings->get_plugin_slug() . '_bh_wp_logger_column';
+		$plugin_slug = $this->settings->get_plugin_slug();
 		/**
 		 * Filter to modify what is printed for the column.
 		 * e.g. find and replace wc_order:123 with a link to the order.
@@ -212,7 +212,7 @@ class Logs_List_Table extends WP_List_Table {
 		 * @param Logger_Settings_Interface $logger_settings
 		 * @param BH_WP_PSR_Logger|LoggerInterface $bh_wp_psr_logger
 		 */
-		$column_output = apply_filters( $plugin_slug_bh_wp_logger_column, $column_output, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
+		$column_output = apply_filters( "{$plugin_slug}_bh_wp_logger_column", $column_output, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
 
 		return $column_output;
 	}
