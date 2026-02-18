@@ -29,7 +29,6 @@ namespace BH_WP_Logger_Test_Plugin;
 use Alley_Interactive\Autoloader\Autoloader;
 use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\Logger;
-use Exception;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -69,7 +68,11 @@ function run_closure_in_plugin( callable $closure ): void {
 	$closure();
 }
 
+
 add_filter(
 	'plugins_url',
 	fn( string $url ) => str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url )
 );
+
+// `wp-env` fixes.
+( new WP_Env() )->register_hooks();
