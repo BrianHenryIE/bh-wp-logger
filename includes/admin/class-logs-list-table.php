@@ -318,7 +318,7 @@ class Logs_List_Table extends WP_List_Table {
 	 */
 	public function no_items(): void {
 		echo '<span class="no-items-message">';
-		echo esc_html( __( 'No items found.' ) );
+		echo esc_html( __( 'No items found.', 'bh-wp-logger' ) );
 		echo '</span>';
 	}
 }
