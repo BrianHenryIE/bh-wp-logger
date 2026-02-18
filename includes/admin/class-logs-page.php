@@ -15,12 +15,15 @@ namespace BrianHenryIE\WP_Logger\Admin;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
 /**
  * Functions for registering a "hidden menu" item, to add the wp-admin page to display the logs.
+ *
+ * @see Plugin_Logger_Actions::add_admin_ui_logs_page_hooks()
  *
  * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
  */
@@ -31,7 +34,7 @@ class Logs_Page {
 	 * Logs_Page constructor.
 	 *
 	 * @param API_Interface             $api The main functions of the logger. Used to get the list of log files. Needed to instantiate the table.
-	 * @param Logger_Settings_Interface $settings The configuration used to set up the logger. The logger settings. i.e. what is the plugin slug this logger is for?
+	 * @param Logger_Settings_Interface $settings The configuration used to set up the logger. The logger settings. i.e. what is the plugin slug this logger is for.
 	 * @param ?BH_WP_PSR_Logger         $logger The logger itself, for logging.
 	 */
 	public function __construct(
@@ -40,6 +43,30 @@ class Logs_Page {
 		?BH_WP_PSR_Logger $logger = null
 	) {
 		$this->setLogger( $logger ?? new NullLogger() );
+	}
+
+	/**
+	 * Set the `global $title` before it is used to avoid a null error.
+	 *
+	 * `Deprecated: strip_tags(): Passing null to parameter #1 ($string) of type string is deprecated in /.../wp-admin/admin-header.php on line 41`
+	 *
+	 * @hooked plugins_loaded
+	 */
+	public function set_page_title(): void {
+		/**
+		 * Data is never written.
+		 * phpcs:disable WordPress.Security.NonceVerification.Recommended
+		 */
+		if (
+			! isset( $_REQUEST['page'] )
+			|| ! is_string( $_REQUEST['page'] )
+			|| $this->settings->get_plugin_slug() . '-logs' !== sanitize_key( wp_unslash( $_REQUEST['page'] ) )
+		) {
+			return;
+		}
+
+		global $title;
+		$title = $this->settings->get_plugin_name() . ' Logs page';
 	}
 
 	/**
@@ -56,6 +83,7 @@ class Logs_Page {
 
 		$parent_slug = '';
 
+		/** @var array<int,string[]> $menu */
 		global $menu;
 		foreach ( $menu as $menu_item ) {
 			if ( stristr( $menu_item[0], 'logs' ) || stristr( $menu_item[2], 'logs' ) || stristr( $menu_item[3], 'logs' ) ) {
@@ -109,7 +137,7 @@ class Logs_Page {
 		echo '<select name="log_date" id="log_date">';
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$chosen_date = isset( $_GET['log_date'] ) ? sanitize_key( $_GET['log_date'] ) : array_key_last( $log_files );
+		$chosen_date = isset( $_GET['log_date'] ) && is_string( $_GET['log_date'] ) ? sanitize_key( $_GET['log_date'] ) : array_key_last( $log_files );
 
 		// Maybe should use set file?
 		$logs_table->set_date( $chosen_date );
