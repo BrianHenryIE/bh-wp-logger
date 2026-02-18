@@ -27,19 +27,20 @@
 namespace BH_WP_Logger_Test_Plugin;
 
 use Alley_Interactive\Autoloader\Autoloader;
-use BH_WP_Logger_Test_Plugin\WP_Includes\BH_WP_Logger_Test_Plugin;
 use BrianHenryIE\WP_Logger\Logger;
-use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
-use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
-use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
-use Psr\Log\LogLevel;
+use Exception;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+if ( file_exists( __DIR__ . '/../vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+	throw new Exception( 'autoload is not at ../vendor/autoload.php' );
+}
+
 
 Autoloader::generate(
 	__NAMESPACE__,
@@ -53,26 +54,10 @@ Autoloader::generate(
  */
 define( 'BH_WP_LOGGER_TEST_PLUGIN_VERSION', '1.0.0' );
 
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
-function instantiate_bh_wp_logger_test_plugin() {
 
-	$logger_settings = new Development_Plugin_Settings();
+$logger_settings = new Development_Plugin_Settings();
+$logger          = Logger::instance( $logger_settings );
 
-	$logger = Logger::instance( $logger_settings );
-
-	$plugin = new BH_WP_Logger_Test_Plugin( $logger_settings, $logger );
-
-	return $plugin;
-}
-$GLOBALS['bh_wp_logger_test_plugin'] = instantiate_bh_wp_logger_test_plugin();
 
 /**
  * Pass in a closure to be executed, so the backtrace will contain the plugin.
