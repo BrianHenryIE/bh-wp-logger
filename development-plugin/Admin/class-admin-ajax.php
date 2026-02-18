@@ -7,6 +7,7 @@
 
 namespace BH_WP_Logger_Test_Plugin\Admin;
 
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -17,6 +18,7 @@ use Psr\Log\LoggerInterface;
  * @package BH_WP_Logger_Test_Plugin\admin
  */
 class Admin_Ajax {
+	use LoggerAwareTrait;
 
 	/**
 	 * Admin_Ajax constructor.
