@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\PHP;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use function Patchwork\redefine;
@@ -10,16 +11,7 @@ use function Patchwork\redefine;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\PHP\PHP_Shutdown_Handler
  */
-class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
-
-	protected function setup(): void {
-		\WP_Mock::setUp();
-	}
-
-	protected function tearDown(): void {
-		\WP_Mock::tearDown();
-		\Patchwork\restoreAll();
-	}
+class PHP_Shutdown_Handler_Unit_Test extends Unit_Testcase {
 
 	/**
 	 * @covers ::__construct
@@ -28,7 +20,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new PHP_Shutdown_Handler( $api, $settings, $logger );
 
@@ -42,7 +34,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new PHP_Shutdown_Handler( $api, $settings, $logger );
 
@@ -68,7 +60,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new PHP_Shutdown_Handler( $api, $settings, $logger );
 
@@ -92,7 +84,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new PHP_Shutdown_Handler( $api, $settings, $logger );
 
@@ -119,7 +111,7 @@ class PHP_Shutdown_Handler_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 
 		$sut = new PHP_Shutdown_Handler( $api, $settings, $logger );
 

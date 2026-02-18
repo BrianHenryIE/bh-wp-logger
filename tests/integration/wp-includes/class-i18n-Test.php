@@ -8,11 +8,13 @@
 
 namespace BH_WP_Logger\WP_Includes;
 
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
+
 /**
  * @coversNothing
  * @see I18n
  */
-class BH_WP_Logger_I18n_Test extends \Codeception\TestCase\WPTestCase {
+class BH_WP_Logger_I18n_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 	/**
 	 * AFAICT, this will fail until a translation has been added.

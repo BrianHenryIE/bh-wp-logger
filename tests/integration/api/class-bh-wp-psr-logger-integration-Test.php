@@ -2,12 +2,14 @@
 
 namespace BrianHenryIE\WP_Logger\API;
 
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
+
 use BrianHenryIE\WP_Logger\Logger;
 
 /**
  * @coversNothing
  */
-class BH_WP_PSR_Logger_Integration_Test extends \Codeception\TestCase\WPTestCase {
+class BH_WP_PSR_Logger_Integration_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 	/**
 	 * The backtrace was starting from inside the logger, naturally, so exclude the first few backtrace entries

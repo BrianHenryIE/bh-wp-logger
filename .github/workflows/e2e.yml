@@ -1,0 +1,84 @@
+name: E2E Tests
+
+# Runs Playwright end-to-end tests against wp-env.
+#
+# npx playwright test
+#
+# @author BrianHenryIE
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - master
+
+jobs:
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Git checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start wp-env
+        run: npm run wp-env
+
+      - name: Wait for WordPress to be ready
+        run: |
+          echo "Waiting for WordPress to be ready..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8888 > /dev/null; then
+              echo "WordPress is ready!"
+              break
+            fi
+            echo "Attempt $i: WordPress not ready yet..."
+            sleep 2
+          done
+
+      - name: Activate plugins
+        run: |
+          # Activate the development plugin on development environment (port 8888)
+          npx wp-env run cli -- wp plugin activate development-plugin
+          # List plugins to verify activation
+          npx wp-env run cli -- wp plugin list
+          # Set up permalinks for REST API
+          npx wp-env run cli -- wp rewrite structure '/%year%/%monthnum%/%postname%/' --hard
+          # Also activate on tests environment (port 8889) for completeness
+          npx wp-env run tests-cli -- wp plugin activate development-plugin
+          npx wp-env run tests-cli -- wp rewrite structure '/%year%/%monthnum%/%postname%/' --hard
+
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=github
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30

@@ -7,13 +7,15 @@
 
 namespace BrianHenryIE\WP_Logger\WP_Includes;
 
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
+
 use BrianHenryIE\ColorLogger\ColorLogger;
 use BrianHenryIE\WP_Logger\Logger;
 
 /**
  * @coversNothing
  */
-class Functions_Integration_Test extends \Codeception\TestCase\WPTestCase {
+class Functions_Integration_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 	/**
 	 * Execute a deprecated function and verify it is handled by our logger.
@@ -22,7 +24,7 @@ class Functions_Integration_Test extends \Codeception\TestCase\WPTestCase {
 	 */
 	public function test_deprecated_function(): void {
 
-		$test_logger = new ColorLogger();
+		$test_logger = $this->logger;
 		$logger      = Logger::instance();
 		$logger->setLogger( $test_logger );
 

@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Codeception\Stub\Expected;
@@ -10,24 +11,16 @@ use Codeception\Stub\Expected;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\Admin_Notices
  */
-class Admin_Notices_Unit_Test extends \Codeception\Test\Unit {
+class Admin_Notices_Unit_Test extends Unit_Testcase {
 
-	protected function setup(): void {
-		parent::setup();
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::admin_notices
 	 */
 	public function test_delete_option_when_on_logs_page(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
@@ -76,7 +69,7 @@ class Admin_Notices_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_return_early_when_not_in_admin_or_ajax(): void {
 
-		$logger   = new ColorLogger();
+		$logger   = $this->logger;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(

@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\WP_Includes;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\Admin\AJAX;
 use BrianHenryIE\WP_Logger\Admin\Plugin_Installer;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
@@ -17,16 +18,9 @@ use WP_Mock\Matcher\AnyInstance;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions
  */
-class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
+class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 
-	protected function setup(): void {
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::_tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::__construct
@@ -48,7 +42,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectFilterAdded(
 			"plugin_action_links_{$basename}",
-			array( new AnyInstance( Plugins_Page::class ), 'add_logs_action_link' ),
+			array( \WP_Mock\Functions::type( Plugins_Page::class ), 'add_logs_action_link' ),
 			99,
 			4
 		);
@@ -74,7 +68,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectFilterAdded(
 			'install_plugin_complete_actions',
-			array( new AnyInstance( Plugin_Installer::class ), 'add_logs_link' ),
+			array( \WP_Mock\Functions::type( Plugin_Installer::class ), 'add_logs_link' ),
 			99,
 			3
 		);
@@ -90,9 +84,23 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 	 */
 	public function test_add_error_handler_hooks(): void {
 
+		// $this->markTestSkipped('This appears correct but isn\'t passing');
+
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		// \WP_Mock::expectActionAdded(
+		// 'plugins_loaded',
+		// array( \WP_Mock\Functions::type( PHP_Error_Handler::class ), 'init' ),
+		// 2
+		// );
+		//
+		// \WP_Mock::expectActionAdded(
+		// 'plugins_loaded',
+		// array( \WP_Mock\Functions::type( PHP_Shutdown_Handler::class ), 'init' ),
+		// 2
+		// );
 
 		\WP_Mock::expectActionAdded(
 			'plugins_loaded',
@@ -116,28 +124,28 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectActionAdded(
 			'deprecated_function_run',
-			array( new AnyInstance( Functions::class ), 'log_deprecated_functions_only_once_per_day' ),
+			array( \WP_Mock\Functions::type( Functions::class ), 'log_deprecated_functions_only_once_per_day' ),
 			10,
 			3
 		);
 
 		\WP_Mock::expectActionAdded(
 			'deprecated_argument_run',
-			array( new AnyInstance( Functions::class ), 'log_deprecated_arguments_only_once_per_day' ),
+			array( \WP_Mock\Functions::type( Functions::class ), 'log_deprecated_arguments_only_once_per_day' ),
 			10,
 			3
 		);
 
 		\WP_Mock::expectActionAdded(
 			'doing_it_wrong_run',
-			array( new AnyInstance( Functions::class ), 'log_doing_it_wrong_only_once_per_day' ),
+			array( \WP_Mock\Functions::type( Functions::class ), 'log_doing_it_wrong_only_once_per_day' ),
 			10,
 			3
 		);
 
 		\WP_Mock::expectActionAdded(
 			'deprecated_hook_run',
-			array( new AnyInstance( Functions::class ), 'log_deprecated_hook_only_once_per_day' ),
+			array( \WP_Mock\Functions::type( Functions::class ), 'log_deprecated_hook_only_once_per_day' ),
 			10,
 			4
 		);
@@ -160,11 +168,11 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectActionAdded(
 			'init',
-			array( new AnyInstance( Cron::class ), 'register_delete_logs_cron_job' )
+			array( \WP_Mock\Functions::type( Cron::class ), 'register_delete_logs_cron_job' )
 		);
 		\WP_Mock::expectActionAdded(
 			'delete_logs_plugin-slug',
-			array( new AnyInstance( Cron::class ), 'delete_old_logs' )
+			array( \WP_Mock\Functions::type( Cron::class ), 'delete_old_logs' )
 		);
 
 		$api      = $this->makeEmpty( API_Interface::class );
@@ -187,7 +195,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectFilterAdded(
 			'bh_wp_private_uploads_url_is_public_warning_plugin-slug_logger',
-			array( new AnyInstance( URL_Is_Public::class ), 'change_warning_message' ),
+			array( \WP_Mock\Functions::type( URL_Is_Public::class ), 'change_warning_message' ),
 			10,
 			2
 		);
@@ -212,7 +220,7 @@ class Plugin_Logger_Actions_Unit_Test extends \Codeception\Test\Unit {
 
 		\WP_Mock::expectActionAdded(
 			'init',
-			array( new AnyInstance( Init::class ), 'maybe_download_log' )
+			array( \WP_Mock\Functions::type( Init::class ), 'maybe_download_log' )
 		);
 
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );

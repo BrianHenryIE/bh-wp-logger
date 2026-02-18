@@ -2,7 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\WP_Includes;
 
-use BrianHenryIE\ColorLogger\ColorLogger;
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
@@ -13,16 +14,9 @@ use Codeception\Stub\Expected;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Cron
  */
-class Cron_Unit_Test extends \Codeception\Test\Unit {
+class Cron_Unit_Test extends Unit_Testcase {
 
-	protected function setUp(): void {
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::__construct
@@ -165,7 +159,7 @@ class Cron_Unit_Test extends \Codeception\Test\Unit {
 			)
 		);
 		$settings     = $this->makeEmpty( Logger_Settings_Interface::class );
-		$color_logger = new ColorLogger();
+		$color_logger = $this->logger;
 
 		$logger = $this->makeEmpty(
 			BH_WP_PSR_Logger::class,

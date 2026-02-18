@@ -8,12 +8,14 @@
 
 namespace BH_WP_Logger_Test_Plugin\WP_Includes;
 
+use BrianHenryIE\WP_Logger\WPUnit_Testcase;
+
 use BH_WP_Logger_Test_Plugin\Admin\Admin;
 
 /**
  * @coversNothing
  */
-class BH_WP_Logger_Integration_Test extends \Codeception\TestCase\WPTestCase {
+class BH_WP_Logger_Integration_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 	/**
 	 * Verify admin_enqueue_scripts action is correctly added for styles, at priority 10.

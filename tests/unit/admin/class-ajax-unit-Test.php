@@ -2,6 +2,8 @@
 
 namespace BrianHenryIE\WP_Logger\Admin;
 
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Codeception\Stub\Expected;
@@ -9,17 +11,9 @@ use Codeception\Stub\Expected;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Admin\AJAX
  */
-class AJAX_Unit_Test extends \Codeception\Test\Unit {
+class AJAX_Unit_Test extends Unit_Testcase {
 
-	protected function setup(): void {
-		parent::setup();
-		\WP_Mock::setUp();
-	}
 
-	protected function tearDown(): void {
-		parent::tearDown();
-		\WP_Mock::tearDown();
-	}
 
 	/**
 	 * @covers ::delete_all

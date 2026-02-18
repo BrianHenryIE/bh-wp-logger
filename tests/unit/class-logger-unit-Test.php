@@ -9,16 +9,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Logger
  */
-class Logger_Unit_Test extends \Codeception\Test\Unit {
-
-	protected function setup(): void {
-		\WP_Mock::setUp();
-	}
-
-	protected function tearDown(): void {
-		\WP_Mock::tearDown();
-		\Patchwork\restoreAll();
-	}
+class Logger_Unit_Test extends Unit_Testcase {
 
 	/**
 	 * @covers ::instance

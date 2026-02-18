@@ -2,12 +2,14 @@
 
 namespace BrianHenryIE\WP_Logger\Private_Uploads;
 
+use BrianHenryIE\WP_Logger\Unit_Testcase;
+
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\Private_Uploads\URL_Is_Public
  */
-class URL_Is_Public_Unit_Test extends \Codeception\Test\Unit {
+class URL_Is_Public_Unit_Test extends Unit_Testcase {
 
 	/**
 	 * @covers ::change_warning_message
