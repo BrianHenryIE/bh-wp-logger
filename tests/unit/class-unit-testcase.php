@@ -17,7 +17,7 @@ class Unit_Testcase extends \Codeception\Test\Unit {
 	}
 
 	protected function tearDown(): void {
-		parent::_tearDown();
+		parent::tearDown();
 		WP_Mock::tearDown();
 		\Patchwork\restoreAll();
 	}
