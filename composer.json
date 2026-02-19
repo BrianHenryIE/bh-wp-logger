@@ -55,6 +55,7 @@
     },
     "require": {
         "php": ">=8.0",
+        "ext-curl": "*",
         "ext-json": "*",
         "brianhenryie/bh-wp-private-uploads": "^0.2",
         "brianhenryie/bh-wc-logger": "^0.1.0",

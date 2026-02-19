@@ -6,8 +6,14 @@ parameters:
     scanDirectories:
         - wp-content/plugins
         - vendor/wp-cli
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#LoggerInterface\|null#'
         - '#Function apply_filters invoked with \d+ parameters, \d+ required.#'
         - '#Parameter \#2 \$callback of static method WP_Mock::expect.*Added\(\) expects callable\(\): mixed, array.*given\.#'
         - '#Variable \$log_data in empty\(\) always exists and is not falsy#'
+        - # PHPStan doesn't associate trait PHPDoc with members when analysing in anonymous class context.
+          # Property BrianHenryIE\WP_Logger\Logger_Settings_Interface@anonymous/class-logger.php:60::$log_levels type has no value type specified in iterable type array.
+          # Method BrianHenryIE\WP_Logger\Logger_Settings_Interface@anonymous/class-logger.php:60::get_log_levels() return type has no value type specified in iterable type array.
+          message: '#log_levels.* type has no value type specified#'
+          path: includes/trait-logger-settings-trait.php

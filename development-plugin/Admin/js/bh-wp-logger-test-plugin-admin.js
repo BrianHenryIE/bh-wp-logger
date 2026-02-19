@@ -11,7 +11,8 @@
 
 			var data = {
 				'action': 'log',
-				'log-test-action': event.target.name
+				'log-test-action': event.target.name,
+				'_wpnonce': bh_wp_logger_development_plugin.__wp_nonce
 			};
 
 			let message = document.getElementById('log_message').value;

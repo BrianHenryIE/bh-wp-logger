@@ -7,6 +7,7 @@
 
 namespace BH_WP_Logger_Test_Plugin\Admin;
 
+use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use wpdb;
@@ -35,9 +36,7 @@ class Admin_Ajax {
 	/**
 	 * @hooked wp_ajax_log
 	 *
-	 * No need for a nonce in a development plugin.
-	 *
-	 * phpcs:disable WordPress.Security.NonceVerification.Missing
+	 * @throws Exception When `missing-log-test-action` = "uncaught-exception" in order to test the behaviour when the exception is not caught.
 	 */
 	public function handle_request(): void {
 
@@ -45,18 +44,9 @@ class Admin_Ajax {
 		$result['error']   = array();
 		$result['success'] = array();
 
-		// if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'logs-test' ) ) {
-		//
-		// $result['error']['nonce-failed'] ='<em>Nonce verification failed.</em> Try reloading the page.';
-		//
-		// TODO: Should not return HTTP status 200? ... 403.
-		// wp_send_json( $result, 403 );
-		//
-		// }
+		check_ajax_referer( 'logs-test' );
 
-		// Validate input.
-
-		if ( ! isset( $_POST['log-test-action'] ) || empty( $_POST['log-test-action'] ) ) {
+		if ( empty( $_POST['log-test-action'] ) ) {
 			$result['error']['missing-log-test-action'] = 'Missing log-test-action parameter.';
 
 		} else {
@@ -106,7 +96,7 @@ class Admin_Ajax {
 					_deprecated_hook( 'hook_name', 'version', 'replacement', 'message' );
 					break;
 				case 'uncaught-exception':
-					throw new \Exception( 'log test exception' );
+					throw new Exception( 'log test exception' );
 				case 'delete-transients':
 					/** @var wpdb $wpdb */
 					global $wpdb;
@@ -117,8 +107,7 @@ class Admin_Ajax {
 					 * phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
 					 * phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
 					 */
-					$result = $wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"' );
-					$result = array();
+					$result['success']['deleted_transient_count'] = $wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"' );
 					break;
 				default:
 					$result['error']['unknown-log-test-action'] = 'Unknown log-test-action parameter.';
