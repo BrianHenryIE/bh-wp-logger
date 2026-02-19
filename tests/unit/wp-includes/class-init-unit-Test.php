@@ -67,11 +67,8 @@ class Init_Unit_Test extends Unit_Testcase {
 		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-bad-nonce';
 
-		try {
-			$init->maybe_download_log();
-		}catch ( Exception $e ) {
-
-		}
+		$this->expectException( Exception::class );
+		$init->maybe_download_log();
 
 		$this->assertTrue( $logger->hasWarning( 'Bad nonce when downloading log.' ) );
 	}

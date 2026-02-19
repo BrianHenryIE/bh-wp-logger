@@ -9,6 +9,7 @@ namespace BH_WP_Logger_Test_Plugin\Admin;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use wpdb;
 
 /**
  * phpcs:disable WordPress.PHP.DevelopmentFunctions
@@ -33,8 +34,12 @@ class Admin_Ajax {
 
 	/**
 	 * @hooked wp_ajax_log
+	 *
+	 * No need for a nonce in a development plugin.
+	 *
+	 * phpcs:disable WordPress.Security.NonceVerification.Missing
 	 */
-	public function handle_request() {
+	public function handle_request(): void {
 
 		$result            = array();
 		$result['error']   = array();
@@ -103,7 +108,15 @@ class Admin_Ajax {
 				case 'uncaught-exception':
 					throw new \Exception( 'log test exception' );
 				case 'delete-transients':
+					/** @var wpdb $wpdb */
 					global $wpdb;
+					/**
+					 * No sense caching a DELETE.
+					 * There is no wpdb method we could use instead.
+					 *
+					 * phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+					 * phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+					 */
 					$result = $wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"' );
 					$result = array();
 					break;

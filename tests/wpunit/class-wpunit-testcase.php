@@ -5,13 +5,14 @@ namespace BrianHenryIE\WP_Logger;
 use BrianHenryIE\ColorLogger\ColorLogger;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\Test\TestLogger;
 
 class WPUnit_Testcase extends WPTestCase {
 
 	/**
-	 * @var LoggerInterface|TestLogger $logger
+	 * @var LoggerInterface|TestLogger|ColorLogger $logger
 	 */
-	protected LoggerInterface $logger;
+	protected TestLogger $logger;
 
 	protected function setUp(): void {
 		parent::setUp();

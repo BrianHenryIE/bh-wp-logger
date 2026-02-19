@@ -15,6 +15,7 @@ use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use BrianHenryIE\WP_Logger\Logger as BH_Logger;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
+use Psr\Log\LoggerInterface;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -24,9 +25,15 @@ use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
  */
 class Admin {
 
+	/**
+	 * Constructor
+	 *
+	 * @param Logger_Settings_Interface $logger_settings Config.
+	 * @param LoggerInterface           $logger A logger to record our own problems.
+	 */
 	public function __construct(
 		protected Logger_Settings_Interface $logger_settings,
-		protected BH_Logger $logger
+		protected LoggerInterface $logger
 	) {
 	}
 
@@ -35,7 +42,7 @@ class Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles(): void {
 
 		$version = time();
 
@@ -49,7 +56,7 @@ class Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts(): void {
 
 		$version = time();
 
@@ -63,7 +70,7 @@ class Admin {
 	 *
 	 * @hooked admin_menu
 	 */
-	public function add_page() {
+	public function add_page(): void {
 
 		$icon_url = 'dashicons-text-page';
 
@@ -81,7 +88,7 @@ class Admin {
 	/**
 	 * Registered in @see add_page()
 	 */
-	public function display_page() {
+	public function display_page(): void {
 
 		$plugin_log_level = $this->logger_settings->get_log_level();
 
