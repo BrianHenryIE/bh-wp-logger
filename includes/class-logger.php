@@ -85,9 +85,18 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 */
 	public function __construct( Logger_Settings_Interface $settings ) {
 
-		if ( $settings instanceof WooCommerce_Logger_Settings_Interface
-			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) ), true ) ) {
-			// Does not use `is_plugin_active()` here because "Call to undefined function" error (maybe an admin function).
+		/**
+		 * We are not using {@see is_plugin_active()} here because "Call to undefined function" error (it may be an admin function).
+		 *
+		 * @param string $plugin_basename The main plugin file's path relative to WP_PLUGIN_DIR.
+		 */
+		$is_plugin_active = function ( string $plugin_basename ): bool {
+			/** @var array<int,string> $active_plugins */
+			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) );
+			return in_array( $plugin_basename, $active_plugins, true );
+		};
+
+		if ( $settings instanceof WooCommerce_Logger_Settings_Interface && $is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 
 			$logger = new WC_PSR_Logger( $settings );
 
