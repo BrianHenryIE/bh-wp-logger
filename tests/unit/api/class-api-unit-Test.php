@@ -41,7 +41,7 @@ class API_Unit_Test extends Unit_Testcase {
 		$simple_log_file = $project_root_dir . '/tests/_data/simple-log-8-lines.log';
 
 		if ( ! file_exists( $simple_log_file ) ) {
-			self::markTestSkipped( 'Test data file not found at: ' . $simple_log_file );
+			$this->markTestSkipped( 'Test data file not found at: ' . $simple_log_file );
 		}
 
 		$logger   = $this->logger;
@@ -67,7 +67,7 @@ class API_Unit_Test extends Unit_Testcase {
 		$multiline_message_log_file = $project_root_dir . '/tests/_data/context-not-rendering.log';
 
 		if ( ! file_exists( $multiline_message_log_file ) ) {
-			self::markTestSkipped( 'Test data file not found at: ' . $multiline_message_log_file );
+			$this->markTestSkipped( 'Test data file not found at: ' . $multiline_message_log_file );
 		}
 
 		$logger   = $this->logger;
