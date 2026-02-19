@@ -59,7 +59,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 			}
 		};
 
-		$this->assertEquals( 'none', $sut->get_log_level() );
+		$this->assertEquals( 'info', $sut->get_log_level() );
 	}
 
 	/**
