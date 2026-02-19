@@ -42,7 +42,7 @@ class Init {
 	 * Return if plugin slug does not match or if date is malformed.
 	 * Invoke `send_private_file()` to download the file.
 	 *
-	 * This is really only needed when WooCommerce logger is being used because it store the log files in
+	 * This is really only needed when WooCommerce logger is being used because it stores the log files in
 	 * `/uploads/wc-logs` which has a `.htaccess` preventing downloads.
 	 *
 	 * @hooked init
@@ -56,7 +56,6 @@ class Init {
 		if ( false === check_admin_referer( 'bh-wp-logger-download' ) ) {
 			$this->logger->warning( 'Bad nonce when downloading log.' );
 			wp_die();
-			return; // Needed for tests. @phpstan-ignore-line.
 		}
 
 		if ( 'true' !== sanitize_text_field( wp_unslash( $_GET['download-log'] ) ) ) {
@@ -111,7 +110,7 @@ class Init {
 		$mimetype = $mime['type'];
 		if ( ! $mimetype && function_exists( 'mime_content_type' ) ) {
 
-			$mimetype = mime_content_type( $filepath );  // Use ext-fileinfo to look inside the file.
+			$mimetype = mime_content_type( $filepath );  // Use `ext-fileinfo` to look inside the file.
 		}
 		if ( ! $mimetype ) {
 			$mimetype = 'application/octet-stream';

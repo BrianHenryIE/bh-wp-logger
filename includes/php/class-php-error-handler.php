@@ -59,8 +59,7 @@ class PHP_Error_Handler {
 
         // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 		$this->previous_error_handler = set_error_handler(
-			array( $this, 'plugin_error_handler' ),
-			E_ALL
+			array( $this, 'plugin_error_handler' )
 		);
 	}
 
@@ -69,15 +68,19 @@ class PHP_Error_Handler {
 	 *
 	 * @see set_error_handler()
 	 *
-	 * @param int    $errno The error code (the level of the error raised, as an integer).
-	 * @param string $errstr A string describing the error.
-	 * @param string $errfile The filename in which the error occurred.
-	 * @param int    $errline The line number in which the error occurred.
+	 * @param int    $errno [errno] The error code (the level of the error raised, as an integer).
+	 * @param string $errstr [errstr] A string describing the error.
+	 * @param string $errfile [errfile] The filename in which the error occurred.
+	 * @param int    $errline [errline] The line number in which the error occurred.
 	 *
 	 * @return bool True if error had been handled and no more handling to do, false to pass the error on.
 	 */
 	public function plugin_error_handler( int $errno, string $errstr, string $errfile, int $errline ) {
 
+		/**
+		 * The `set_error_handler()` has been called with a different number of functions in different PHP versions
+		 * so rather than passing the values one-by-one, we'll pass them as they were passed to this method.
+		 */
 		$func_args = func_get_args();
 
 		$plugin_related_error = $this->is_related_error( $errno, $errstr, $errfile, $errline );

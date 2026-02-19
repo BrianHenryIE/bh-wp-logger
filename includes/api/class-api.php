@@ -21,7 +21,6 @@ use DateTimeZone;
 use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use stdClass;
 use WP_Filesystem_Base;
 
@@ -59,7 +58,7 @@ class API implements API_Interface {
 	 * allows setting the logger after instantiation.
 	 *
 	 * @param Logger_Settings_Interface $settings The settings provided by the plugin to instantiate the logger. Needed for the plugin slug to link correctly.
-	 * @param ?LoggerInterface          $logger A PSR logger, presumably later a BH_WP_PSR_Logger.
+	 * @param LoggerInterface           $logger A PSR logger, presumably later a BH_WP_PSR_Logger.
 	 */
 	public function __construct(
 		protected Logger_Settings_Interface $settings,

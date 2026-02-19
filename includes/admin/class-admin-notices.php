@@ -10,6 +10,7 @@ namespace BrianHenryIE\WP_Logger\Admin;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use DateTimeImmutable;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WPTRT\AdminNotices\Notices;
@@ -30,12 +31,12 @@ class Admin_Notices extends Notices {
 	/**
 	 * @param API_Interface             $api The main functions.
 	 * @param Logger_Settings_Interface $settings The configured settings.
-	 * @param ?LoggerInterface          $logger PSR logger for recording errors that happen within this class.
+	 * @param LoggerInterface           $logger PSR logger for recording errors that happen within this class.
 	 */
 	public function __construct(
 		protected API_Interface $api,
 		protected Logger_Settings_Interface $settings,
-		LoggerInterface $logger = null
+		LoggerInterface $logger
 	) {
 		$this->setLogger( $logger );
 	}
@@ -145,7 +146,7 @@ class Admin_Notices extends Notices {
 			if ( '+00:00' !== wp_timezone()->getName() ) {
 
 				$content .= ' (';
-				$content .= ( new \DateTimeImmutable( "@{$error_time}" ) )->setTimezone( wp_timezone() )->format( 'Y-m-d H:i:s' );
+				$content .= ( new DateTimeImmutable( "@{$error_time}" ) )->setTimezone( wp_timezone() )->format( 'Y-m-d H:i:s' );
 				$content .= ' ' . wp_timezone()->getName() . ')';
 			}
 

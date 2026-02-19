@@ -7,6 +7,7 @@ use BrianHenryIE\WP_Logger\Unit_Testcase;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Codeception\Stub\Expected;
+use Exception;
 
 /**
  * @coversDefaultClass \BrianHenryIE\WP_Logger\WP_Includes\Init
@@ -53,8 +54,11 @@ class Init_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction(
 			'wp_die',
 			array(
-				'args'  => array(),
-				'times' => 1,
+				'args'   => array(),
+				'return' => function () {
+					throw new Exception();
+				},
+				'times'  => 1,
 			)
 		);
 
@@ -63,7 +67,11 @@ class Init_Unit_Test extends Unit_Testcase {
 		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-bad-nonce';
 
-		$init->maybe_download_log();
+		try {
+			$init->maybe_download_log();
+		}catch ( Exception $e ) {
+
+		}
 
 		$this->assertTrue( $logger->hasWarning( 'Bad nonce when downloading log.' ) );
 	}

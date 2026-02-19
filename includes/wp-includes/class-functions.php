@@ -19,7 +19,6 @@ use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * Intercepts WordPress's logging to prevent duplicate logs and to add detail.
@@ -39,7 +38,7 @@ class Functions {
 	 *
 	 * @param API_Interface             $api The logger's utility functions. Used to check the backtrace to see is it relevant to this plugin.
 	 * @param Logger_Settings_Interface $settings The logger settings. Not used here.
-	 * @param ?LoggerInterface          $logger PSR logger.
+	 * @param LoggerInterface           $logger PSR logger.
 	 */
 	public function __construct(
 		protected API_Interface $api,

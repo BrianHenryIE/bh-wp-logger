@@ -45,11 +45,12 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 * Ideally settings should be provided the first time the logger is instantiated, then they do not need
 	 * to be provided when accessing the singleton later on.
 	 *
+	 * @see Logger_Settings`
+	 * @see Plugins
+	 *
 	 * @param ?Logger_Settings_Interface $settings The loglevel, plugin name, slug, and basename.
 	 *
-	 * @return LoggerInterface|Logger
-	 * @see Logger_Settings
-	 * @see Plugins
+	 * @return LoggerInterface Ideally a {@see \BrianHenryIE\WP_Logger\Logger} but `NullLogger` sometimes.
 	 */
 	public static function instance( ?Logger_Settings_Interface $settings = null ): LoggerInterface {
 
@@ -78,8 +79,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 	/**
 	 * If log level is 'none', use NullLogger.
-	 * If Settings is WooCommerce_Logger_Settings_Interface use WC_Logger.
-	 * Otherwise use KLogger.
+	 * If Settings is WooCommerce_Logger_Settings_Interface use WC_Logger, otherwise use KLogger.
 	 *
 	 * @param Logger_Settings_Interface $settings Basic settings required for the logger.
 	 */
@@ -115,7 +115,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			 * Add the `{context}` template string,
 			 * then provide `'appendContext' => false` to Klogger (since it is already takes care of).
 			 *
-			 * @see \Katzgrau\KLogger\Logger::formatMessage()
+			 * @see KLogger::formatMessage()
 			 */
 			$log_format = "{date} {level} {message}\n{context}";
 

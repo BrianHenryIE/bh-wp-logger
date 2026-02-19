@@ -34,7 +34,7 @@ class Plugin_Installer {
 	 * @param object   $_api            Object containing WordPress.org API plugin data. Empty
 	 *                                  for non-API installs, such as when a plugin is installed
 	 *                                  via upload.
-	 * @param string   $plugin_file     Path to the plugin file relative to the plugins directory.
+	 * @param string   $plugin_file     Path to the plugin file relative to the plugins' directory.
 	 *
 	 * @return string[]
 	 */
