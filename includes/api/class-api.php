@@ -405,6 +405,11 @@ class API implements API_Interface {
 	 */
 	public function get_last_log_time(): ?DateTimeInterface {
 
+		// If a user can't access `plugins.php`, this method is moot.
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return null;
+		}
+
 		$transient_name = $this->get_last_log_time_transient_name();
 
 		$transient_value = get_transient( $transient_name );
@@ -462,7 +467,9 @@ class API implements API_Interface {
 		$last_log_view_time_atom_string = get_option( $option_name );
 
 		if ( ! is_string( $last_log_view_time_atom_string ) ) {
-			delete_option( $option_name );
+			if ( ! empty( $last_log_view_time_atom_string ) ) {
+				delete_option( $option_name );
+			}
 			return null;
 		}
 
@@ -495,6 +502,7 @@ class API implements API_Interface {
 			/**
 			 * This will never happen.
 			 */
+			return;
 		}
 
 		$atom_time_string = $date_time->format( DateTimeInterface::ATOM );

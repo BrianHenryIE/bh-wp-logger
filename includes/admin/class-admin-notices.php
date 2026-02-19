@@ -96,8 +96,7 @@ class Admin_Notices extends Notices {
 
 		// Check is the ajax request relevant.
 		if ( wp_doing_ajax() ) {
-
-			$action = 'wptrt_dismiss_notice_development-plugin-recent-error';
+			$action = "wptrt_dismiss_notice_{$this->settings->get_plugin_slug()}-recent-error";
 			if ( ! isset( $_POST['action'] )
 				|| ! is_string( $_POST['action'] )
 				|| 'wptrt_dismiss_notice' !== sanitize_key( wp_unslash( $_POST['action'] ) )
@@ -139,7 +138,11 @@ class Admin_Notices extends Notices {
 			$error_time = (int) $last_error['timestamp'];
 
 			$title   = '';
-			$content = "<strong>{$this->settings->get_plugin_name()}</strong>. Error: \"{$error_text}\" ";
+			$content = sprintf(
+				'<strong>%s</strong>. Error: "%s" ',
+				$this->settings->get_plugin_name(),
+				esc_html( $error_text )
+			);
 
 			$content .= ' at ' . gmdate( 'Y-m-d H:i:s', $error_time ) . ' UTC';
 
