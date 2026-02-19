@@ -22,6 +22,7 @@ use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use WP_Filesystem_Base;
 
 /**
  * BH_WP_PSR_Logger extends this, then Logger extends that.
@@ -178,7 +179,7 @@ class API implements API_Interface {
 			return $result;
 		}
 
-		unlink( $log_filepaths_by_date[ $ymd_date ] );
+		wp_delete_file( $log_filepaths_by_date[ $ymd_date ] );
 		$result['success'] = true;
 		$message           = 'Logfile deleted at ' . $log_filepaths_by_date[ $ymd_date ];
 		$result['message'] = $message;
@@ -204,7 +205,7 @@ class API implements API_Interface {
 		$log_filepaths_by_date = $this->get_log_files();
 
 		foreach ( $log_filepaths_by_date as $date => $log_filepath ) {
-			$deleted = unlink( $log_filepath );
+			$deleted = wp_delete_file( $log_filepath );
 			if ( $deleted ) {
 				$deleted_files[ $date ] = $log_filepath;
 			} else {
@@ -235,10 +236,10 @@ class API implements API_Interface {
 
 			if ( strtotime( $date ) < time() - MONTH_IN_SECONDS ) {
 				$this->logger->debug( 'deleting old log file ' . $log_filepath );
-				unlink( $log_filepath );
+				wp_delete_file( $log_filepath );
 			} elseif ( 0 === filesize( $log_filepath ) ) {
 				$this->logger->debug( 'deleting empty log file ' . $log_filepath );
-				unlink( $log_filepath );
+				wp_delete_file( $log_filepath );
 			}
 		}
 
@@ -252,7 +253,7 @@ class API implements API_Interface {
 	 * * call_user_func_array()
 	 * * function calls from other plugins using this same library (using filename).
 	 *
-	 * TODO: Check is WordPress's own backtrace a good replacement for Spatie.
+	 * TODO: Check is WordPress's own wp_debug_backtrace_summary a good replacement for Spatie.
 	 *
 	 * @param ?string $source_hash A unique identifier for the source of the log entry. Used to cache the backtrace. The backtrace will not be cached if this is absent.
 	 * @param ?int    $steps The number of backtrace entries to return.
@@ -388,12 +389,7 @@ class API implements API_Interface {
 	/**
 	 * Used on plugins.php to highlight the logs link if there are new logs since they were last viewed.
 	 *
-	 * Read the log file backwards from the last character. Each time a newline character is found, check the buffer
-	 * to see was there a data at the beginning of the line. Return the first date found.
-	 *
-	 * @see https://stackoverflow.com/a/15017711/336146
-	 *
-	 * @return ?DateTimeInterface
+	 * Saves the time in a 24-hour transient to avoid filesystem calls. The transient is deleted when the log is written to.
 	 */
 	public function get_last_log_time(): ?DateTimeInterface {
 
@@ -401,7 +397,7 @@ class API implements API_Interface {
 
 		$transient_value = get_transient( $transient_name );
 
-		if ( ! empty( $transient_value ) ) {
+		if ( is_string( $transient_value ) ) {
 			return new DateTimeImmutable( $transient_value, new DateTimeZone( 'UTC' ) );
 		}
 
@@ -409,35 +405,31 @@ class API implements API_Interface {
 
 		$reverse_chronological_log_files = array_reverse( $log_files );
 
+		/** @var WP_Filesystem_Base $wp_filesystem */
+		global $wp_filesystem;
+
+		if ( empty( $wp_filesystem ) ) {
+			WP_Filesystem();
+		}
+
 		foreach ( $reverse_chronological_log_files as $last_log_file_path ) {
 
-			$file_pointer = fopen( $last_log_file_path, 'r' );
-
-			if ( false === $file_pointer ) {
-				$this->logger->warning( "Failed opening log file at {$last_log_file_path}." );
+			if ( ! $wp_filesystem->exists( $last_log_file_path ) ) {
 				continue;
 			}
 
-			$offset_position = - 2;
+			$timestamp = $wp_filesystem->mtime( $last_log_file_path );
 
-			$current_line = '';
-
-			while ( - 1 !== fseek( $file_pointer, $offset_position, SEEK_END ) ) {
-				$character = fgetc( $file_pointer );
-				if ( PHP_EOL === $character ) {
-
-					if ( 1 === preg_match( '/^(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s/im', $current_line, $output_array ) ) {
-						set_transient( $transient_name, $output_array['time'], DAY_IN_SECONDS );
-						// Log time will always be UTC.
-						return new DateTimeImmutable( $output_array['time'], new DateTimeZone( 'UTC' ) );
-					}
-
-					$current_line = '';
-				} else {
-					$current_line = $character . $current_line;
-				}
-				--$offset_position;
+			if ( ! is_numeric( $timestamp ) ) {
+				continue;
 			}
+
+			$datetime = new DateTimeImmutable( "@{$timestamp}" );
+
+			set_transient( $transient_name, $datetime->format( DateTimeInterface::ATOM ), DAY_IN_SECONDS );
+
+			// Log time will always be UTC.
+			return $datetime;
 		}
 
 		return null;
