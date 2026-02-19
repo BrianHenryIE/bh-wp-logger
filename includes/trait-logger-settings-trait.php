@@ -19,6 +19,7 @@ namespace BrianHenryIE\WP_Logger;
 use BrianHenryIE\WP_Logger\WP_Includes\CLI;
 use Exception;
 use Psr\Log\LogLevel;
+use ReflectionClass;
 
 /**
  * Default function implementations for Logger_Settings_Interface.
@@ -32,15 +33,22 @@ trait Logger_Settings_Trait {
 	 *
 	 * Default is Info.
 	 * Looks for saved value in `get_option( 'my-plugin-slug_log_level' ).
-	 * Returns `none` when the plugin basename cannot be determined.
 	 *
 	 * @see LogLevel
 	 */
 	public function get_log_level(): string {
 		try {
-			return get_option( $this->get_plugin_slug() . '_log_level', LogLevel::INFO );
-		} catch ( \Exception ) {
-			return 'none';
+			$saved_option = get_option( $this->get_plugin_slug() . '_log_level' );
+			return is_string( $saved_option )
+					&& in_array(
+						$saved_option,
+						array_values( ( new ReflectionClass( LogLevel::class ) )->getConstants() ),
+						true
+					)
+					? $saved_option
+					: LogLevel::INFO;
+		} catch ( Exception ) {
+			return LogLevel::INFO;
 		}
 	}
 
