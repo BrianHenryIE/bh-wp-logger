@@ -22,10 +22,14 @@ use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use stdClass;
 use WP_Filesystem_Base;
 
 /**
  * BH_WP_PSR_Logger extends this, then Logger extends that.
+ *
+ * @phpstan-type BackTraceFrameArray array{function: string, line?: int, file?: string, class?: class-string, type?: "->"|"::", args?: list<mixed>, object?: object}
+ * @phpstan-type BackTraceArray list<BackTraceFrameArray>
  *
  * @see BH_WP_PSR_Logger
  * @see Logger
@@ -34,18 +38,19 @@ class API implements API_Interface {
 
 	use LoggerAwareTrait;
 
+	// TODO: replace globals with `wp_cache_set()` etc.
 	const CACHE_GROUP_KEY = 'bh-wp-logger';
 
 	/**
 	 *
-	 * TODO: IS getmypid() reliable?
+	 * TODO: IS {@see getmypid()} reliable?
 	 * TODO: Add current user id.
 	 *
 	 * @see https://stackoverflow.com/questions/10404979/get-unique-worker-thread-process-request-id-in-php
 	 *
-	 * @var string[] Common data for context. "state"?
+	 * @var array<string,mixed> Common data for context. "state"?
 	 */
-	protected $common_context = array();
+	protected array $common_context = array();
 
 	/**
 	 * Instantiate the API class with settings provided by the plugin.
@@ -65,9 +70,9 @@ class API implements API_Interface {
 
 	/**
 	 * Array of data to add to every log entry.
-	 * Resets on each new pageload (request).
+	 * Resets on each new page-load (request).
 	 *
-	 * @return string[]
+	 * @return array<string, mixed>
 	 */
 	public function get_common_context(): array {
 		return $this->common_context;
@@ -78,10 +83,8 @@ class API implements API_Interface {
 	 *
 	 * @param string $key Descriptive key.
 	 * @param mixed  $value Will be parsed to JSON later.
-	 *
-	 * @return void
 	 */
-	public function set_common_context( string $key, $value ): void {
+	public function set_common_context( string $key, mixed $value ): void {
 		$this->common_context[ $key ] = $value;
 	}
 
@@ -102,9 +105,7 @@ class API implements API_Interface {
 			$query_args['date'] = $date;
 		}
 
-		$logs_url = admin_url( add_query_arg( $query_args, 'admin.php' ) );
-
-		return $logs_url;
+		return admin_url( add_query_arg( $query_args, 'admin.php' ) );
 	}
 
 	/**
@@ -119,9 +120,10 @@ class API implements API_Interface {
 	public function get_log_files( ?string $date = null ): array {
 
 		// TODO: Replace WC_LOG_DIR check with the plugin_active check that is used overall.
-		if ( ( $this->settings instanceof WooCommerce_Logger_Settings_Interface ) && defined( 'WC_LOG_DIR' ) ) {
+		if ( ( $this->settings instanceof WooCommerce_Logger_Settings_Interface ) && defined( 'WC_LOG_DIR' ) && is_string( constant( 'WC_LOG_DIR' ) ) ) {
 
-			$log_files_dir = WC_LOG_DIR;
+			/** @var string $log_files_dir */
+			$log_files_dir = constant( 'WC_LOG_DIR' );
 
 		} else {
 
@@ -169,9 +171,9 @@ class API implements API_Interface {
 
 		$result = array();
 
-		$log_filepaths_by_date = $this->get_log_files();
+		$log_file_paths_by_date = $this->get_log_files();
 
-		if ( ! isset( $log_filepaths_by_date[ $ymd_date ] ) ) {
+		if ( ! isset( $log_file_paths_by_date[ $ymd_date ] ) ) {
 			$result['success'] = false;
 			$message           = 'Log file not found for date: ' . $ymd_date;
 			$result['message'] = $message;
@@ -179,11 +181,11 @@ class API implements API_Interface {
 			return $result;
 		}
 
-		wp_delete_file( $log_filepaths_by_date[ $ymd_date ] );
+		wp_delete_file( $log_file_paths_by_date[ $ymd_date ] );
 		$result['success'] = true;
-		$message           = 'Logfile deleted at ' . $log_filepaths_by_date[ $ymd_date ];
+		$message           = 'Logfile deleted at ' . $log_file_paths_by_date[ $ymd_date ];
 		$result['message'] = $message;
-		$this->logger->info( $message, array( 'logfile' => $log_filepaths_by_date[ $ymd_date ] ) );
+		$this->logger->info( $message, array( 'logfile' => $log_file_paths_by_date[ $ymd_date ] ) );
 
 		return $result;
 	}
@@ -202,9 +204,9 @@ class API implements API_Interface {
 		$deleted_files    = array();
 		$failed_to_delete = array();
 
-		$log_filepaths_by_date = $this->get_log_files();
+		$log_file_paths_by_date = $this->get_log_files();
 
-		foreach ( $log_filepaths_by_date as $date => $log_filepath ) {
+		foreach ( $log_file_paths_by_date as $date => $log_filepath ) {
 			$deleted = wp_delete_file( $log_filepath );
 			if ( $deleted ) {
 				$deleted_files[ $date ] = $log_filepath;
@@ -253,12 +255,10 @@ class API implements API_Interface {
 	 * * call_user_func_array()
 	 * * function calls from other plugins using this same library (using filename).
 	 *
-	 * TODO: Check is WordPress's own wp_debug_backtrace_summary a good replacement for Spatie.
-	 *
 	 * @param ?string $source_hash A unique identifier for the source of the log entry. Used to cache the backtrace. The backtrace will not be cached if this is absent.
 	 * @param ?int    $steps The number of backtrace entries to return.
 	 *
-	 * @return array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}>
+	 * @return BackTraceArray
 	 */
 	public function get_backtrace( ?string $source_hash = null, ?int $steps = null ): array {
 
@@ -270,11 +270,17 @@ class API implements API_Interface {
 			}
 		}
 
-		// This is critical to the library.
-		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
+		/**
+		 * This is critical to the library.
+		 *
+		 * phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
+		 *
+		 * @var BackTraceArray $backtrace
+		 */
 		$backtrace = debug_backtrace();
 
 		$ignore_starting_frame = function ( array $frame ): bool {
+			/** @var BackTraceFrameArray $frame */
 			switch ( true ) {
 				case isset( $frame['file'] ) && __FILE__ === $frame['file']:
 				case 'call_user_func_array' === $frame['function']:
@@ -296,6 +302,7 @@ class API implements API_Interface {
 				break;
 			}
 		}
+		/** @var BackTraceArray $backtrace */
 
 		if ( ! is_null( $source_hash ) ) {
 			$this->set_cached_backtrace( $source_hash, $backtrace );
@@ -313,11 +320,11 @@ class API implements API_Interface {
 	 *
 	 * @see debug_backtrace()
 	 *
-	 * @param string                                                                                          $source_hash A unique identifier for backtrace – `implode(func_get_args())` of the error handler is used.
-	 * @param array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}> $backtrace The PHP backtrace, presumably filtered to remove irrelevant frames.
+	 * @param string               $source_hash A unique identifier for backtrace – `implode(func_get_args())` of the error handler is used.
+	 * @param BackTraceArray&array $backtrace The PHP backtrace, presumably filtered to remove irrelevant frames.
 	 */
 	protected function set_cached_backtrace( string $source_hash, array $backtrace ): void {
-		if ( ! isset( $GLOBALS['bh_wp_logger_cache'] ) ) {
+		if ( ! isset( $GLOBALS['bh_wp_logger_cache'] ) || ! is_array( $GLOBALS['bh_wp_logger_cache'] ) ) {
 			$GLOBALS['bh_wp_logger_cache'] = array();
 		}
 		$source_hash                                   = sanitize_key( $source_hash );
@@ -329,13 +336,19 @@ class API implements API_Interface {
 	 *
 	 * @param string $source_hash A unique identifier for backtrace.
 	 *
-	 * @return ?array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}>
+	 * @return ?BackTraceArray
 	 */
 	protected function get_cached_backtrace( string $source_hash ): ?array {
 		$source_hash = sanitize_key( $source_hash );
-		return isset( $GLOBALS['bh_wp_logger_cache'], $GLOBALS['bh_wp_logger_cache'][ $source_hash ] )
-			? $GLOBALS['bh_wp_logger_cache'][ $source_hash ]
-			: null;
+
+		if ( ! isset( $GLOBALS['bh_wp_logger_cache'] ) ) {
+			return null;
+		}
+
+		/** @var array<string, BackTraceArray> $bh_wp_logger_cache */
+		global $bh_wp_logger_cache;
+
+		return $bh_wp_logger_cache[ $source_hash ] ?? null;
 	}
 
 	/**
@@ -345,7 +358,7 @@ class API implements API_Interface {
 	 */
 	public function is_backtrace_contains_plugin( ?string $source_hash = null ): bool {
 
-		$frames = $this->get_backtrace( $source_hash, null );
+		$frames = $this->get_backtrace( $source_hash );
 
 		$is_file_from_plugin = false;
 
@@ -371,7 +384,7 @@ class API implements API_Interface {
 	 * @param string $filepath Path to the file to be checked.
 	 */
 	public function is_file_from_plugin( string $filepath ): bool {
-		return str_starts_with( plugin_basename( realpath( $filepath ) ), $this->settings->get_plugin_slug() );
+		return str_starts_with( plugin_basename( realpath( $filepath ) ?: $filepath ), $this->settings->get_plugin_slug() );
 	}
 
 	/**
@@ -398,19 +411,23 @@ class API implements API_Interface {
 		$transient_value = get_transient( $transient_name );
 
 		if ( is_string( $transient_value ) ) {
-			return new DateTimeImmutable( $transient_value, new DateTimeZone( 'UTC' ) );
+			try {
+				return new DateTimeImmutable( $transient_value, new DateTimeZone( 'UTC' ) );
+			} catch ( Exception $_exception ) {
+				delete_transient( $transient_name );
+			}
 		}
 
 		$log_files = $this->get_log_files();
 
 		$reverse_chronological_log_files = array_reverse( $log_files );
 
-		/** @var WP_Filesystem_Base $wp_filesystem */
-		global $wp_filesystem;
-
-		if ( empty( $wp_filesystem ) ) {
+		if ( empty( $GLOBALS['wp_filesystem'] ) ) {
 			WP_Filesystem();
 		}
+
+		/** @var WP_Filesystem_Base $wp_filesystem */
+		global $wp_filesystem;
 
 		foreach ( $reverse_chronological_log_files as $last_log_file_path ) {
 
@@ -444,7 +461,13 @@ class API implements API_Interface {
 
 		$option_name                    = $this->settings->get_plugin_slug() . '-last-logs-view-time';
 		$last_log_view_time_atom_string = get_option( $option_name );
-		$last_log_view_time_datetime    = DateTimeImmutable::createFromFormat( DateTimeInterface::ATOM, $last_log_view_time_atom_string, new DateTimeZone( 'UTC' ) );
+
+		if ( ! is_string( $last_log_view_time_atom_string ) ) {
+			delete_option( $option_name );
+			return null;
+		}
+
+		$last_log_view_time_datetime = DateTimeImmutable::createFromFormat( DateTimeInterface::ATOM, $last_log_view_time_atom_string, new DateTimeZone( 'UTC' ) );
 
 		if ( false === $last_log_view_time_datetime ) {
 			delete_option( $option_name );
@@ -462,18 +485,17 @@ class API implements API_Interface {
 	 *
 	 * @param ?DateTimeInterface $date_time A time to set, defaults to "now".
 	 *
-	 * @return void
+	 * phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 	 */
 	public function set_last_logs_view_time( ?DateTimeInterface $date_time = null ): void {
 		$option_name = $this->settings->get_plugin_slug() . '-last-logs-view-time';
 
-		if ( is_null( $date_time ) ) {
-			try {
-				$date_time = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
-			} catch ( Exception ) {
-				// This will never happen.
-				return;
-			}
+		try {
+			$date_time ??= new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
+		} catch ( Exception $_exception ) { /** @phpstan-ignore catch.neverThrown */
+			/**
+			 * This will never happen.
+			 */
 		}
 
 		$atom_time_string = $date_time->format( DateTimeInterface::ATOM );
@@ -490,7 +512,7 @@ class API implements API_Interface {
 	 *
 	 * @param string $filepath Path to the log file to read.
 	 *
-	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:\stdClass|null}>
+	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}>
 	 */
 	public function parse_log( string $filepath ): array {
 
@@ -522,9 +544,7 @@ class API implements API_Interface {
 			}
 		}
 
-		$data = array_map( array( $this, 'log_lines_to_entry' ), $entries );
-
-		return $data;
+		return array_map( array( $this, 'log_lines_to_entry' ), $entries );
 	}
 
 	/**
@@ -534,7 +554,7 @@ class API implements API_Interface {
 	 *
 	 * @param array{line_one_parsed:array{time:string,level:string,message:string}, lines:string[]} $input_lines A single log entries as a set of lines.
 	 *
-	 * @return array{time:string,datetime:DateTime|null,level:string,message:string,context:\stdClass|null}
+	 * @return array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}
 	 */
 	protected function log_lines_to_entry( array $input_lines ): array {
 
@@ -553,7 +573,7 @@ class API implements API_Interface {
 		$context = json_decode( implode( PHP_EOL, $input_lines['lines'] ) );
 		if ( is_null( $context ) ) {
 			foreach ( $input_lines['lines'] as $input_line ) {
-				// This is a bug but I'm not going to fix it until I see the problem exist.
+				// This is a bug, but I'm not going to fix it until I see the problem exist.
 				// What happens if there is multiple lines that for some reason are valid JSON? Data will be lost in display.
 				$context = json_decode( $input_line );
 				if ( is_null( $context ) ) {
@@ -562,7 +582,7 @@ class API implements API_Interface {
 			}
 		}
 
-		if ( ! is_null( $context ) && isset( $context->source ) ) {
+		if ( $context instanceof stdClass && isset( $context->source ) ) {
 			unset( $context->source );
 		}
 
@@ -570,7 +590,7 @@ class API implements API_Interface {
 		$entry['datetime'] = $datetime;
 		$entry['level']    = $level;
 		$entry['message']  = $message;
-		$entry['context']  = $context;
+		$entry['context']  = $context instanceof stdClass ? $context : null;
 
 		return $entry;
 	}
