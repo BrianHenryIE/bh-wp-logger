@@ -61,7 +61,7 @@ class Logs_Page_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction(
 			'wp_enqueue_style',
 			array(
-				'args'  => array( 'test-enqueue-styles-logs', \WP_Mock\Functions::type( 'string' ), array(), $version, 'all' ),
+				'args'  => array( 'test-enqueue-styles-logs', \WP_Mock\Functions::type( 'string' ), array(), $version ),
 				'times' => 1,
 			)
 		);

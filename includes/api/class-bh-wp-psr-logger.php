@@ -138,9 +138,9 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			} catch ( ReflectionException $_exception ) {
 				// Ironic.
 			}
-			$exception_details['properties'] = $context['exception']->getTrace();
+			$exception_details['properties'] = $props;
 
-			$exception_details['backtrace'] = $props;
+			$exception_details['backtrace'] = $context['exception']->getTrace();
 
 			$context['exception'] = $exception_details;
 		}
