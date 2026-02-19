@@ -45,7 +45,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 * Ideally settings should be provided the first time the logger is instantiated, then they do not need
 	 * to be provided when accessing the singleton later on.
 	 *
-	 * @see Logger_Settings`
+	 * @see Logger_Settings
 	 * @see Plugins
 	 *
 	 * @param ?Logger_Settings_Interface $settings The loglevel, plugin name, slug, and basename.

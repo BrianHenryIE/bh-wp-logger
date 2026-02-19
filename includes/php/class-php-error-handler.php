@@ -59,7 +59,8 @@ class PHP_Error_Handler {
 
         // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 		$this->previous_error_handler = set_error_handler(
-			array( $this, 'plugin_error_handler' )
+			array( $this, 'plugin_error_handler' ),
+			E_ALL // PhpStorm says this is unnecessary, but Claude says it is.
 		);
 	}
 

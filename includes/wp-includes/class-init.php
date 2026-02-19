@@ -129,10 +129,10 @@ class Init {
 		header( 'Expires: ' . gmdate( $date_format, time() + HOUR_IN_SECONDS ) ); // an arbitrary hour from now.
 
 		// Support for caching.
-		$client_etag              = isset( $_REQUEST['HTTP_IF_NONE_MATCH'] ) && is_string( $_REQUEST['HTTP_IF_NONE_MATCH'] )
-			? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_NONE_MATCH'] ) ) ) : '';
-		$client_if_mod_since      = isset( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) && is_string( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] )
-			? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) ) ) : '';
+		$client_etag              = isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) && is_string( $_SERVER['HTTP_IF_NONE_MATCH'] )
+			? trim( sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ) ) ) : '';
+		$client_if_mod_since      = isset( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) && is_string( $_SERVER['HTTP_IF_MODIFIED_SINCE'] )
+			? trim( sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) ) ) : '';
 		$client_if_mod_since_unix = strtotime( $client_if_mod_since );
 
 		if ( $etag === $client_etag || $last_modified_unix <= $client_if_mod_since_unix ) {

@@ -237,7 +237,7 @@ class Logs_List_Table extends WP_List_Table {
 				return sprintf(
 					'<a href="%s">%s</a>',
 					admin_url( "user-edit.php?user_id={$matches[1]}" ),
-					$user->user_nicename
+					esc_html( $user->user_nicename )
 				);
 			}
 
