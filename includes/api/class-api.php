@@ -63,9 +63,9 @@ class API implements API_Interface {
 	 */
 	public function __construct(
 		protected Logger_Settings_Interface $settings,
-		?LoggerInterface $logger = null
+		LoggerInterface $logger
 	) {
-		$this->setLogger( $logger ?? new NullLogger() );
+		$this->setLogger( $logger );
 	}
 
 	/**

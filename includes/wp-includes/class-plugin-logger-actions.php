@@ -106,7 +106,7 @@ class Plugin_Logger_Actions {
 	 */
 	protected function add_admin_notices_hooks(): void {
 
-		$admin_notices = new Admin_Notices( $this->api, $this->settings );
+		$admin_notices = new Admin_Notices( $this->api, $this->settings, $this->wrapped_real_logger );
 		// Generate the notices from wp_options.
 		add_action( 'admin_init', array( $admin_notices, 'admin_notices' ), 9 );
 		// Add the notice.
