@@ -4,7 +4,7 @@
  *
  * The dream would someday to have complex filtering on this table. e.g. filter all logs to one request, to one user...
  *
- * Time should show (UTC,local and "five hours ago")
+ * Time should show (UTC, local and "five hours ago")
  *
  * @package  brianhenryie/bh-wp-logger
  */
@@ -13,9 +13,9 @@ namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
 use BrianHenryIE\WP_Logger\API_Interface;
-use BrianHenryIE\WP_Logger\Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use DateTime;
+use Exception;
 use Psr\Log\LoggerInterface;
 use WP_List_Table;
 use WP_Post_Type;
@@ -98,13 +98,12 @@ class Logs_List_Table extends WP_List_Table {
 	 * @return array{level:string, time:string, message:string, context:string} array<column identifier, column title>
 	 */
 	public function get_columns() {
-		$columns = array(
+		return array(
 			'level'   => '',
 			'time'    => 'Time',
 			'message' => 'Message',
 			'context' => 'Context',
 		);
-		return $columns;
 	}
 
 	/**
@@ -126,6 +125,8 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * @see WP_List_Table::single_row()
 	 *
+	 * @used-by WP_List_Table::display_rows()
+	 *
 	 * @param array{time:string, level:string, message:string, context:array<mixed>} $item The current item.
 	 * @return void
 	 */
@@ -141,10 +142,10 @@ class Logs_List_Table extends WP_List_Table {
 	 * @param array{time:string, level:string, message:string, context:array<string, mixed>} $item ...whatever type get_data returns.
 	 * @param string                                                                         $column_name The specified column.
 	 *
-	 * @return string|true|void
 	 * @see WP_List_Table::column_default()
-	 *
 	 * @see Logs_List_Table::get_data()
+	 *
+	 * @return string
 	 */
 	public function column_default( $item, $column_name ) {
 
@@ -159,11 +160,11 @@ class Logs_List_Table extends WP_List_Table {
 					// TODO: Is it better to use the user's timezone rather than the server timezone?
 					$datetime->setTimezone( wp_timezone() );
 
-					// Output in format: 20:02, Saturday, 14 November, 2020 (PST).
-					$date_formatted = $datetime->format( 'H:i, l, d F, Y (T)' );
+					// Output in format: 20:02, Saturday, 14 November 2020 (PST).
+					$date_formatted = $datetime->format( 'H:i, l, d F Y (T)' );
 					$column_output .= $date_formatted;
 					$column_output .= '<br/>';
-				} catch ( \Exception ) {
+				} catch ( Exception ) {
 					$column_output .= 'Could not parse date: ';
 				}
 				$column_output .= $time;
@@ -180,8 +181,7 @@ class Logs_List_Table extends WP_List_Table {
 							esc_html( $un_pretty_context ),
 							esc_html( trim( $pretty_context, "'\"" ) )
 						)
-						/** phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r Is there a better option to print an array? */
-						: esc_html( print_r( $item['context'], true ) );
+						: esc_html( $this->get_print_r( $item['context'] ) );
 				}
 				break;
 			case 'message':
@@ -212,9 +212,9 @@ class Logs_List_Table extends WP_List_Table {
 		 * @param Logger_Settings_Interface $logger_settings
 		 * @param BH_WP_PSR_Logger|LoggerInterface $bh_wp_psr_logger
 		 */
-		$column_output = apply_filters( "{$plugin_slug}_bh_wp_logger_column", $column_output, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
+		$filtered_column_output = apply_filters( "{$plugin_slug}_bh_wp_logger_column", $column_output, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
 
-		return $column_output;
+		return is_string( $filtered_column_output ) ? $filtered_column_output : $column_output; /** @phpstan-ignore function.alreadyNarrowedType */
 	}
 
 	/**
@@ -234,18 +234,17 @@ class Logs_List_Table extends WP_List_Table {
 			$user = get_user_by( 'ID', $matches[1] );
 
 			if ( $user instanceof WP_User ) {
-				// TODO: wpcs.
-				$url  = admin_url( "user-edit.php?user_id={$matches[1]}" );
-				$link = "<a href=\"{$url}\">{$user->user_nicename}</a>";
-				return $link;
+				return sprintf(
+					'<a href="%s">%s</a>',
+					admin_url( "user-edit.php?user_id={$matches[1]}" ),
+					$user->user_nicename
+				);
 			}
 
 			return $matches[0];
 		};
 
-		$message = preg_replace_callback( '/wp_user:(\d+)/', $callback, $message ) ?? $message;
-
-		return $message;
+		return preg_replace_callback( '/wp_user:(\d+)/', $callback, $message ) ?? $message;
 	}
 
 	/**
@@ -296,29 +295,45 @@ class Logs_List_Table extends WP_List_Table {
 				return $matches[0];
 			}
 
-			$link = sprintf(
+			return sprintf(
 				'<a href="%s">%s %s</a>',
 				esc_url( $url, null, 'href' ),
 				$post_type_name,
 				$post_id,
 			);
-
-			return $link;
 		};
 
-		$message = preg_replace_callback( '/`(\w+):(\d+)`/', $callback, $column_output ) ?? $column_output;
-
-		return $message;
+		return preg_replace_callback( '/`(\w+):(\d+)`/', $callback, $column_output ) ?? $column_output;
 	}
 
 	/**
 	 * Print message to when there are no items to display.
 	 *
 	 * We add a span here to add padding via CSS.
+	 *
+	 * @see WP_List_Table::no_items()
+	 * @used-by WP_List_Table::display_rows_or_placeholder()
 	 */
 	public function no_items(): void {
 		echo '<span class="no-items-message">';
 		echo esc_html( __( 'No items found.', 'bh-wp-logger' ) );
 		echo '</span>';
+	}
+
+	/**
+	 * Print an array to a string.
+	 *
+	 * This is probably an array whose source was reading it from a text file.
+	 * This function is used only when {@see wp_json_encode()} returns false.
+	 *
+	 * Is there a better option to print an array?
+	 *
+	 * phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r
+	 *
+	 * @param array<string, mixed> $context The log context array.
+	 */
+	protected function get_print_r( array $context ): string {
+
+		return print_r( $context, true );
 	}
 }
