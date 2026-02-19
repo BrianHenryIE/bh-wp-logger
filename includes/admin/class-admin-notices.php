@@ -55,7 +55,7 @@ class Admin_Notices extends Notices {
 	 *
 	 * @see Admin_Notices::get_error_detail_option_name()
 	 *
-	 * @return ?array{message: string, timestamp: string}
+	 * @return ?array{message: string, timestamp: int}
 	 */
 	protected function get_last_error(): ?array {
 		$last_error = get_option( $this->get_error_detail_option_name() );
@@ -64,7 +64,7 @@ class Admin_Notices extends Notices {
 			&& isset( $last_error['message'] )
 			&& isset( $last_error['timestamp'] )
 			&& is_string( $last_error['message'] )
-			&& is_string( $last_error['timestamp'] )
+			&& is_int( $last_error['timestamp'] )
 		) {
 			return $last_error;
 		}
@@ -135,7 +135,7 @@ class Admin_Notices extends Notices {
 			$is_dismissed_option_name = "wptrt_notice_dismissed_{$this->settings->get_plugin_slug()}-recent-error";
 
 			$error_text = trim( $last_error['message'] );
-			$error_time = (int) $last_error['timestamp'];
+			$error_time = $last_error['timestamp'];
 
 			$title   = '';
 			$content = sprintf(
@@ -160,7 +160,10 @@ class Admin_Notices extends Notices {
 				// Link to logs.
 			$log_link = $this->api->get_log_url( gmdate( 'Y-m-d', $error_time ) );
 
-			$content .= ' <a href="' . $log_link . '">View Logs</a>.</p></div>';
+			$content .= sprintf(
+				' <a href="%s">View Logs</a>.',
+				esc_url( $log_link, null, 'href' )
+			);
 
 			// ID must be globally unique because it is the CSS id that will be used.
 			$this->add(
@@ -184,6 +187,7 @@ class Admin_Notices extends Notices {
 				delete_option( $option_name );
 				return $old_value; // When new and old match, it short-circuits.
 			};
+
 			add_filter( "pre_update_option_{$is_dismissed_option_name}", $on_dismiss, 10, 3 );
 		}
 	}
