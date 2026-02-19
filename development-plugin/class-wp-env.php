@@ -42,7 +42,7 @@ class WP_Env {
 		add_filter( 'home_url', array( $this, 'wpenv_fix_url' ), 1, 2 );
 		add_filter( 'wp_login_url', array( $this, 'wpenv_fix_url' ), 1, 2 );
 		add_filter( 'admin_url', array( $this, 'wpenv_fix_url' ), 1, 2 );
-		add_action( 'requests-requests.before_request', array( $this, 'wpenv_fix_requests_url' ), 1, 5 );
+		add_action( 'requests-requests.before_request', array( $this, 'wpenv_fix_requests_url' ), 1, 6 );
 	}
 
 	/**
