@@ -88,13 +88,13 @@ class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 
 		\WP_Mock::expectActionAdded(
 			'plugins_loaded',
-			array( \WP_Mock\Functions::type( PHP_Error_Handler::class ), 'init' ),
+			array( new AnyInstance( PHP_Error_Handler::class ), 'init' ),
 			2
 		);
 
 		\WP_Mock::expectActionAdded(
 			'plugins_loaded',
-			array( \WP_Mock\Functions::type( PHP_Shutdown_Handler::class ), 'init' ),
+			array( new AnyInstance( PHP_Shutdown_Handler::class ), 'init' ),
 			2
 		);
 
