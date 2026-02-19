@@ -13,8 +13,6 @@ use Codeception\Stub\Expected;
  */
 class Admin_Notices_Unit_Test extends Unit_Testcase {
 
-
-
 	/**
 	 * @covers ::admin_notices
 	 */
@@ -40,6 +38,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 			)
 		);
 
+		\WP_Mock::userFunction( 'wp_doing_ajax' )->andReturnFalse();
+
 		\WP_Mock::userFunction(
 			'delete_option',
 			array(
@@ -48,21 +48,15 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 			)
 		);
 
-		\WP_Mock::userFunction(
-			'sanitize_key',
-			array(
-				'return_arg' => true,
-				'times'      => 1,
-			)
-		);
-
-		$_GET['page'] = 'test-logs';
+		global $pagenow;
+		$pagenow = 'admin.php';
+		global $plugin_page;
+		$plugin_page = 'test-logs';
 
 		$sut = new Admin_Notices( $api, $settings, $logger );
 
 		$sut->admin_notices();
 	}
-
 
 	/**
 	 * @covers ::admin_notices
