@@ -11,12 +11,16 @@ namespace BrianHenryIE\WP_Logger\API;
 
 use BrianHenryIE\WP_CLI_Logger\WP_CLI_Logger;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
+use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use ReflectionClass;
+use ReflectionException;
 use WP_CLI;
+use WP_CLI\Runner;
 
 /**
  * Functions to add context to logs and to record the time of logs.
@@ -30,9 +34,15 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 */
 	protected LoggerInterface $cli_logger;
 
+	/**
+	 * Construct
+	 *
+	 * @param Logger_Settings_Interface $settings The configured settings.
+	 * @param LoggerInterface           $logger The true logger that logging is delegated to.
+	 */
 	public function __construct(
 		Logger_Settings_Interface $settings,
-		?LoggerInterface $logger = null
+		LoggerInterface $logger
 	) {
 		parent::__construct( $settings, $logger );
 
@@ -41,8 +51,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		 *
 		 * @see https://wordpress.stackexchange.com/questions/226152/detect-if-wp-is-running-under-wp-cli
 		 */
-		$this->cli_logger = ( defined( 'WP_CLI' ) && WP_CLI
-			&& class_exists( WP_CLI_Logger::class ) )
+		$this->cli_logger = ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) && class_exists( WP_CLI_Logger::class ) ) /** @phpstan-ignore booleanAnd.rightAlwaysTrue */
 						? new WP_CLI_Logger()
 						: new NullLogger();
 	}
@@ -83,27 +92,20 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 *
 	 * TODO: Add a filter on level.
 	 *
-	 * @see LogLevel
-	 *
 	 * @param string                   $level The log severity.
 	 * @param string                   $message The message to log.
 	 * @param array<int|string, mixed> $context Additional information to be logged (not saved at all log levels).
+	 * @see LogLevel
 	 */
 	public function log( $level, $message, $context = array() ) {
 
 		$context = array_merge( $context, $this->get_common_context() );
 
-		if ( isset( $context['exception'] ) && $context['exception'] instanceof \Throwable ) {
-			$exception_backtrace = $context['exception']->getTrace();
-			// Backtrace::createForThrowable( $exception_backtrace );
-
-		}
-
 		$settings_log_level = $this->settings->get_log_level();
 
 		if ( LogLevel::ERROR === $level ) {
 
-			$debug_backtrace            = $this->get_backtrace( null, null );
+			$debug_backtrace            = $this->get_backtrace();
 			$context['debug_backtrace'] = $debug_backtrace;
 
 			// TODO: This could be useful on all logs.
@@ -119,19 +121,26 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			$context['filters'] = $wp_current_filter;
 		}
 
-		if ( isset( $context['exception'] ) && $context['exception'] instanceof \Exception ) {
+		if ( isset( $context['exception'] ) && $context['exception'] instanceof Exception ) {
 			$exception                    = $context['exception'];
 			$exception_details            = array();
 			$exception_details['class']   = $exception::class;
 			$exception_details['message'] = $exception->getMessage();
 
-			$reflect = new \ReflectionClass( $exception::class );
-			$props   = array();
-			foreach ( $reflect->getProperties() as $property ) {
-				$property->setAccessible( true );
-				$props[ $property->getName() ] = $property->getValue( $exception );
+			$props = array();
+			try {
+				$reflect = new ReflectionClass( $exception::class );
+				foreach ( $reflect->getProperties() as $property ) {
+					$property->setAccessible( true );
+					$props[ $property->getName() ] = $property->getValue( $exception );
+				}
+				// phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			} catch ( ReflectionException $_exception ) {
+				// Ironic.
 			}
-			$exception_details['properties'] = $props;
+			$exception_details['properties'] = $context['exception']->getTrace();
+
+			$exception_details['backtrace'] = $props;
 
 			$context['exception'] = $exception_details;
 		}
@@ -178,11 +187,13 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		}
 
 		// Add WP CLI command to context.
-		if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) ) {
+		if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) ) { /** @phpstan-ignore booleanAnd.rightAlwaysTrue */
+			/** @var Runner $runner */
+			$runner            = WP_CLI::get_runner();
 			$context['wp_cli'] = array(
 				array(
-					'command'    => 'wp ' . implode( ' ', WP_CLI::get_runner()->arguments ),
-					'assoc_args' => WP_CLI::get_runner()->assoc_args,
+					'command'    => 'wp ' . implode( ' ', $runner->arguments ),
+					'assoc_args' => $runner->assoc_args,
 				),
 			);
 		}
