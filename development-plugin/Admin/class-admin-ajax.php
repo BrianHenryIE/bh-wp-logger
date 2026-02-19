@@ -107,7 +107,17 @@ class Admin_Ajax {
 					 * phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
 					 * phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
 					 */
-					$result['success']['deleted_transient_count'] = $wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"' );
+					$delete_query_result = $wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "_transient_%"' );
+					if ( false === $delete_query_result ) {
+						wp_send_json_error(
+							array(
+								'error' => 'DELETE SQL query failed',
+							),
+							500
+						);
+					}
+
+					$result['success']['deleted_transient_count'] = $delete_query_result;
 					break;
 				default:
 					$result['error']['unknown-log-test-action'] = 'Unknown log-test-action parameter.';
