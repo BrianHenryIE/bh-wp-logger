@@ -60,6 +60,8 @@ trait Logger_Settings_Trait {
 	/**
 	 * Returns all valid log levels. Only computes it once.
 	 *
+	 * @see LogLevel
+	 *
 	 * @return string[]
 	 */
 	protected function get_log_levels(): array {

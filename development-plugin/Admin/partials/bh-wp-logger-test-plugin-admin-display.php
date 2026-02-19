@@ -36,7 +36,7 @@
 		<p>WP_DEBUG_LOG: <code><?php echo esc_html( $wp_debug_log ); ?></code></p>
 	</div>
 	<div>
-		<p><a class="button button-primary" href="<?php echo $plugin_log_url; ?>">View logs</a></p>
+		<p><a class="button button-primary" href="<?php echo esc_url( $plugin_log_url, null, 'href' ); ?>">View logs</a></p>
 	</div>
 	<div>
 		<h3>Log a message</h3>

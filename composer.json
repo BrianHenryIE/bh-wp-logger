@@ -64,6 +64,7 @@
         "wptrt/admin-notices": "^1.0"
     },
     "require-dev": {
+        "ext-curl": "*",
         "10up/wp_mock": "^1.0",
         "antecedent/patchwork": "^2.1",
         "alleyinteractive/wordpress-autoloader": "^1.1",

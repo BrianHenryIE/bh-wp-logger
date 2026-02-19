@@ -54,7 +54,7 @@ class Admin {
 	/**
 	 * Register the JavaScript for the admin area.
 	 *
-	 * @since    1.0.0
+	 * @hooked admin_enqueue_scripts
 	 */
 	public function enqueue_scripts(): void {
 
@@ -63,6 +63,16 @@ class Admin {
 		$url = WP_PLUGIN_URL . '/development-plugin/Admin/js/bh-wp-logger-test-plugin-admin.js';
 
 		wp_enqueue_script( 'bh-wp-logger-development-plugin', $url, array( 'jquery' ), $version, true );
+
+		$nonce = wp_create_nonce( 'logs-test' );
+
+		$script = <<<EOD
+const bh_wp_logger_development_plugin = {
+	__wp_nonce: "$nonce"
+};
+EOD;
+
+		wp_add_inline_script( 'bh-wp-logger-development-plugin', $script, 'before' );
 	}
 
 	/**

@@ -14,11 +14,16 @@
 
 namespace BH_WP_Logger_Test_Plugin;
 
+use CurlHandle;
 use Exception;
 use WP_HTTP_Requests_Hooks;
+use WpOrg\Requests\Response;
 
 /**
  * Modify the URL used in requests to itself.
+ *
+ * The parameters vary and are documented.
+ * phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
  */
 class WP_Env {
 
@@ -37,7 +42,7 @@ class WP_Env {
 		add_filter( 'home_url', array( $this, 'wpenv_fix_url' ), 1, 2 );
 		add_filter( 'wp_login_url', array( $this, 'wpenv_fix_url' ), 1, 2 );
 		add_filter( 'admin_url', array( $this, 'wpenv_fix_url' ), 1, 2 );
-		add_action( 'requests-requests.before_request', array( $this, 'wpenv_fix_requests_url' ), 1, 3 );
+		add_action( 'requests-requests.before_request', array( $this, 'wpenv_fix_requests_url' ), 1, 6 );
 	}
 
 	/**
@@ -63,20 +68,45 @@ class WP_Env {
 	/**
 	 * Edit urls as the Requests HTTP library is about to use them.
 	 *
+	 * @see do_action_ref_array()
 	 * @see WP_HTTP_Requests_Hooks::dispatch()
 	 * @hooked requests-requests.before_request
+	 *
+	 * `WP_HTTP_Requests_Hooks::dispatch()` fires on at least: `requests.before_request`, `curl.before_request`,
+	 * `curl.before_send`, `curl.after_send`, `curl.after_request`, `requests.before_parse`,
+	 * `requests.before_redirect_check`, `requests.after_request`, which are each prefixed with `requests-` for
+	 * their action names.
+	 *
+	 * @phpstan-type Url string
+	 * @phpstan-type Data mixed
+	 * @phpstan-type Method string|"GET"|"POST"
+	 * @phpstan-type HttpHeadersArray array<string,string>
+	 * @phpstan-type RequestOptions array{timeout:int, connect_timeout:int, useragent:string, protocol_version:float, redirected:int, redirects:int, follow_redirects:bool, blocking:bool, type:string, filename:bool, auth:bool, proxy:bool, cookies:\WpOrg\Requests\Cookie\Jar, max_bytes:bool, idn:bool, hooks:WP_HTTP_Requests_Hooks, transport:null, verify:string, verifyname:bool, data_format:string}
+	 * @phpstan-type ResponseHeadersString string
+	 *
+	 * @phpstan-type RequestsBeforeRequest array{0:Url, 1:HttpHeadersArray, 2:Data, 3:Method, 4:RequestOptions}
+	 * @phpstan-type CurlBeforeRequestParameters array{0:CurlHandle}
+	 * @phpstan-type CurlBeforeSendParameters array{0:CurlHandle}
+	 * @phpstan-type CurlAfterSendParameters array{}
+	 * @phpstan-type CurlAfterRequestParameters array{1:array<string,mixed>}
+	 * @phpstan-type RequestsBeforeParseParameters array{0:ResponseHeadersString, 1:Url, 2:HttpHeadersArray, 3:Data, 4:Method, 5:RequestOptions}
+	 * @phpstan-type RequestsBeforeRedirectCheckParameters array{0:Response, 1:HttpHeadersArray, 2:Data, 3:RequestOptions}
+	 * @phpstan-type RequestsAfterRequest array{0:Response, 1:HttpHeadersArray, 2:Data, 3:RequestOptions}
 	 */
-	public function wpenv_fix_requests_url( &$parameters, $request = null, $url = null ) {
+	public function wpenv_fix_requests_url( &$parameter0 = null, &$parameter1 = null, &$parameter2 = null, &$parameter3 = null, &$parameter4 = null, &$parameter5 = null ): void {
+		try {
+			$is_url = function ( mixed $maybe_url ): bool {
+				return is_string( $maybe_url ) && sanitize_url( $maybe_url ) === $maybe_url;
+			};
 
-		$is_url = function ( mixed $maybe_url ): bool {
-			return is_string( $maybe_url ) && $maybe_url === sanitize_url( $maybe_url );
-		};
+			if ( ! $is_url( $parameter0 ) ) {
+				return;
+			}
 
-		if ( ! $is_url( $parameters ) ) {
+			$parameter0 = $this->get_internal_url( $parameter0 );
+		} catch ( Exception $_exception ) {
 			return;
 		}
-
-		$parameters = $this->get_internal_url( $parameters );
 	}
 
 	/**

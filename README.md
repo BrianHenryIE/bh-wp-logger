@@ -1,4 +1,4 @@
-![PHP](https://img.shields.io/badge/PHP-8.0-777BB4?logo=php&logoColor=white) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-logger/)
+![PHP](https://img.shields.io/badge/PHP-8.0-777BB4?logo=php&logoColor=white) [![WordPress tested 6.9](https://img.shields.io/badge/WordPress-v6.9%20tested-0073aa.svg)](#) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards%20-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-logger/) [![PHPStan ](https://img.shields.io/badge/PHPStan-Level%2010%20-2a5ea7.svg)](https://github.com/szepeviktor/phpstan-wordpress)
 
 # BH WP Logger
 
@@ -236,7 +236,7 @@ From my limited logging experience, I find it useful to add a `debug` log at the
 * ~~Log notice should dismiss when the log page is visited~~
 * ~~Redact sensitive data. e.g. use `userid:123` in the saved logs and replace it with richer data when displaying them~~
 * Add errors to dashboard Site Health widget
-* Ensure output is properly escaped
+* ~~Ensure output is properly escaped~~
 
 Minor concerns:
 * Debug logging could maybe be moved to a shutdown handler
@@ -246,6 +246,6 @@ Minor concerns:
 
 To date I think it has been used mostly by me, i.e. internal projects. There are no egregious issues. It _should_ work for everyone but I would like some feedback from others on how well it works for you. 
 
-I'll start at Semver 1.0.0 once I've caught up with WPCS, PhpStan and PhpUnit. There's about 65 tests and 43% coverage. WPCS + PHPStan are both pretty good.
+I'll start at Semver 1.0.0 once I've caught up with WPCS ✅, PhpStan ✅ and PhpUnit. There's about 65 tests and 43% coverage. WPCS + PHPStan are ~~both pretty good~~ now 100%.
 
 I think that's higher code-quality than most WordPress plugins.
