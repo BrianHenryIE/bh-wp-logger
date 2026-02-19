@@ -25,7 +25,7 @@ use Psr\Log\NullLogger;
  *
  * @see Plugin_Logger_Actions::add_admin_ui_logs_page_hooks()
  *
- * @uses \BrianHenryIE\WP_Logger\Logger_Settings_Interface::get_plugin_slug()
+ * @uses Logger_Settings_Interface::get_plugin_slug()
  */
 class Logs_Page {
 	use LoggerAwareTrait;
@@ -185,16 +185,26 @@ class Logs_Page {
 			++$log_level_counts[ strtolower( $datum['level'] ) ];
 		}
 
-		$checkboxes = array();
+		$checkboxes_first = true;
 		foreach ( $log_level_counts as $log_level => $log_level_count ) {
-			$disabled        = 0 === $log_level_count ? 'disabled' : '';
-			$friendly_level  = ucfirst( $log_level );
-			$log_level       = esc_attr( $log_level );
-			$log_level_count = intval( $log_level_count );
-			$checkboxes[]    = "<input {$disabled} class=\"log_level_display_checkbox\" type=\"checkbox\" id=\"log_level_display_checkbox_{$log_level}\" name=\"log_level_display_checkbox_{$log_level}\" checked> <label for=\"log_level_display_checkbox_{$log_level}\">$friendly_level ($log_level_count)</label>";
-		}
+			if ( ! $checkboxes_first ) {
+				echo ' • ';
+			}
+			$checkboxes_first = false;
 
-		echo implode( ' • ', $checkboxes );
+			$disabled       = 0 === $log_level_count ? 'disabled' : '';
+			$friendly_level = ucfirst( $log_level );
+			printf(
+				'<input %s class="log_level_display_checkbox" type="checkbox" id="log_level_display_checkbox_%s" name="log_level_display_checkbox_%s" checked>'
+				. '<label for="log_level_display_checkbox_%s">%s (%s)</label>',
+				esc_attr( $disabled ),
+				esc_attr( $log_level ),
+				esc_attr( $log_level ),
+				esc_attr( $log_level ),
+				esc_html( $friendly_level ),
+				intval( $log_level_count )
+			);
+		}
 
 		echo '</p>';
 
@@ -209,7 +219,7 @@ class Logs_Page {
 	}
 
 	/**
-	 * Enqueue the logs page javascript for changing date and deleting logs.
+	 * Enqueue the logs page JavaScript for changing date and deleting logs.
 	 * Checks the plugin slug and only adds the script on the logs page for this plugin.
 	 *
 	 * @hooked admin_enqueue_scripts
@@ -278,6 +288,6 @@ class Logs_Page {
 		$css_path = realpath( __DIR__ . '/../../' ) . '/assets/bh-wp-logger.css';
 		$css_url  = plugin_dir_url( $css_path ) . 'bh-wp-logger.css';
 
-		wp_enqueue_style( $handle, $css_url, array(), $version, 'all' );
+		wp_enqueue_style( $handle, $css_url, array(), $version );
 	}
 }
