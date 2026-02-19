@@ -23,7 +23,7 @@ interface API_Interface {
 	 *
 	 * @used-by Logs_Page
 	 *
-	 * @param string $date Optional specific dated file to delete.
+	 * @param ?string $date Optional specific dated file to delete.
 	 *
 	 * @return array<string, string> Y-m-d index with path as the value.
 	 */
@@ -89,7 +89,8 @@ interface API_Interface {
 	/**
 	 * Get the debug backtrace leading up to the point the message was logged.
 	 *
-	 * @param ?int $steps The number of entries to return.
+	 * @param ?string $source_hash A unique id for caching.
+	 * @param ?int    $steps The number of entries to return.
 	 *
 	 * @return array<array{file?:string,line?:int,function:string,class:string,type:string,args:array<mixed>}>
 	 */
@@ -98,7 +99,9 @@ interface API_Interface {
 	/**
 	 * Checks the current backtrace for any reference to the current plugin.
 	 *
-	 * Use `implode( '', func_get_args() )`
+	 * E.g. use `implode( '', func_get_args() )` as the `source_hash`.
+	 *
+	 * @param ?string $source_hash A unique id for caching.
 	 */
 	public function is_backtrace_contains_plugin( ?string $source_hash = null ): bool;
 

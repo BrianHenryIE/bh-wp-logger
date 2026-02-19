@@ -16,9 +16,10 @@ use Exception;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use WP_CLI;
+use WP_CLI\ExitException;
 
 /**
- * `wp {$cli_base} licence get-status`
+ * `wp {$cli_base} logger delete-all`
  */
 class CLI {
 	use LoggerAwareTrait;
@@ -26,7 +27,9 @@ class CLI {
 	/**
 	 * Constructor.
 	 *
-	 * @param API_Interface $api The main API class where the functionality is implemented.
+	 * @param API_Interface             $api The main API class where the functionality is implemented.
+	 * @param Logger_Settings_Interface $settings The configuration.
+	 * @param LoggerInterface           $logger A logger to use for issues that occur in this class.
 	 */
 	public function __construct(
 		protected API_Interface $api,
@@ -71,12 +74,14 @@ class CLI {
 	 *   $ wp $cli_base logger delete-all
 	 *   Success: Deleted 12 log files.
 	 *
-	 * @param string[]             $args The unlabelled command line arguments.
-	 * @param array<string,string> $assoc_args The labelled command line arguments.
-	 *
 	 * @see API_Interface::get_licence_details()
+	 *
+	 * @param string[]             $_args The unlabelled command line arguments.
+	 * @param array<string,string> $_assoc_args The labelled command line arguments.
+	 *
+	 * @throws ExitException On `WP_CLI::error()`.
 	 */
-	public function delete_all_logs( array $args, array $assoc_args ): void {
+	public function delete_all_logs( array $_args, array $_assoc_args ): void {
 
 		try {
 			$result = $this->api->delete_all_logs();

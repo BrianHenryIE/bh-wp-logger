@@ -60,7 +60,7 @@ class PHP_Error_Handler {
         // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 		$this->previous_error_handler = set_error_handler(
 			array( $this, 'plugin_error_handler' ),
-			E_ALL
+			E_ALL // PhpStorm says this is unnecessary, but Claude says it is.
 		);
 	}
 
@@ -69,15 +69,19 @@ class PHP_Error_Handler {
 	 *
 	 * @see set_error_handler()
 	 *
-	 * @param int    $errno The error code (the level of the error raised, as an integer).
-	 * @param string $errstr A string describing the error.
-	 * @param string $errfile The filename in which the error occurred.
-	 * @param int    $errline The line number in which the error occurred.
+	 * @param int    $errno [errno] The error code (the level of the error raised, as an integer).
+	 * @param string $errstr [errstr] A string describing the error.
+	 * @param string $errfile [errfile] The filename in which the error occurred.
+	 * @param int    $errline [errline] The line number in which the error occurred.
 	 *
 	 * @return bool True if error had been handled and no more handling to do, false to pass the error on.
 	 */
 	public function plugin_error_handler( int $errno, string $errstr, string $errfile, int $errline ) {
 
+		/**
+		 * The `set_error_handler()` has been called with a different number of functions in different PHP versions
+		 * so rather than passing the values one-by-one, we'll pass them as they were passed to this method.
+		 */
 		$func_args = func_get_args();
 
 		$plugin_related_error = $this->is_related_error( $errno, $errstr, $errfile, $errline );
@@ -120,8 +124,8 @@ class PHP_Error_Handler {
 	/**
 	 * Call the chain of other registered error handlers before returning the result.
 	 *
-	 * @param bool              $handled Flag to indicate has the error already been handled.
-	 * @param array<int|string> $args    The arguments passed by PHP to our own registered error handler.
+	 * @param bool                          $handled Flag to indicate has the error already been handled.
+	 * @param array<int|string>|list<mixed> $args    The arguments passed by PHP to our own registered error handler.
 	 *
 	 * @return bool True if the error has been handled, false if PHP error handler should still run.
 	 */

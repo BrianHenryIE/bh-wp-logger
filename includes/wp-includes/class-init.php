@@ -42,28 +42,30 @@ class Init {
 	 * Return if plugin slug does not match or if date is malformed.
 	 * Invoke `send_private_file()` to download the file.
 	 *
-	 * This is really only needed when WooCommerce logger is being used because it store the log files in
+	 * This is really only needed when WooCommerce logger is being used because it stores the log files in
 	 * `/uploads/wc-logs` which has a `.htaccess` preventing downloads.
 	 *
 	 * @hooked init
 	 */
 	public function maybe_download_log(): void {
 
-		if ( ! isset( $_GET['download-log'] ) ) {
+		if ( ! isset( $_GET['download-log'] ) || ! is_string( $_GET['download-log'] ) ) {
 			return;
 		}
 
 		if ( false === check_admin_referer( 'bh-wp-logger-download' ) ) {
 			$this->logger->warning( 'Bad nonce when downloading log.' );
 			wp_die();
-			return; // Needed for tests. @phpstan-ignore-line.
 		}
 
 		if ( 'true' !== sanitize_text_field( wp_unslash( $_GET['download-log'] ) ) ) {
 			return;
 		}
 
-		if ( ! isset( $_GET['page'] ) || ! isset( $_GET['date'] ) ) {
+		if (
+			! isset( $_GET['page'] ) || ! isset( $_GET['date'] )
+			|| ! is_string( $_GET['page'] ) || ! is_string( $_GET['date'] )
+		) {
 			return;
 		}
 
@@ -108,7 +110,7 @@ class Init {
 		$mimetype = $mime['type'];
 		if ( ! $mimetype && function_exists( 'mime_content_type' ) ) {
 
-			$mimetype = mime_content_type( $filepath );  // Use ext-fileinfo to look inside the file.
+			$mimetype = mime_content_type( $filepath );  // Use `ext-fileinfo` to look inside the file.
 		}
 		if ( ! $mimetype ) {
 			$mimetype = 'application/octet-stream';
@@ -127,8 +129,10 @@ class Init {
 		header( 'Expires: ' . gmdate( $date_format, time() + HOUR_IN_SECONDS ) ); // an arbitrary hour from now.
 
 		// Support for caching.
-		$client_etag              = isset( $_REQUEST['HTTP_IF_NONE_MATCH'] ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_NONE_MATCH'] ) ) ) : '';
-		$client_if_mod_since      = isset( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) ) ) : '';
+		$client_etag              = isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) && is_string( $_SERVER['HTTP_IF_NONE_MATCH'] )
+			? trim( sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ) ) ) : '';
+		$client_if_mod_since      = isset( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) && is_string( $_SERVER['HTTP_IF_MODIFIED_SINCE'] )
+			? trim( sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) ) ) : '';
 		$client_if_mod_since_unix = strtotime( $client_if_mod_since );
 
 		if ( $etag === $client_etag || $last_modified_unix <= $client_if_mod_since_unix ) {
@@ -139,9 +143,14 @@ class Init {
 
 		// If we made it this far, just serve the file.
 		status_header( 200 );
-		// (WP_Filesystem is only loaded for admin requests, not applicable here).
-		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_read_readfile
+
+		/**
+		 * We could use {@see \WP_Filesystem_Direct::get_contents()} but streaming the file prevents memory issues.
+		 *
+		 * phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		 */
 		readfile( $filepath );
+
 		die();
 	}
 }

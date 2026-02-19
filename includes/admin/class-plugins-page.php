@@ -50,7 +50,7 @@ class Plugins_Page {
 	 * @param array<int|string, string>  $action_links The existing plugin links (usually "Deactivate").
 	 * @param string                     $_plugin_basename The plugin's directory/filename.php.
 	 * @param array<string, string|bool> $_plugin_data Associative array including PluginURI, slug, Author, Version. See `get_plugin_data()`.
-	 * @param string                     $_context     The plugin context. By default this can include 'all', 'active', 'inactive',
+	 * @param string                     $_context     The plugin context. By default, this can include 'all', 'active', 'inactive',
 	 *                                                'recently_activated', 'upgrade', 'mustuse', 'dropins', and 'search'.
 	 *
 	 * @return array<int|string, string> The links to display below the plugin name on plugins.php.

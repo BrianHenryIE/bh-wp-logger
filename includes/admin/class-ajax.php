@@ -13,8 +13,8 @@ use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 /**
  * Handle delete and delete-all actions.
  *
- * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_log()
- * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_all_logs()
+ * @uses API_Interface::delete_log()
+ * @uses API_Interface::delete_all_logs()
  * @uses Logger_Settings_Interface::get_plugin_slug()
  */
 class AJAX {
@@ -50,7 +50,9 @@ class AJAX {
 	public function delete(): void {
 
 		if ( ! isset( $_POST['_wpnonce'], $_POST['plugin_slug'], $_POST['date_to_delete'] )
-			|| ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'bh-wp-logger-delete' ) ) {
+			|| ! is_string( $_POST['_wpnonce'] ) || ! is_string( $_POST['plugin_slug'] ) || ! is_string( $_POST['date_to_delete'] )
+			|| ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'bh-wp-logger-delete' )
+		) {
 			return;
 		}
 
@@ -83,12 +85,14 @@ class AJAX {
 	 *
 	 * @hooked wp_ajax_bh_wp_logger_logs_delete_all
 	 *
-	 * @uses \BrianHenryIE\WP_Logger\API_Interface::delete_all_logs()
+	 * @uses API_Interface::delete_all_logs()
 	 */
 	public function delete_all(): void {
 
 		if ( ! isset( $_POST['_wpnonce'], $_POST['plugin_slug'] )
-			|| ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'bh-wp-logger-delete' ) ) {
+			|| ! is_string( $_POST['_wpnonce'] ) || ! is_string( $_POST['plugin_slug'] )
+			|| ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'bh-wp-logger-delete' )
+		) {
 			return;
 		}
 

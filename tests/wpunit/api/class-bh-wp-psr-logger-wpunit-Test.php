@@ -29,7 +29,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 			)
 		);
 
-		$sut = new BH_WP_PSR_Logger( $setttings );
+		$sut = new BH_WP_PSR_Logger( $setttings, $this->logger );
 
 		$logger = new class() extends ColorLogger {
 			/**
@@ -74,7 +74,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 			)
 		);
 
-		$sut = new BH_WP_PSR_Logger( $setttings );
+		$sut = new BH_WP_PSR_Logger( $setttings, $this->logger );
 
 		$sut->setLogger( $logger );
 		$context = json_decode( '{ "type": 2, "message": "Trying to access array offset on value of type bool", "file": "\/Users\/brianhenry\/Sites\/bh-wc-shipment-tracking-updates\/includes\/strauss\/jamiemadden\/licenseserver\/includes\/class-slswc-client.php", "line": 296, "debug_backtrace": [ { "file": "\/Users\/brianhenry\/Sites\/bh-wc-shipment-tracking-updates\/includes\/strauss\/brianhenryie\/bh-wp-logger\/includes\/PHP\/class-php-shutdown-handler.php", "lineNumber": 87, "arguments": [], "applicationFrame": true, "method": "handle" }, { "file": "unknown", "lineNumber": 0, "arguments": [], "applicationFrame": false, "method": "[top]", "class": null } ], "filters": [] }', true );

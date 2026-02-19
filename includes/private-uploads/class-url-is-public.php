@@ -25,16 +25,20 @@ class URL_Is_Public {
 	 *
 	 * @hooked bh_wp_private_uploads_url_is_public_warning_{$this->settings->get_plugin_slug()}._logger
 	 *
-	 * @param string $message The default message.
+	 * @param string $_message The default message. We will override this, but it is a positional argument in the filter.
 	 * @param string $url The publicly accessible URL.
 	 *
 	 * @return string
 	 */
-	public function change_warning_message( string $message, string $url ): string {
+	public function change_warning_message( string $_message, string $url ): string {
 
-		/* translators: %s: The URL where the log files are accessible. */
-		$new_message = sprintf( __( 'The logs directory is, and should not be, publicly accessible at the URL: %s. Please update your webserver configuration to block access to that folder.', 'bh-wp-logger' ), $url );
-
-		return $new_message;
+		return sprintf(
+			/* translators: %s: The URL where the log files are accessible. */
+			__(
+				'The logs directory is, and should not be, publicly accessible at the URL: %s. Please update your webserver configuration to block access to that folder.',
+				'bh-wp-logger'
+			),
+			$url
+		);
 	}
 }

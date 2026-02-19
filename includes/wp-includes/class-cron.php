@@ -27,7 +27,7 @@ class Cron {
 	 * Cron constructor.
 	 *
 	 * @param API_Interface             $api The logger's main functions. The API instance will delete the old logs.
-	 * @param Logger_Settings_Interface $settings he logger settings are used to determine which plugin we're working with.
+	 * @param Logger_Settings_Interface $settings The logger settings are used to determine which plugin we're working with.
 	 * @param BH_WP_PSR_Logger          $logger The logger itself for logging.
 	 */
 	public function __construct(

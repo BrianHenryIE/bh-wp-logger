@@ -45,11 +45,12 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 	 * Ideally settings should be provided the first time the logger is instantiated, then they do not need
 	 * to be provided when accessing the singleton later on.
 	 *
-	 * @param ?Logger_Settings_Interface $settings The loglevel, plugin name, slug, and basename.
-	 *
-	 * @return LoggerInterface|Logger
 	 * @see Logger_Settings
 	 * @see Plugins
+	 *
+	 * @param ?Logger_Settings_Interface $settings The loglevel, plugin name, slug, and basename.
+	 *
+	 * @return LoggerInterface Ideally a {@see \BrianHenryIE\WP_Logger\Logger} but `NullLogger` sometimes.
 	 */
 	public static function instance( ?Logger_Settings_Interface $settings = null ): LoggerInterface {
 
@@ -78,16 +79,24 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 	/**
 	 * If log level is 'none', use NullLogger.
-	 * If Settings is WooCommerce_Logger_Settings_Interface use WC_Logger.
-	 * Otherwise use KLogger.
+	 * If Settings is WooCommerce_Logger_Settings_Interface use WC_Logger, otherwise use KLogger.
 	 *
 	 * @param Logger_Settings_Interface $settings Basic settings required for the logger.
 	 */
 	public function __construct( Logger_Settings_Interface $settings ) {
 
-		if ( $settings instanceof WooCommerce_Logger_Settings_Interface
-			&& in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) ), true ) ) {
-			// Does not use `is_plugin_active()` here because "Call to undefined function" error (maybe an admin function).
+		/**
+		 * We are not using {@see is_plugin_active()} here because "Call to undefined function" error (it may be an admin function).
+		 *
+		 * @param string $plugin_basename The main plugin file's path relative to WP_PLUGIN_DIR.
+		 */
+		$is_plugin_active = function ( string $plugin_basename ): bool {
+			/** @var array<int,string> $active_plugins */
+			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) );
+			return in_array( $plugin_basename, $active_plugins, true );
+		};
+
+		if ( $settings instanceof WooCommerce_Logger_Settings_Interface && $is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 
 			$logger = new WC_PSR_Logger( $settings );
 
@@ -106,7 +115,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			 * Add the `{context}` template string,
 			 * then provide `'appendContext' => false` to Klogger (since it is already takes care of).
 			 *
-			 * @see \Katzgrau\KLogger\Logger::formatMessage()
+			 * @see KLogger::formatMessage()
 			 */
 			$log_format = "{date} {level} {message}\n{context}";
 
