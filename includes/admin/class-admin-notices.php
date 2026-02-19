@@ -100,7 +100,7 @@ class Admin_Notices extends Notices {
 			if ( ! isset( $_POST['action'] )
 				|| ! is_string( $_POST['action'] )
 				|| 'wptrt_dismiss_notice' !== sanitize_key( wp_unslash( $_POST['action'] ) )
-				|| false === check_admin_referer( $action, 'nonce' )
+				|| false === check_admin_referer( $action, 'nonce' ) // `false === ` doesn't do anything because it `die()`s if it fails.
 			) {
 
 				return;

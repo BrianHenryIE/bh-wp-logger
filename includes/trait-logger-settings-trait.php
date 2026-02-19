@@ -42,7 +42,7 @@ trait Logger_Settings_Trait {
 			return is_string( $saved_option )
 					&& in_array(
 						$saved_option,
-						array_values( ( new ReflectionClass( LogLevel::class ) )->getConstants() ),
+						$this->get_log_levels(),
 						true
 					)
 					? $saved_option
@@ -50,6 +50,23 @@ trait Logger_Settings_Trait {
 		} catch ( Exception ) {
 			return LogLevel::INFO;
 		}
+	}
+
+	/**
+	 * @var string[] $log_levels
+	 */
+	protected array $log_levels;
+
+	/**
+	 * Returns all valid log levels. Only computes it once.
+	 *
+	 * @return string[]
+	 */
+	protected function get_log_levels(): array {
+		if ( ! isset( $this->log_levels ) ) {
+			$this->log_levels = array_values( ( new ReflectionClass( LogLevel::class ) )->getConstants() );
+		}
+		return $this->log_levels;
 	}
 
 	/**
