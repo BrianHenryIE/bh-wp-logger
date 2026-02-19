@@ -87,6 +87,7 @@ class Admin_Notices extends Notices {
 		}
 
 		// Don't show during plugin installs.
+		/** @var string $pagenow */
 		global $pagenow;
 		if ( 'updater.php' === $pagenow ) {
 			return;
@@ -109,8 +110,6 @@ class Admin_Notices extends Notices {
 		$error_detail_option_name = $this->get_error_detail_option_name();
 
 		// If we're on the logs page, don't show the admin notice linking to the logs page.
-		/** @var string $pagenow */
-		global $pagenow;
 		/** @var string $plugin_page */
 		global $plugin_page;
 		if ( 'admin.php' === $pagenow && $this->settings->get_plugin_slug() . '-logs' === $plugin_page ) {
