@@ -60,7 +60,7 @@ class Init_Unit_Test extends Unit_Testcase {
 
 		$init = new Init( $api, $settings, $logger );
 
-		$_GET['download-log'] = true;
+		$_GET['download-log'] = 'true';
 		$_GET['_wpnonce']     = 'a-bad-nonce';
 
 		$init->maybe_download_log();

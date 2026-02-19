@@ -49,7 +49,7 @@ class Init {
 	 */
 	public function maybe_download_log(): void {
 
-		if ( ! isset( $_GET['download-log'] ) ) {
+		if ( ! isset( $_GET['download-log'] ) || ! is_string( $_GET['download-log'] ) ) {
 			return;
 		}
 
@@ -63,7 +63,10 @@ class Init {
 			return;
 		}
 
-		if ( ! isset( $_GET['page'] ) || ! isset( $_GET['date'] ) ) {
+		if (
+			! isset( $_GET['page'] ) || ! isset( $_GET['date'] )
+			|| ! is_string( $_GET['page'] ) || ! is_string( $_GET['date'] )
+		) {
 			return;
 		}
 
@@ -127,8 +130,10 @@ class Init {
 		header( 'Expires: ' . gmdate( $date_format, time() + HOUR_IN_SECONDS ) ); // an arbitrary hour from now.
 
 		// Support for caching.
-		$client_etag              = isset( $_REQUEST['HTTP_IF_NONE_MATCH'] ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_NONE_MATCH'] ) ) ) : '';
-		$client_if_mod_since      = isset( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) ) ) : '';
+		$client_etag              = isset( $_REQUEST['HTTP_IF_NONE_MATCH'] ) && is_string( $_REQUEST['HTTP_IF_NONE_MATCH'] )
+			? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_NONE_MATCH'] ) ) ) : '';
+		$client_if_mod_since      = isset( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) && is_string( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] )
+			? trim( sanitize_text_field( wp_unslash( $_REQUEST['HTTP_IF_MODIFIED_SINCE'] ) ) ) : '';
 		$client_if_mod_since_unix = strtotime( $client_if_mod_since );
 
 		if ( $etag === $client_etag || $last_modified_unix <= $client_if_mod_since_unix ) {
@@ -139,9 +144,14 @@ class Init {
 
 		// If we made it this far, just serve the file.
 		status_header( 200 );
-		// (WP_Filesystem is only loaded for admin requests, not applicable here).
-		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_read_readfile
+
+		/**
+		 * We could use {@see \WP_Filesystem_Direct::get_contents()} but streaming the file prevents memory issues.
+		 *
+		 * phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		 */
 		readfile( $filepath );
+
 		die();
 	}
 }
