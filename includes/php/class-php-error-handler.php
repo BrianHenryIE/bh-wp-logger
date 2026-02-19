@@ -120,8 +120,8 @@ class PHP_Error_Handler {
 	/**
 	 * Call the chain of other registered error handlers before returning the result.
 	 *
-	 * @param bool              $handled Flag to indicate has the error already been handled.
-	 * @param array<int|string> $args    The arguments passed by PHP to our own registered error handler.
+	 * @param bool                          $handled Flag to indicate has the error already been handled.
+	 * @param array<int|string>|list<mixed> $args    The arguments passed by PHP to our own registered error handler.
 	 *
 	 * @return bool True if the error has been handled, false if PHP error handler should still run.
 	 */
