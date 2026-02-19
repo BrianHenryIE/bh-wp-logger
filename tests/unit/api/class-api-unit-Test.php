@@ -129,6 +129,15 @@ EOD;
 		);
 
 		\WP_Mock::userFunction(
+			'current_user_can',
+			array(
+				'args'   => array( 'activate_plugins' ),
+				'times'  => 1,
+				'return' => true,
+			)
+		);
+
+		\WP_Mock::userFunction(
 			'set_transient',
 			array(
 				'args'  => array( 'test-last-log-time', '2022-02-23T22:56:01+00:00', DAY_IN_SECONDS ),
