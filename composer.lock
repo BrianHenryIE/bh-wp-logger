@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fccb4e03d44a33d23467bf8c1d3d988f",
+    "content-hash": "47b7e60e773f2037eb48c6be8eb13e8f",
     "packages": [
         {
             "name": "brianhenryie/bh-wc-logger",
@@ -3251,16 +3251,16 @@
         },
         {
             "name": "lucatume/wp-browser",
-            "version": "4.5.13",
+            "version": "4.5.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lucatume/wp-browser.git",
-                "reference": "b4cd300d2f2578a5bc85a0a1ef52ae656c2c6875"
+                "reference": "45f11d432dace2e008560bf098a63a1412a58138"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lucatume/wp-browser/zipball/b4cd300d2f2578a5bc85a0a1ef52ae656c2c6875",
-                "reference": "b4cd300d2f2578a5bc85a0a1ef52ae656c2c6875",
+                "url": "https://api.github.com/repos/lucatume/wp-browser/zipball/45f11d432dace2e008560bf098a63a1412a58138",
+                "reference": "45f11d432dace2e008560bf098a63a1412a58138",
                 "shasum": ""
             },
             "require": {
@@ -3341,7 +3341,7 @@
             ],
             "support": {
                 "issues": "https://github.com/lucatume/wp-browser/issues",
-                "source": "https://github.com/lucatume/wp-browser/tree/4.5.13"
+                "source": "https://github.com/lucatume/wp-browser/tree/4.5.14"
             },
             "funding": [
                 {
@@ -3349,7 +3349,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-18T16:39:07+00:00"
+            "time": "2026-02-19T10:13:12+00:00"
         },
         {
             "name": "marc-mabe/php-enum",
@@ -11172,7 +11172,9 @@
         "php": ">=8.0",
         "ext-json": "*"
     },
-    "platform-dev": {},
+    "platform-dev": {
+        "ext-curl": "*"
+    },
     "platform-overrides": {
         "php": "8.0"
     },
