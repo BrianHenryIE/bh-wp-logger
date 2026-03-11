@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fccb4e03d44a33d23467bf8c1d3d988f",
+    "content-hash": "47b7e60e773f2037eb48c6be8eb13e8f",
     "packages": [
         {
             "name": "brianhenryie/bh-wc-logger",
@@ -11126,15 +11126,15 @@
         },
         {
             "name": "wpackagist-plugin/woocommerce",
-            "version": "10.5.2",
+            "version": "10.6.0",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/woocommerce/",
-                "reference": "tags/10.5.2"
+                "reference": "tags/10.6.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/woocommerce.10.5.2.zip"
+                "url": "https://downloads.wordpress.org/plugin/woocommerce.10.6.0.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -11172,9 +11172,11 @@
         "php": ">=8.0",
         "ext-json": "*"
     },
-    "platform-dev": {},
+    "platform-dev": {
+        "ext-curl": "*"
+    },
     "platform-overrides": {
         "php": "8.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
