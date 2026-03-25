@@ -53,15 +53,11 @@ class Logs_Page {
 	 * @hooked admin_init
 	 */
 	public function set_page_title(): void {
-		/**
-		 * Data is never written.
-		 * phpcs:disable WordPress.Security.NonceVerification.Recommended
-		 */
-		if (
-			! isset( $_REQUEST['page'] )
-			|| ! is_string( $_REQUEST['page'] )
-			|| $this->settings->get_plugin_slug() . '-logs' !== sanitize_key( wp_unslash( $_REQUEST['page'] ) )
-		) {
+		/** @var string $pagenow */
+		global $pagenow;
+		/** @var string $plugin_page */
+		global $plugin_page;
+		if ( 'admin.php' !== $pagenow && $this->settings->get_plugin_slug() . '-logs' !== $plugin_page ) {
 			return;
 		}
 
