@@ -156,16 +156,16 @@
         },
         {
             "name": "brianhenryie/bh-wp-private-uploads",
-            "version": "0.2.0",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads.git",
-                "reference": "abe5de677475fa30ad4313574b1618c4f558ec42"
+                "reference": "c9b61fc9e1a86f1dee56f45aa1342d463d0ddaee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BrianHenryIE/bh-wp-private-uploads/zipball/abe5de677475fa30ad4313574b1618c4f558ec42",
-                "reference": "abe5de677475fa30ad4313574b1618c4f558ec42",
+                "url": "https://api.github.com/repos/BrianHenryIE/bh-wp-private-uploads/zipball/c9b61fc9e1a86f1dee56f45aa1342d463d0ddaee",
+                "reference": "c9b61fc9e1a86f1dee56f45aa1342d463d0ddaee",
                 "shasum": ""
             },
             "require": {
@@ -180,8 +180,7 @@
                 "antecedent/patchwork": "^2.1",
                 "behat/behat": "^3.15.0",
                 "brianhenryie/color-logger": "*",
-                "brianhenryie/php-codecoverage-markdown": "^0.1.0",
-                "cweagans/composer-patches": "*",
+                "brianhenryie/php-codecoverage-markdown": "^0.2",
                 "dealerdirect/phpcodesniffer-composer-installer": "*",
                 "dvdoug/behat-code-coverage": "^5.3",
                 "ext-json": "*",
@@ -233,9 +232,9 @@
             "description": "WordPress library for serving private/protected file uploads.",
             "support": {
                 "issues": "https://github.com/BrianHenryIE/bh-wp-private-uploads/issues",
-                "source": "https://github.com/BrianHenryIE/bh-wp-private-uploads/tree/0.2.0"
+                "source": "https://github.com/BrianHenryIE/bh-wp-private-uploads/tree/0.2.1"
             },
-            "time": "2026-02-12T01:41:35+00:00"
+            "time": "2026-04-02T21:40:00+00:00"
         },
         {
             "name": "katzgrau/klogger",
@@ -11178,5 +11177,5 @@
     "platform-overrides": {
         "php": "8.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
