@@ -184,10 +184,13 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 				}
 			};
 
-			// Don't use the Private_Uploads singleton in case the parent plugin also needs it.
-			$private_uploads = new Private_Uploads( $private_uploads_settings, $this );
-			new BH_WP_Private_Uploads_Hooks( $private_uploads, $private_uploads_settings, $this );
+			// Mute debug logs from library: the handler drops records below INFO.
+			$private_uploads_logger = new \Monolog\Logger( $settings->get_plugin_slug() . '-private-uploads' );
+			$private_uploads_logger->pushHandler( new PsrHandler( $logger, \Monolog\Logger::INFO ) );
 
+			// Don't use the Private_Uploads singleton in case the parent plugin also needs it.
+			$private_uploads_api = new Private_Uploads( $private_uploads_settings, $private_uploads_logger );
+			new BH_WP_Private_Uploads_Hooks( $private_uploads_api, $private_uploads_settings, $private_uploads_logger );
 		}
 
 		parent::__construct( $settings, $logger );
