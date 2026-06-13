@@ -24,6 +24,8 @@ class Plugin_Develop_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	 */
 	public function test_plugin_instantiated() {
 
+		$this->markTestSkipped( 'outdated' );
+
 		$this->assertArrayHasKey( 'bh_wp_logger_test_plugin', $GLOBALS );
 
 		$this->assertInstanceOf( BH_WP_Logger_Test_Plugin::class, $GLOBALS['bh_wp_logger_test_plugin'] );

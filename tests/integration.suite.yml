@@ -4,20 +4,18 @@
 
 actor: WpunitTester
 modules:
-    enabled:
-        - WPLoader
-        - \Helper\Wpunit
-    config:
-        WPLoader:
-            wpRootFolder: "%WP_ROOT_FOLDER%"
-            dbName: "%TEST_DB_NAME%"
-            dbHost: "%TEST_DB_HOST%"
-            dbUser: "%TEST_DB_USER%"
-            dbPassword: "%TEST_DB_PASSWORD%"
-            tablePrefix: "%TEST_TABLE_PREFIX%"
-            domain: "%TEST_SITE_WP_DOMAIN%"
-            adminEmail: "%TEST_SITE_ADMIN_EMAIL%"
-            title: "bh-wp-logger-development-plugin"
-            plugins: ['bh-wp-logger-development-plugin/bh-wp-logger-development-plugin.php']
-            activatePlugins: ['bh-wp-logger-development-plugin/bh-wp-logger-development-plugin.php']
+  enabled:
+    - lucatume\WPBrowser\Module\WPLoader
+    - \Helper\Wpunit
+  config:
+    lucatume\WPBrowser\Module\WPLoader:
+      loadOnly: false
+      wpRootFolder: "%WP_ROOT_FOLDER%"
+      dbUrl: 'mysql://%TEST_DB_USER%:%TEST_DB_PASSWORD%@%TEST_DB_HOST%:%TEST_DB_PORT%/%TEST_DB_NAME%'
+      tablePrefix: "%TEST_TABLE_PREFIX%"
+      domain: "%TEST_SITE_WP_DOMAIN%"
+      adminEmail: "%TEST_SITE_ADMIN_EMAIL%"
+      title: "bh-wp-logger-development-plugin"
+      plugins: ['/Users/brianhenry/Sites/bh-wp-logger/development-plugin/development-plugin.php']
+      activatePlugins: ['development-plugin/development-plugin.php']
 bootstrap: _bootstrap.php
