@@ -1,13 +1,18 @@
 # Changelog
 
-== 0.4 ==
+## 0.3.0 – 2026-06-12
+
+* Add: Monolog (replacing KLogger)
+* Mute downstream BH Private Uploads debug logs
+
+== 0.0.4 ==
 
 * Fix: fatal error in brianhenryie/bh-wp-private-uploads
 * Fix: fatal error when using `Logger_Settings_Trait` default plugin name
 * Add: WP CLI command to log context
 * Add: WP CLI commands to delete logs
 
-== 0.3 == 2023-04-11 ==
+== 0.0.3 == 2023-04-11 ==
 
 * Use new WPTT Admin Notices bugfix patch https://github.com/WPTT/admin-notices/pull/15
 * Fix: JavaScript dependencies (`wp_enqueue_script` `$deps` array)
@@ -21,7 +26,7 @@
 
 74 PhpUnit tests, ~48% coverage.
 
-== 0.2 == 2023-03-02 ==
+== 0.0.2 == 2023-03-02 ==
 
 * Fix: Test plugin loading assets
 * Add: auto-size date column, allow resizing all columns
