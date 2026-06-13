@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3 – 2026-06-12
+
+* `public function error(Stringable|string $message, array $context = []): void`
+
 ## 0.3.2 – 2026-06-12
 
 * `composer require psr/log:"^2.0 || ^3.0"`
