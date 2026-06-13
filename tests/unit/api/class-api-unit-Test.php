@@ -32,7 +32,7 @@ class API_Unit_Test extends Unit_Testcase {
 	 */
 	public function test_parse_logs_simple(): void {
 
-		$this->markTestSkipped( 'Test data file not found at: /Users/brian.henry/Sites/bh-wp-logger/tests/_data/simple-log-8-lines.log' );
+		$this->markTestSkipped( 'Test data file not found at: tests/_data/simple-log-8-lines.log' );
 
 		global $project_root_dir;
 
