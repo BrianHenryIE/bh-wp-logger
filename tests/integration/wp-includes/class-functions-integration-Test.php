@@ -24,6 +24,16 @@ class Functions_Integration_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase
 	 */
 	public function test_deprecated_function(): void {
 
+		/**
+		 * Remove wp-browser's deprecated warnings test fail mechanism.
+		 *
+		 * @see WPTestCase.php:303
+		 *
+		 * @var \WP_Hook[] $wp_filter
+		 */
+		global $wp_filter;
+		array_pop( $wp_filter['deprecated_function_run']->callbacks[10] );
+
 		$test_logger = $this->logger;
 		$logger      = Logger::instance();
 		$logger->setLogger( $test_logger );
