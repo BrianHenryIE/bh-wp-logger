@@ -5,6 +5,7 @@ namespace BrianHenryIE\WP_Logger;
 use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface;
 use Katzgrau\KLogger\Logger as KLogger;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -95,7 +96,7 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 		$logger = $sut->get_logger();
 
-		$this->assertInstanceOf( KLogger::class, $logger );
+		$this->assertInstanceOf( \Monolog\Logger::class, $logger );
 	}
 
 
@@ -146,6 +147,6 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 		$logger = $sut->get_logger();
 
-		$this->assertInstanceOf( KLogger::class, $logger );
+		$this->assertInstanceOf( \Monolog\Logger::class, $logger );
 	}
 }

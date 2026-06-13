@@ -23,7 +23,10 @@ use BrianHenryIE\WP_Private_Uploads\BH_WP_Private_Uploads_Hooks;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Interface;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Trait;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads;
-use Katzgrau\KLogger\Logger as KLogger;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\PsrHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -113,26 +116,41 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 			/**
 			 * Add the `{context}` template string,
-			 * then provide `'appendContext' => false` to Klogger (since it is already takes care of).
+			 * then provide `'appendContext' => false` to Lineformatter (since it is already takes care of).
 			 *
-			 * @see KLogger::formatMessage()
+			 * @see LineFormatter::SIMPLE_FORMAT
+			 * "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
 			 */
-			$log_format = "{date} {level} {message}\n{context}";
+			$log_format = "%datetime% %level_name% %message%\n%context%";
+
+			// /path/to/.../wp-content/uploads/logs/bh-wp-logger-test-plugin-2024-04-20.log
+			$logfile = sprintf(
+				'%s/%s-%s.log',
+				$log_directory,
+				$settings->get_plugin_slug(),
+				gmdate( 'Y-m-d' )
+			);
 
 			/**
 			 * `c` is chosen to match WooCommerce's choice.
 			 *
+			 * ISO8601: "2004-02-12T15:19:21+00:00".
+			 *
 			 * @see WC_Log_Handler::format_time()
 			 */
-			$options = array(
-				'extension'     => 'log',
-				'prefix'        => "{$settings->get_plugin_slug()}-",
-				'dateFormat'    => 'c',
-				'logFormat'     => $log_format,
-				'appendContext' => false,
+			$formatter = new LineFormatter(
+				format: $log_format,
+				dateFormat: 'c',
+				allowInlineLineBreaks: true,
+				ignoreEmptyContextAndExtra: true,
+				includeStacktraces: false
 			);
 
-			$logger = new KLogger( $log_directory, $log_level_threshold, $options );
+			$logger  = new \Monolog\Logger( $settings->get_plugin_slug() );
+			$handler = new StreamHandler( $logfile, $log_level_threshold );
+			$handler->setFormatter( $formatter );
+			$logger->pushHandler( $handler );
+			$logger->pushProcessor( new PsrLogMessageProcessor() );
 
 			// Make the logs directory inaccessible to the public.
 			$private_uploads_settings = new class( $settings ) implements Private_Uploads_Settings_Interface {

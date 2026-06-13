@@ -56,11 +56,10 @@
     "require": {
         "php": ">=8.0",
         "ext-json": "*",
-        "brianhenryie/bh-wp-private-uploads": "^0.2",
-        "brianhenryie/bh-wc-logger": "^0.1.0",
+        "brianhenryie/bh-wp-private-uploads": ">=0.3.0",
+        "brianhenryie/bh-wc-logger": ">=0.1.0",
         "brianhenryie/bh-wp-cli-logger": "^1.0",
-        "katzgrau/klogger": "dev-master",
-        "psr/log": "^1.0",
+        "monolog/monolog": "*",
         "wptrt/admin-notices": "^1.0"
     },
     "require-dev": {
