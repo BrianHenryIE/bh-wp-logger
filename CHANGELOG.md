@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 – 2026-06-12
+
+* `composer require psr/log:"^2.0 || ^3.0"`
+
 ## 0.3.1 – 2026-06-12
 
 * Loosen `bh-wp-cli-logger` requirement to any newer version (the psr/log requirement will dictate what is installed)
