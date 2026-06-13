@@ -60,6 +60,7 @@
         "brianhenryie/bh-wc-logger": ">=0.1.0",
         "brianhenryie/bh-wp-cli-logger": ">=1.0",
         "monolog/monolog": "*",
+        "psr/log": "^2.0 || ^3.0",
         "wptrt/admin-notices": "^1.0"
     },
     "require-dev": {
@@ -67,7 +68,7 @@
         "10up/wp_mock": "^1.0",
         "antecedent/patchwork": "^2.1",
         "alleyinteractive/wordpress-autoloader": "^1.1",
-        "brianhenryie/color-logger": "^1.0",
+        "brianhenryie/color-logger": "*",
         "brianhenryie/php-codecoverage-markdown": "*",
         "johnpbloch/wordpress": "*",
         "lucatume/wp-browser": "^4.5",

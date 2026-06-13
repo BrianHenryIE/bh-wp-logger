@@ -19,6 +19,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use ReflectionClass;
 use ReflectionException;
+use Stringable;
 use WP_CLI;
 use WP_CLI\Runner;
 
@@ -97,7 +98,8 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 * @param array<int|string, mixed> $context Additional information to be logged (not saved at all log levels).
 	 * @see LogLevel
 	 */
-	public function log( $level, $message, $context = array() ) {
+	public function log( $level, string|Stringable $message, array $context = array() ): void {
+		$message = (string) $message;
 
 		$context = array_merge( $context, $this->get_common_context() );
 
