@@ -77,7 +77,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 * @param string               $message The message to be logged.
 	 * @param array<string, mixed> $context Data to record the system state at the time of the log.
 	 */
-	public function error( $message, $context = array() ) {
+	public function error(Stringable|string $message, array $context = []): void {
 
 		$this->log( LogLevel::ERROR, $message, $context );
 	}
