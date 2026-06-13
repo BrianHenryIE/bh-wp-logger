@@ -79,7 +79,6 @@
         "szepeviktor/phpstan-wordpress": "*",
         "woocommerce/woocommerce-sniffs": "*",
         "wordpress/wordpress": "*",
-        "wp-cli/wp-cli-bundle": "*",
         "wp-coding-standards/wpcs": "^3.0",
         "wpackagist-theme/twentytwenty": "*",
         "wpackagist-plugin/woocommerce": "*"
@@ -93,8 +92,8 @@
             "@sync-composer-wpenv"
         ],
         "sync-composer-wpenv": [
-            "for name in $(cat .wp-env.json | jq '.mappings | values[]' | sed -r 's/^\\\"|\\\"$//g'); do [ ! -d $name ] && [ ! -f $name ] && echo $name && jq 'del(.. | select(. ==\"'$name'\"))' .wp-env.json | sponge .wp-env.json || true; done",
-            "find wp-content/plugins -type d -depth 1 ! -type l | sort -h | jq -Rn '[inputs]' | jq 'reduce .[] as $item ({}; . + {$item:$item})' | jq '.[] |= \"./\\(.)\"' | jq '. | {mappings: .}' | jq --sort-keys -s '.[] * $existing[]' --slurpfile existing .wp-env.json | sponge .wp-env.json"
+            "php ./bin/sync-composer-wpenv.php",
+            "php ./bin/wpenv-mappings-to-phpstorm.php"
         ],
         "test": [
             "codecept run unit",

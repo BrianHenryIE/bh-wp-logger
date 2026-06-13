@@ -62,9 +62,6 @@ jobs:
         with:
           env-file: .env.testing
 
-      - name: Install sponge
-        run: sudo apt-get install moreutils
-
       - name: Install PHP dependencies
         run: composer install --verbose
 

@@ -15,6 +15,7 @@
     <arg name="colors"/>
 
     <exclude-pattern>/assets/</exclude-pattern>
+    <exclude-pattern>/bin/</exclude-pattern>
     <exclude-pattern>/dist-archive/</exclude-pattern>
     <exclude-pattern>/node_modules/</exclude-pattern>
     <exclude-pattern>/scratch/</exclude-pattern>

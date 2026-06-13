@@ -18,5 +18,6 @@
     "wp-content/plugins/vendor": "./vendor",
     "wp-content/plugins/woocommerce": "./wp-content/plugins/woocommerce"
   },
-  "phpVersion": "8.4"
+  "phpVersion": "8.0",
+  "core": "WordPress/WordPress#6.9.4"
 }
