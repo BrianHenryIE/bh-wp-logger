@@ -1,9 +1,18 @@
 # Changelog
 
+## 0.3.1 – 2026-06-12
+
+* Loosen `bh-wp-cli-logger` requirement to any newer version (the psr/log requirement will dictate what is installed)
+
 ## 0.3.0 – 2026-06-12
 
 * Add: Monolog (replacing KLogger)
 * Mute downstream BH Private Uploads debug logs
+* Don't show recent error admin_notice on plugin install page
+
+## 0.2.1 - 2026-02-18
+
+* Pass `''` to `strip_tags()` instead of `null`
 
 == 0.0.4 ==
 
