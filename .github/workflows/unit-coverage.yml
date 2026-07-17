@@ -50,6 +50,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: ${{ matrix.php == env.COVERAGE_PHP_VERSION && 'xdebug' || 'none' }}
+          ini-values: register_argc_argv=on # 8.5: PHP Fatal error: Uncaught Codeception\Exception\ConfigurationException: register_argc_argv must be set to On for running Codeception
 
       - name: Update .env.testing config for GitHub Actions
         env:
