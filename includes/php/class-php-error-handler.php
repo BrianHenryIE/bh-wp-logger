@@ -81,6 +81,8 @@ class PHP_Error_Handler {
 		/**
 		 * The `set_error_handler()` has been called with a different number of functions in different PHP versions
 		 * so rather than passing the values one-by-one, we'll pass them as they were passed to this method.
+		 *
+		 * @var array<string|int> $func_args
 		 */
 		$func_args = func_get_args();
 
