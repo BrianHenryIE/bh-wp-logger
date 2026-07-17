@@ -2,6 +2,8 @@
 
 ## 0.3.4 – 2026-07-17
 
+* Require PHP 8.1
+* Update: bh-wp-private-uploads
 * Fix: infinite loop when an error occurs in a delegate logger
 * Fix: display of log entries in table
 * Fix: deprecation warnings for `Reflection*::setAccessible()`

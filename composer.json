@@ -19,7 +19,7 @@
             "phpstan/extension-installer": true
         },
         "platform": {
-            "php": "8.0"
+            "php": "8.1"
         },
         "process-timeout": 0,
         "sort-packages": true
@@ -49,14 +49,14 @@
             "url": "https://wpackagist.org"
         },
         "wordpress/wordpress": {
-            "url": "https://github.com/WordPress/wordpress-develop",
+            "url": "https://github.com/WordPress/wordpress-develop.git",
             "type": "git"
         }
     },
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.1",
         "ext-json": "*",
-        "brianhenryie/bh-wp-private-uploads": ">=0.3.0",
+        "brianhenryie/bh-wp-private-uploads": ">=0.4.0",
         "brianhenryie/bh-wc-logger": ">=0.1.0",
         "brianhenryie/bh-wp-cli-logger": ">=1.0",
         "monolog/monolog": "*",
