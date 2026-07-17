@@ -1,7 +1,14 @@
 <?php
+/**
+ * Runs after WordPress loaded, before any tests are run
+ *
+ * @package brianhenryie/bh-wp-logger
+ */
 
 /**
  * Fix.
+ *
+ * TODO: move this to `development-plugin`.
  *
  * @see plugin_basename
  */
