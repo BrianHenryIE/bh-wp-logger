@@ -53,6 +53,79 @@ class API_Unit_Test extends Unit_Testcase {
 	}
 
 	/**
+	 * This line was not parsing correctly
+	 *
+	 * @covers ::parse_log
+	 * @covers ::log_lines_to_entry
+	 */
+	public function test_parse_log_problem(): void {
+
+		$log_entry = <<<'EOD'
+2026-07-17T19:36:59+00:00 ERROR Uncaught Exception: log test exception in /var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php:99
+Stack trace:
+#0 /var/www/html/wp-includes/class-wp-hook.php(341): BH_WP_Logger_Test_Plugin\Admin\Admin_Ajax->handle_request('')
+#1 /var/www/html/wp-includes/class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#2 /var/www/html/wp-includes/plugin.php(522): WP_Hook->do_action(Array)
+#3 /var/www/html/wp-admin/admin-ajax.php(192): do_action('wp_ajax_log')
+#4 {main}
+  thrown
+{"type":1,"message":"Uncaught Exception: log test exception in /var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php:99
+Stack trace:
+#0 /var/www/html/wp-includes/class-wp-hook.php(341): BH_WP_Logger_Test_Plugin\\Admin\\Admin_Ajax->handle_request('')
+#1 /var/www/html/wp-includes/class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#2 /var/www/html/wp-includes/plugin.php(522): WP_Hook->do_action(Array)
+#3 /var/www/html/wp-admin/admin-ajax.php(192): do_action('wp_ajax_log')
+#4 {main}
+  thrown","file":"/var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php","line":99,"debug_backtrace":[{"file":"/var/www/html/wp-content/uploads/development-plugin/includes/api/class-bh-wp-psr-logger.php","line":123,"function":"get_backtrace","class":"BrianHenryIE\\WP_Logger\\API\\API","object":{"BrianHenryIE\\WP_Logger\\Logger":[]},"type":"->","args":[]},{"file":"/var/www/html/wp-content/uploads/development-plugin/includes/api/class-bh-wp-psr-logger.php","line":87,"function":"log","class":"BrianHenryIE\\WP_Logger\\API\\BH_WP_PSR_Logger","object":{"BrianHenryIE\\WP_Logger\\Logger":[]},"type":"->","args":["error","Uncaught Exception: log test exception in /var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php:99
+Stack trace:
+#0 /var/www/html/wp-includes/class-wp-hook.php(341): BH_WP_Logger_Test_Plugin\\Admin\\Admin_Ajax->handle_request('')
+#1 /var/www/html/wp-includes/class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#2 /var/www/html/wp-includes/plugin.php(522): WP_Hook->do_action(Array)
+#3 /var/www/html/wp-admin/admin-ajax.php(192): do_action('wp_ajax_log')
+#4 {main}
+  thrown",{"type":1,"message":"Uncaught Exception: log test exception in /var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php:99
+Stack trace:
+#0 /var/www/html/wp-includes/class-wp-hook.php(341): BH_WP_Logger_Test_Plugin\\Admin\\Admin_Ajax->handle_request('')
+#1 /var/www/html/wp-includes/class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#2 /var/www/html/wp-includes/plugin.php(522): WP_Hook->do_action(Array)
+#3 /var/www/html/wp-admin/admin-ajax.php(192): do_action('wp_ajax_log')
+#4 {main}
+  thrown","file":"/var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php","line":99}]},{"file":"/var/www/html/wp-content/uploads/development-plugin/includes/php/class-php-shutdown-handler.php","line":71,"function":"error","class":"BrianHenryIE\\WP_Logger\\API\\BH_WP_PSR_Logger","object":{"BrianHenryIE\\WP_Logger\\Logger":[]},"type":"->","args":["Uncaught Exception: log test exception in /var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php:99
+Stack trace:
+#0 /var/www/html/wp-includes/class-wp-hook.php(341): BH_WP_Logger_Test_Plugin\\Admin\\Admin_Ajax->handle_request('')
+#1 /var/www/html/wp-includes/class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#2 /var/www/html/wp-includes/plugin.php(522): WP_Hook->do_action(Array)
+#3 /var/www/html/wp-admin/admin-ajax.php(192): do_action('wp_ajax_log')
+#4 {main}
+  thrown",{"type":1,"message":"Uncaught Exception: log test exception in /var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php:99
+Stack trace:
+#0 /var/www/html/wp-includes/class-wp-hook.php(341): BH_WP_Logger_Test_Plugin\\Admin\\Admin_Ajax->handle_request('')
+#1 /var/www/html/wp-includes/class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#2 /var/www/html/wp-includes/plugin.php(522): WP_Hook->do_action(Array)
+#3 /var/www/html/wp-admin/admin-ajax.php(192): do_action('wp_ajax_log')
+#4 {main}
+  thrown","file":"/var/www/html/wp-content/uploads/development-plugin/development-plugin/Admin/class-admin-ajax.php","line":99}]},{"function":"handle","class":"BrianHenryIE\\WP_Logger\\PHP\\PHP_Shutdown_Handler","object":{"BrianHenryIE\\WP_Logger\\PHP\\PHP_Shutdown_Handler":[]},"type":"->","args":[]}],"filters":["wp_ajax_log"]}
+EOD;
+
+		$temp_file = tempnam( sys_get_temp_dir(), 'log' ) . '.txt';
+
+		try {
+			file_put_contents( $temp_file, $log_entry );
+
+			$logger   = $this->logger;
+			$settings = $this->makeEmpty( Logger_Settings_Interface::class );
+
+			$sut = new API( $settings, $logger );
+
+			$result = $sut->parse_log( $temp_file );
+
+			$this->assertNotNull( $result[0]['context'], 'context not properly parsed from log entry');
+		} finally {
+			unlink( $temp_file );
+		}
+	}
+
+	/**
 	 * A log message could span multiple lines, e.g. fatal error backtrace.
 	 *
 	 * @covers ::parse_log
