@@ -121,7 +121,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			 * @see LineFormatter::SIMPLE_FORMAT
 			 * "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
 			 */
-			$log_format = "%datetime% %level_name% %message%\n%context%";
+			$log_format = "%datetime% %level_name% %message%\n%context%\n";
 
 			// /path/to/.../wp-content/uploads/logs/bh-wp-logger-test-plugin-2024-04-20.log
 			$logfile = sprintf(

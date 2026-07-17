@@ -447,7 +447,7 @@ class API implements API_Interface {
 
 			$datetime = new DateTimeImmutable( "@{$timestamp}" );
 
-			set_transient( $transient_name, $datetime->format( DateTimeInterface::ATOM ), DAY_IN_SECONDS );
+			set_transient( $transient_name, $datetime->format( DateTimeInterface::ATOM ), constant( 'DAY_IN_SECONDS' ) );
 
 			// Log time will always be UTC.
 			return $datetime;
@@ -523,14 +523,13 @@ class API implements API_Interface {
 	 */
 	public function parse_log( string $filepath ): array {
 
-		$file_lines = file( $filepath );
+		// The file is read one line at a time to avoid loading a potentially large log into memory.
+		$file_handle = fopen( $filepath, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
-		if ( false === $file_lines ) {
-			// Failed to read file.
+		if ( false === $file_handle ) {
+			// Failed to open the file.
 			return array();
 		}
-
-		$entries = array();
 
 		if ( $this->logger instanceof WC_PSR_Logger ) {
 			$pattern = '/^(?P<time>[^\s]*)\s(?P<level>\w*)\s(?P<message>.*?)\sCONTEXT:\s(?P<context>.*)/';
@@ -538,53 +537,126 @@ class API implements API_Interface {
 			$pattern = '/(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})\s(?P<level>\w*)\s(?P<message>.*)/im';
 		}
 
-		// TODO: This will fail if the first line does not parse.
-		foreach ( $file_lines as $input_line ) {
-			$output_array = array();
-			if ( 1 === preg_match( $pattern, $input_line, $output_array ) ) {
-				$entries[] = array(
-					'line_one_parsed' => $output_array,
-					'lines'           => array( $output_array['context'] ?? '' ),
-				);
-			} else {
-				$entries[ count( $entries ) - 1 ]['lines'][] = $input_line;
+		$time_pattern = '/^(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})/i';
+
+		$entries = array();
+
+		/**
+		 * Each log entry begins with a line starting with a timestamp ($time_pattern). Read the file
+		 * one line at a time, accumulating the lines of the current entry until the next timestamped
+		 * line (or the end of the file), then hand the collected lines off to be parsed into a single
+		 * entry. Lines before the first timestamp do not belong to any entry and are discarded.
+		 */
+		$entry_lines = array();
+
+		while ( false !== ( $line = fgets( $file_handle ) ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+
+			$line = rtrim( $line, "\r\n" );
+
+			if ( 1 === preg_match( $time_pattern, $line ) ) {
+				// A new entry starts on this line; parse the entry that just ended.
+				if ( count( $entry_lines ) > 0 ) {
+					$entry = $this->log_lines_to_entry( $entry_lines, $pattern );
+					if ( ! is_null( $entry ) ) {
+						$entries[] = $entry;
+					}
+				}
+				$entry_lines = array( $line );
+			} elseif ( count( $entry_lines ) > 0 ) {
+				// A continuation line, e.g. a stack trace or multi-line JSON context.
+				$entry_lines[] = $line;
 			}
 		}
 
-		return array_map( array( $this, 'log_lines_to_entry' ), $entries );
+		// Parse the final entry.
+		if ( count( $entry_lines ) > 0 ) {
+			$entry = $this->log_lines_to_entry( $entry_lines, $pattern );
+			if ( ! is_null( $entry ) ) {
+				$entries[] = $entry;
+			}
+		}
+
+		return $entries;
 	}
 
 	/**
-	 * Given the set of lines that constitutes a single log entry, this parses them into the array of time, level, message, context.
+	 * Given the lines that make up a single log entry, parse them into the time, level, message and context.
+	 *
+	 * The first line contains the time, level and message (and, for WooCommerce, an inline context). Any
+	 * remaining lines are a continuation of the message (e.g. a stack trace) followed by the JSON context.
+	 * To recover the context: if the entry ends with `}`, seek in reverse for the line that opens the JSON
+	 * object, decode from there to the end, and treat the lines before it as the remainder of the message.
 	 *
 	 * @used-by API::parse_log()
 	 *
-	 * @param array{line_one_parsed:array{time:string,level:string,message:string}, lines:string[]} $input_lines A single log entries as a set of lines.
+	 * @param string[] $lines   The lines of a single log entry, with newlines already stripped.
+	 * @param string   $pattern The regex used to parse the first line into time/level/message (and, for WooCommerce, an inline context).
 	 *
-	 * @return array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}
+	 * @return ?array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}
 	 */
-	protected function log_lines_to_entry( array $input_lines ): array {
+	protected function log_lines_to_entry( array $lines, string $pattern ): ?array {
 
-		$entry = array();
+		$line_one = array();
+		if ( 1 !== preg_match( $pattern, $lines[0], $line_one ) ) {
+			// The first line does not match the expected format; skip this entry.
+			return null;
+		}
 
-		$time_string = $input_lines['line_one_parsed']['time'];
+		$time_string = $line_one['time'];
 		$str_time    = strtotime( $time_string );
 		// E.g. "2020-10-23T17:39:36+00:00".
 		$datetime = DateTime::createFromFormat( 'U', "{$str_time}" ) ?: null;
 
-		$level = $input_lines['line_one_parsed']['level'];
+		$level   = $line_one['level'];
+		$message = $line_one['message'];
+		$context = null;
 
-		$message = $input_lines['line_one_parsed']['message'];
+		if ( isset( $line_one['context'] ) ) {
 
-		// Assume all lines that do not begin with a date should be joined together as context object.
-		$context = json_decode( implode( PHP_EOL, $input_lines['lines'] ) );
-		if ( is_null( $context ) ) {
-			foreach ( $input_lines['lines'] as $input_line ) {
-				// This is a bug, but I'm not going to fix it until I see the problem exist.
-				// What happens if there is multiple lines that for some reason are valid JSON? Data will be lost in display.
-				$context = json_decode( $input_line );
-				if ( is_null( $context ) ) {
-					$message .= $input_line;
+			// WooCommerce logs the context inline on the first line, after "CONTEXT:".
+			$context = json_decode( $line_one['context'] );
+
+		} else {
+
+			$context_lines = array_slice( $lines, 1 );
+
+			// If the entry ends with `}`, the JSON context is the block from the last line that opens
+			// with `{` to the end. Seek in reverse for that line and attempt to decode from it.
+			if ( count( $context_lines ) > 0 && str_ends_with( end( $context_lines ), '}' ) ) {
+
+				for ( $i = count( $context_lines ) - 1; $i >= 0; $i-- ) {
+					if ( str_starts_with( ltrim( $context_lines[ $i ] ), '{' ) ) {
+						break;
+					}
+				}
+
+				if ( $i >= 0 ) {
+					$candidate = implode( "\n", array_slice( $context_lines, $i ) );
+
+					// The context can contain unescaped literal newlines inside string values (e.g. a
+					// stack trace), which json_decode rejects; escape them and try again.
+					$context = json_decode( $candidate ) ?? json_decode( str_replace( "\n", '\n', $candidate ) );
+
+					if ( ! is_null( $context ) ) {
+						// Any lines before the JSON object are a continuation of the message.
+						$message_lines = array_slice( $context_lines, 0, $i );
+						if ( count( $message_lines ) > 0 ) {
+							$message = rtrim( $message . "\n" . implode( "\n", $message_lines ) );
+						}
+						$context_lines = array();
+					}
+				}
+			}
+
+			// Fallback: any remaining lines that are not themselves valid JSON are message text.
+			if ( is_null( $context ) ) {
+				foreach ( $context_lines as $context_line ) {
+					$decoded = json_decode( $context_line );
+					if ( is_null( $decoded ) ) {
+						$message .= "\n" . $context_line;
+					} else {
+						$context = $decoded;
+					}
 				}
 			}
 		}
@@ -593,12 +665,12 @@ class API implements API_Interface {
 			unset( $context->source );
 		}
 
-		$entry['time']     = $time_string;
-		$entry['datetime'] = $datetime;
-		$entry['level']    = $level;
-		$entry['message']  = $message;
-		$entry['context']  = $context instanceof stdClass ? $context : null;
-
-		return $entry;
+		return array(
+			'time'     => $time_string,
+			'datetime' => $datetime,
+			'level'    => $level,
+			'message'  => $message,
+			'context'  => $context instanceof stdClass ? $context : null,
+		);
 	}
 }
