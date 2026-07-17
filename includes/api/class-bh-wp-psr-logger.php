@@ -79,10 +79,10 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 *
 	 * TODO: include a link to the log url so the last file with an error will be linked, rather than the most recent log file.
 	 *
-	 * @param string               $message The message to be logged.
+	 * @param string|Stringable    $message The message to be logged.
 	 * @param array<string, mixed> $context Data to record the system state at the time of the log.
 	 */
-	public function error(Stringable|string $message, array $context = []): void {
+	public function error( string|Stringable $message, array $context = array() ): void {
 
 		$this->log( LogLevel::ERROR, $message, $context );
 	}
@@ -99,7 +99,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 * TODO: Add a filter on level.
 	 *
 	 * @param string                   $level The log severity.
-	 * @param string                   $message The message to log.
+	 * @param string|Stringable        $message The message to log.
 	 * @param array<int|string, mixed> $context Additional information to be logged (not saved at all log levels).
 	 * @see LogLevel
 	 */
