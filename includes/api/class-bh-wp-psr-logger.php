@@ -184,6 +184,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		$log_data = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_log', $log_data, $settings, $bh_wp_psr_logger );
 
 		if ( empty( $log_data ) ) {
+			$this->is_looping = false;
 			return;
 		}
 
