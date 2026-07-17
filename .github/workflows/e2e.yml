@@ -35,8 +35,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Build assets
-        run: npm run build
+#      - name: Build assets
+#        run: npm run build
 
       - name: Start wp-env
         run: npm run wp-env
