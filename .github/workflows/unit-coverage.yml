@@ -65,6 +65,9 @@ jobs:
       - name: Install PHP dependencies
         run: composer install --verbose
 
+      - name: List installed PHP dependencies
+        run: composer show
+
       - name: Run tests without coverage
         if: ${{ matrix.php != env.COVERAGE_PHP_VERSION }}
         run: |
