@@ -35,7 +35,19 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$project_vendor = __DIR__ . '/../vendor/autoload.php';
+$wp_env_vendor  = '/var/www/html/wp-content/uploads/development-plugin/vendor/autoload.php';
+
+switch ( true ) {
+	case file_exists( $project_vendor ):
+		require_once $project_vendor;
+		break;
+	case file_exists( $wp_env_vendor ):
+		require_once $wp_env_vendor;
+		break;
+	default:
+		return;
+}
 
 Autoloader::generate(
 	__NAMESPACE__,
@@ -68,11 +80,5 @@ function run_closure_in_plugin( callable $closure ): void {
 	$closure();
 }
 
-
-add_filter(
-	'plugins_url',
-	fn( string $url ) => str_replace( 'Users/brianhenry/Sites', 'bh-wp-logger-development-plugin/vendor/brianhenryie', $url )
-);
-
 // `wp-env` fixes.
-( new WP_Env() )->register_hooks();
+( new Mappings() )->register_hooks();

@@ -26,7 +26,7 @@ if ( ! file_exists( $wp_env_file ) ) {
 if ( ! file_exists( $workspace_file ) ) {
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo "Error: .idea/workspace.xml not found at {$workspace_file}\n";
-	exit( 1 );
+	exit( 0 ); // In CI, `.idea` does not exist.
 }
 
 // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents

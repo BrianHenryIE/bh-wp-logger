@@ -38,7 +38,7 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 			 * @see TestLogger
 			 */
 			public $context = array();
-			public function log( $level, $message, array $context = array() ) {
+			public function log( $level, $message, array $context = array() ): void {
 				$this->context = $context;
 				parent::log( $level, $message, $context );
 			}
@@ -94,5 +94,77 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		);
 
 		$sut->log( LogLevel::ERROR, 'Trying to access array offset on value of type bool', $context );
+	}
+
+	/**
+	 * When the delegated logger itself triggers logging, `is_looping` should short-circuit the
+	 * re-entrant call so the delegated logger is reached exactly once rather than recursing forever.
+	 *
+	 * @covers ::log
+	 */
+	public function test_reentrant_delegated_logger_does_not_loop(): void {
+
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
+
+		$sut = new BH_WP_PSR_Logger( $settings, $this->logger );
+
+		// A delegated logger that itself triggers logging through the SUT.
+		$reentrant_logger      = new class() extends ColorLogger {
+			public ?BH_WP_PSR_Logger $sut = null;
+			public int $call_count        = 0;
+			public function log( $level, $message, array $context = array() ): void {
+				++$this->call_count;
+				parent::log( $level, $message, $context );
+				$this->sut->log( $level, 'reentrant message' );
+			}
+		};
+		$reentrant_logger->sut = $sut;
+
+		$sut->setLogger( $reentrant_logger );
+
+		$sut->info( 'first message' );
+
+		// The re-entrant call returns early because `is_looping` is still true,
+		// so the delegated logger is reached exactly once (no infinite loop).
+		$this->assertSame( 1, $reentrant_logger->call_count );
+	}
+
+	/**
+	 * When a log is cancelled by the filter, `log()` returns early from inside the guarded block.
+	 * The `try`/`finally` must still reset `is_looping` so subsequent logs are not silently dropped.
+	 *
+	 * @covers ::log
+	 */
+	public function test_is_looping_reset_after_cancelled_log(): void {
+
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'plugin-slug',
+				'get_log_level'   => 'info',
+			)
+		);
+
+		$sut = new BH_WP_PSR_Logger( $settings, $this->logger );
+
+		add_filter(
+			'plugin-slug_bh_wp_logger_log',
+			fn( array $log_data, $settings, $bh_wp_psr_logger )
+				=> 'cancel me' === $log_data['message'] ? null : $log_data,
+			10,
+			3
+		);
+
+		$sut->info( 'cancel me' ); // Cancelled: early return inside try; finally resets is_looping.
+		$sut->info( 'log me' );    // Must still be delegated.
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$this->assertCount( 1, $this->logger->recordsByLevel['info'] );
 	}
 }

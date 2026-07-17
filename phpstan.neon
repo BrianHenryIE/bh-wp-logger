@@ -5,7 +5,7 @@ parameters:
     excludePaths:
     scanDirectories:
         - wp-content/plugins
-        - vendor/wp-cli
+#        - vendor/wp-cli # wp-cli was removed because installing it with Composer caused issues with it running in wp-env.
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#LoggerInterface\|null#'

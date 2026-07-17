@@ -30,7 +30,7 @@ jobs:
 
     strategy:
       matrix:
-        php: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
+        php: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6' ]
 
     steps:
       - uses: actions/checkout@v6
@@ -50,6 +50,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: ${{ matrix.php == env.COVERAGE_PHP_VERSION && 'xdebug' || 'none' }}
+          ini-values: register_argc_argv=on # 8.5: PHP Fatal error: Uncaught Codeception\Exception\ConfigurationException: register_argc_argv must be set to On for running Codeception
 
       - name: Update .env.testing config for GitHub Actions
         env:
@@ -64,6 +65,9 @@ jobs:
 
       - name: Install PHP dependencies
         run: composer install --verbose
+
+      - name: List installed PHP dependencies
+        run: composer show
 
       - name: Run tests without coverage
         if: ${{ matrix.php != env.COVERAGE_PHP_VERSION }}
