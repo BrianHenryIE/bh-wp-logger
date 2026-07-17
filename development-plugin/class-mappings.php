@@ -12,7 +12,7 @@ class Mappings {
 	public function wp_plugin_paths(): void {
 
 		/**
-		 * Fix for mapped directories. I.e. vendor is not under `wp-content/plugins/development-plugins`.
+		 * Fix for mapped directories. I.e. vendor is not under `wp-content/plugins/development-plugin`.
 		 *
 		 * @see plugin_basename()
 		 */
@@ -30,6 +30,7 @@ class Mappings {
 		$url = str_replace( 'wp-content/plugins/var/www/html/', '', $url );
 		$url = str_replace( 'plugins/development-plugin/vendor', 'uploads/development-plugin/vendor', $url );
 		$url = str_replace( 'plugins/development-plugin/includes', 'uploads/development-plugin/includes', $url );
+		$url = str_replace( 'plugins/development-plugin/assets', 'uploads/development-plugin/assets', $url );
 		return $url;
 	}
 }
