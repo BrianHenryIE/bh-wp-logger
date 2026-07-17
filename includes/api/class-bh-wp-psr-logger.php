@@ -36,6 +36,11 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	protected LoggerInterface $cli_logger;
 
 	/**
+	 * Protect against infinite loops when delegated loggers themselves cause errors.
+	 */
+	protected bool $is_looping = false;
+
+	/**
 	 * Construct
 	 *
 	 * @param Logger_Settings_Interface $settings The configured settings.
@@ -99,6 +104,12 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 	 * @see LogLevel
 	 */
 	public function log( $level, string|Stringable $message, array $context = array() ): void {
+		if ( $this->is_looping ) {
+			return;
+		}
+
+		$this->is_looping = true;
+
 		$message = (string) $message;
 
 		$context = array_merge( $context, $this->get_common_context() );
@@ -207,5 +218,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 		// that transient is expired. TODO: We're deleting here on the assumption deleting is more performant than writing
 		// the new value. This could also be run only in WordPress's 'shutdown' action.
 		delete_transient( $this->get_last_log_time_transient_name() );
+
+		$this->is_looping = false;
 	}
 }
