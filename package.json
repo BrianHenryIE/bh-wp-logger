@@ -16,6 +16,6 @@
     "url": "git+https://github.com/BrianHenryIE/bh-wp-logger.git"
   },
   "devDependencies": {
-    "@wordpress/env": "^11.3.0"
+    "@wordpress/env": "^11.10.0"
   }
 }
