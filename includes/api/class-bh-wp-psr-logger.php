@@ -110,116 +110,119 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 
 		$this->is_looping = true;
 
-		$message = (string) $message;
+		try {
 
-		$context = array_merge( $context, $this->get_common_context() );
+			$message = (string) $message;
 
-		$settings_log_level = $this->settings->get_log_level();
+			$context = array_merge( $context, $this->get_common_context() );
 
-		if ( LogLevel::ERROR === $level ) {
+			$settings_log_level = $this->settings->get_log_level();
 
-			$debug_backtrace            = $this->get_backtrace();
-			$context['debug_backtrace'] = $debug_backtrace;
+			if ( LogLevel::ERROR === $level ) {
 
-			// TODO: This could be useful on all logs.
-			global $wp_current_filter;
-			$context['filters'] = $wp_current_filter;
+				$debug_backtrace            = $this->get_backtrace();
+				$context['debug_backtrace'] = $debug_backtrace;
 
-		} elseif ( LogLevel::WARNING === $level || LogLevel::DEBUG === $settings_log_level ) {
+				// TODO: This could be useful on all logs.
+				global $wp_current_filter;
+				$context['filters'] = $wp_current_filter;
 
-			$debug_backtrace            = $this->get_backtrace( null, 3 );
-			$context['debug_backtrace'] = $debug_backtrace;
+			} elseif ( LogLevel::WARNING === $level || LogLevel::DEBUG === $settings_log_level ) {
 
-			global $wp_current_filter;
-			$context['filters'] = $wp_current_filter;
-		}
+				$debug_backtrace            = $this->get_backtrace( null, 3 );
+				$context['debug_backtrace'] = $debug_backtrace;
 
-		if ( isset( $context['exception'] ) && $context['exception'] instanceof Exception ) {
-			$exception                    = $context['exception'];
-			$exception_details            = array();
-			$exception_details['class']   = $exception::class;
-			$exception_details['message'] = $exception->getMessage();
-
-			$props = array();
-			try {
-				$reflect = new ReflectionClass( $exception::class );
-				foreach ( $reflect->getProperties() as $property ) {
-					PHP_VERSION_ID < 80100 && $property->setAccessible( true );
-					$props[ $property->getName() ] = $property->getValue( $exception );
-				}
-				// phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			} catch ( ReflectionException $_exception ) {
-				// Ironic.
+				global $wp_current_filter;
+				$context['filters'] = $wp_current_filter;
 			}
-			$exception_details['properties'] = $props;
 
-			$exception_details['backtrace'] = $context['exception']->getTrace();
+			if ( isset( $context['exception'] ) && $context['exception'] instanceof Exception ) {
+				$exception                    = $context['exception'];
+				$exception_details            = array();
+				$exception_details['class']   = $exception::class;
+				$exception_details['message'] = $exception->getMessage();
 
-			$context['exception'] = $exception_details;
-		}
+				$props = array();
+				try {
+					$reflect = new ReflectionClass( $exception::class );
+					foreach ( $reflect->getProperties() as $property ) {
+						PHP_VERSION_ID < 80100 && $property->setAccessible( true );
+						$props[ $property->getName() ] = $property->getValue( $exception );
+					}
+					// phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				} catch ( ReflectionException $_exception ) {
+					// Ironic.
+				}
+				$exception_details['properties'] = $props;
 
-		/**
-		 * TODO: regex to replace email addresses with b**********e@gmail.com, credit card numbers etc.
-		 * There's a PHP proposal for omitting info from logs.
-		 *
-		 * @see https://wiki.php.net/rfc/redact_parameters_in_back_traces
-		 */
+				$exception_details['backtrace'] = $context['exception']->getTrace();
 
-		$log_data         = array(
-			'level'   => $level,
-			'message' => $message,
-			'context' => $context,
-		);
-		$settings         = $this->settings;
-		$bh_wp_psr_logger = $this;
+				$context['exception'] = $exception_details;
+			}
 
-		/**
-		 * Filter to modify the log data.
-		 * Return null to cancel logging this message.
-		 *
-		 * @param array{level:string,message:string,context:array} $log_data
-		 * @param Logger_Settings_Interface $settings
-		 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
-		 */
-		$log_data = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_log', $log_data, $settings, $bh_wp_psr_logger );
+			/**
+			 * TODO: regex to replace email addresses with b**********e@gmail.com, credit card numbers etc.
+			 * There's a PHP proposal for omitting info from logs.
+			 *
+			 * @see https://wiki.php.net/rfc/redact_parameters_in_back_traces
+			 */
 
-		if ( empty( $log_data ) ) {
+			$log_data         = array(
+				'level'   => $level,
+				'message' => $message,
+				'context' => $context,
+			);
+			$settings         = $this->settings;
+			$bh_wp_psr_logger = $this;
+
+			/**
+			 * Filter to modify the log data.
+			 * Return null to cancel logging this message.
+			 *
+			 * @param array{level:string,message:string,context:array} $log_data
+			 * @param Logger_Settings_Interface $settings
+			 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
+			 */
+			$log_data = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_log', $log_data, $settings, $bh_wp_psr_logger );
+
+			if ( empty( $log_data ) ) {
+				return;
+			}
+
+			[ $level, $message, $context ] = array_values( $log_data );
+
+			if ( LogLevel::ERROR === $level ) {
+				update_option(
+					$this->settings->get_plugin_slug() . '-recent-error-data',
+					array(
+						'message'   => $message,
+						'timestamp' => time(),
+					)
+				);
+			}
+
+			// Add WP CLI command to context.
+			if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) ) {
+				/** @phpstan-ignore booleanAnd.rightAlwaysTrue */
+				/** @var Runner $runner */
+				$runner            = WP_CLI::get_runner();
+				$context['wp_cli'] = array(
+					array(
+						'command'    => 'wp ' . implode( ' ', $runner->arguments ),
+						'assoc_args' => $runner->assoc_args,
+					),
+				);
+			}
+
+			$this->logger->$level( $message, $context );
+			$this->cli_logger->$level( $message, $context );
+
+			// We store the last log time in a transient to avoid reading the file from disk. When a new log is written,
+			// that transient is expired. TODO: We're deleting here on the assumption deleting is more performant than writing
+			// the new value. This could also be run only in WordPress's 'shutdown' action.
+			delete_transient( $this->get_last_log_time_transient_name() );
+		} finally {
 			$this->is_looping = false;
-			return;
 		}
-
-		[$level, $message, $context] = array_values( $log_data );
-
-		if ( LogLevel::ERROR === $level ) {
-			update_option(
-				$this->settings->get_plugin_slug() . '-recent-error-data',
-				array(
-					'message'   => $message,
-					'timestamp' => time(),
-				)
-			);
-		}
-
-		// Add WP CLI command to context.
-		if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) ) { /** @phpstan-ignore booleanAnd.rightAlwaysTrue */
-			/** @var Runner $runner */
-			$runner            = WP_CLI::get_runner();
-			$context['wp_cli'] = array(
-				array(
-					'command'    => 'wp ' . implode( ' ', $runner->arguments ),
-					'assoc_args' => $runner->assoc_args,
-				),
-			);
-		}
-
-		$this->logger->$level( $message, $context );
-		$this->cli_logger->$level( $message, $context );
-
-		// We store the last log time in a transient to avoid reading the file from disk. When a new log is written,
-		// that transient is expired. TODO: We're deleting here on the assumption deleting is more performant than writing
-		// the new value. This could also be run only in WordPress's 'shutdown' action.
-		delete_transient( $this->get_last_log_time_transient_name() );
-
-		$this->is_looping = false;
 	}
 }
