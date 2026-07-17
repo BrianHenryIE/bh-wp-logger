@@ -213,7 +213,11 @@ EOD;
 		\WP_Mock::userFunction(
 			'set_transient',
 			array(
-				'args'  => array( 'test-last-log-time', '2022-02-23T22:56:01+00:00', DAY_IN_SECONDS ),
+				'args'  => array(
+					'test-last-log-time',
+					'2022-02-23T22:56:01+00:00',
+					60 * 60 * 24, // `DAY_IN_SECONDS`.
+				),
 				'times' => 1,
 			)
 		);

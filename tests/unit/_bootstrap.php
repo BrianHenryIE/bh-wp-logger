@@ -8,8 +8,6 @@
 WP_Mock::setUsePatchwork( true );
 WP_Mock::bootstrap();
 
-define( 'DAY_IN_SECONDS', 60 * 60 * 24 );
-
 $class_map = array(
 	'WP_Error'             => codecept_root_dir( 'wordpress/wp-includes/class-wp-error.php' ),
 	'WP_Filesystem_Base'   => codecept_root_dir( 'wordpress/wp-admin/includes/class-wp-filesystem-base.php' ),
