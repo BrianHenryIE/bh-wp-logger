@@ -144,7 +144,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			try {
 				$reflect = new ReflectionClass( $exception::class );
 				foreach ( $reflect->getProperties() as $property ) {
-					$property->setAccessible( true );
+					PHP_VERSION_ID < 80100 && $property->setAccessible( true );
 					$props[ $property->getName() ] = $property->getValue( $exception );
 				}
 				// phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch

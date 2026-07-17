@@ -3,6 +3,7 @@
 ## 0.3.4 – 2026-07-17
 
 * Fix: infinite loop when an error occurs in a delegate logger
+* Fix: deprecation warnings for `Reflection*::setAccessible()`
 
 ## 0.3.3 – 2026-06-12
 

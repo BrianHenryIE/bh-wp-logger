@@ -114,7 +114,7 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 
 		$reflector          = new \ReflectionClass( $sut );
 		$reflector_property = $reflector->getProperty( 'previous_error_handler' );
-		$reflector_property->setAccessible( true );
+		PHP_VERSION_ID < 80100 && $reflector_property->setAccessible( true );
 
 		$this->assertEquals( $my_handler, $reflector_property->getValue( $sut ) );
 	}

@@ -29,7 +29,7 @@ class PHP_Error_Handler_Unit_Test extends Unit_Testcase {
 		$sut = new PHP_Error_Handler( $api, $settings, $logger );
 
 		$method = new \ReflectionMethod( PHP_Error_Handler::class, 'errno_to_psr3' );
-		$method->setAccessible( true );
+		PHP_VERSION_ID < 80100 && $method->setAccessible( true );
 
 		$result = $method->invoke( $sut, $from );
 
@@ -55,7 +55,7 @@ class PHP_Error_Handler_Unit_Test extends Unit_Testcase {
 		$sut = new PHP_Error_Handler( $api, $settings, $logger );
 
 		$method = new \ReflectionMethod( PHP_Error_Handler::class, 'errno_to_psr3' );
-		$method->setAccessible( true );
+		PHP_VERSION_ID < 80100 && $method->setAccessible( true );
 
 		$result = $method->invoke( $sut, 918273645 );
 
