@@ -187,9 +187,13 @@ class Logs_List_Table extends WP_List_Table {
 			case 'message':
 				// The "message" is just text.
 				$column_output = $item['message'];
-				$column_output = esc_html( $column_output );
-				$column_output = $this->replace_wp_user_id_with_link( $column_output );
-				$column_output = $this->replace_post_type_id_with_link( $column_output );
+				if(0===strpos($column_output, 'Uncaught ')) {
+					$column_output = '<pre style="margin-top:0; overflow-x: auto;">' . esc_html( $column_output ) . '</pre>';
+				} else {
+					$column_output = esc_html( $column_output );
+					$column_output = $this->replace_wp_user_id_with_link( $column_output );
+					$column_output = $this->replace_post_type_id_with_link( $column_output );
+				}
 				break;
 			case 'level':
 				// The "level" column is just a color bar.
