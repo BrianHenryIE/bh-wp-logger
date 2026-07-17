@@ -119,7 +119,7 @@ EOD;
 
 			$result = $sut->parse_log( $temp_file );
 
-			$this->assertNotNull( $result[0]['context'], 'context not properly parsed from log entry');
+			$this->assertNotNull( $result[0]['context'], 'context not properly parsed from log entry' );
 		} finally {
 			unlink( $temp_file );
 		}
