@@ -447,7 +447,7 @@ class API implements API_Interface {
 
 			$datetime = new DateTimeImmutable( "@{$timestamp}" );
 
-			set_transient( $transient_name, $datetime->format( DateTimeInterface::ATOM ), DAY_IN_SECONDS );
+			set_transient( $transient_name, $datetime->format( DateTimeInterface::ATOM ), constant( 'DAY_IN_SECONDS' ) );
 
 			// Log time will always be UTC.
 			return $datetime;
