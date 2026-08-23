@@ -88,9 +88,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		 */
 		add_filter(
 			'plugin-slug_bh_wp_logger_log',
-			fn( array $log_data, $settings, $bh_wp_psr_logger ) => null,
+			fn( array $log_data, string $plugin_slug, $settings, $bh_wp_psr_logger ) => null,
 			10,
-			3
+			4
 		);
 
 		$sut->log( LogLevel::ERROR, 'Trying to access array offset on value of type bool', $context );
@@ -155,10 +155,10 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 
 		add_filter(
 			'plugin-slug_bh_wp_logger_log',
-			fn( array $log_data, $settings, $bh_wp_psr_logger )
+			fn( array $log_data, string $plugin_slug, $settings, $bh_wp_psr_logger )
 				=> 'cancel me' === $log_data['message'] ? null : $log_data,
 			10,
-			3
+			4
 		);
 
 		$sut->info( 'cancel me' ); // Cancelled: early return inside try; finally resets is_looping.

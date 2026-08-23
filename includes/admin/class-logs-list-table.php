@@ -265,12 +265,13 @@ class Logs_List_Table extends WP_List_Table {
 		 * e.g. find and replace wc_order:123 with a link to the order.
 		 *
 		 * @param string $column_output
+		 * @param string $plugin_slug The plugin slug the logger is running as.
 		 * @param array{time:string, level:string, message:string, context:?string} $item The log entry row.
 		 * @param string $column_name
 		 * @param Logger_Settings_Interface $logger_settings
 		 * @param BH_WP_PSR_Logger|LoggerInterface $bh_wp_psr_logger
 		 */
-		$filtered_column_output = apply_filters( "{$plugin_slug}_bh_wp_logger_column", $column_output, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
+		$filtered_column_output = apply_filters( "{$plugin_slug}_bh_wp_logger_column", $column_output, $plugin_slug, $item, $column_name, $logger_settings, $bh_wp_psr_logger );
 
 		return is_string( $filtered_column_output ) ? $filtered_column_output : $column_output; /** @phpstan-ignore function.alreadyNarrowedType */
 	}

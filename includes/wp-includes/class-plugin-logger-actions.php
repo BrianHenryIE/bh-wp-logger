@@ -179,9 +179,9 @@ class Plugin_Logger_Actions {
 	 */
 	protected function add_private_uploads_hooks(): void {
 
-		$url_is_public = new URL_Is_Public();
+		$url_is_public = new URL_Is_Public( $this->settings );
 
-		add_filter( "bh_wp_private_uploads_url_is_public_warning_{$this->settings->get_plugin_slug()}_logger", array( $url_is_public, 'change_warning_message' ), 10, 2 );
+		add_filter( 'bh_wp_private_uploads_url_is_public_warning', array( $url_is_public, 'change_warning_message' ), 10, 4 );
 	}
 
 	/**

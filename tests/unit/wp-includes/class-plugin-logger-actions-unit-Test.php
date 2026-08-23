@@ -178,10 +178,10 @@ class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 	public function test_add_private_uploads_hooks(): void {
 
 		\WP_Mock::expectFilterAdded(
-			'bh_wp_private_uploads_url_is_public_warning_plugin-slug_logger',
+			'bh_wp_private_uploads_url_is_public_warning',
 			array( \WP_Mock\Functions::type( URL_Is_Public::class ), 'change_warning_message' ),
 			10,
-			2
+			4
 		);
 
 		$api      = $this->makeEmpty( API_Interface::class );
