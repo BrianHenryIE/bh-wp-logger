@@ -288,6 +288,8 @@ class API implements API_Interface {
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'bh-wp-logger/includes' ):
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
 				case isset( $frame['file'] ) && str_contains( $frame['file'], 'php-http/logger-plugin' ):
+				case isset( $frame['file'] ) && 'LoggerTrait.php' === basename( $frame['file'] ):
+				case isset( $frame['class'] ) && 'BH_WP_PSR_Logger' === array_reverse( explode( '\\', $frame['class'] ) )[0]:
 					return true;
 				default:
 					return false;
