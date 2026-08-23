@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fix: dismissing any other plugin's WPTRT admin notice (e.g. bh-wp-private-uploads' "directory is publicly accessible") returned 403 – the recent-error notice's ajax gate called `check_admin_referer()` on every `wptrt_dismiss_notice` request instead of first checking the notice id
 * Fix: out-of-memory error viewing large log files – the logs page now parses the file once, keeps only the most recent 1,000 entries, and caps each entry at 64KB (`API::parse_log_file()`), showing "Showing the most recent X of Y entries" when truncated
 * Change: parsed log entries' `context` is now the raw JSON string (decoded per-row for display) instead of a decoded `stdClass` – decoded object trees used ~10x the memory
 * Add: `API_Interface::parse_log_file( $filepath, $max_entries, $max_entry_bytes ): Parsed_Log_File` – full-file entry count and per-level counts with bounded memory
