@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+* Fix: out-of-memory error viewing large log files – the logs page now parses the file once, keeps only the most recent 1,000 entries, and caps each entry at 64KB (`API::parse_log_file()`), showing "Showing the most recent X of Y entries" when truncated
+* Change: parsed log entries' `context` is now the raw JSON string (decoded per-row for display) instead of a decoded `stdClass` – decoded object trees used ~10x the memory
+* Add: `API_Interface::parse_log_file( $filepath, $max_entries, $max_entry_bytes ): Parsed_Log_File` – full-file entry count and per-level counts with bounded memory
+* Add: log file size and entry counts displayed on the logs page
+* Fix: form-handler redirects used `menu_page_url()`, which returns an empty string in `admin-post.php` context
+* Fix: the download link always pointed at the most recent date rather than the displayed date
+* Fix: log levels beyond the five displayed (e.g. `critical`) no longer cause an undefined-array-key warning when counting
+
 ## 0.3.4 – 2026-07-17
 
 * Require PHP 8.1

@@ -12,6 +12,7 @@
 namespace BrianHenryIE\WP_Logger\Admin;
 
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
+use BrianHenryIE\WP_Logger\API\Parsed_Log_File;
 use BrianHenryIE\WP_Logger\API_Interface;
 use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 use DateTime;
@@ -25,6 +26,19 @@ use WP_User;
  * WordPress list table for displaying the logs.
  */
 class Logs_List_Table extends WP_List_Table {
+
+	/**
+	 * Only the most recent entries of a large log file are displayed, keeping memory use (and the
+	 * rendered page size) bounded. The full file remains available via the download link.
+	 */
+	public const MAX_DISPLAYED_ENTRIES = 1000;
+
+	/**
+	 * Each displayed entry is capped at this many bytes of log text (an entry's context can contain
+	 * enormous data, e.g. a whole email), with a truncation note appended to its message.
+	 */
+	public const MAX_ENTRY_BYTES = 65536;
+
 	/**
 	 * The logs are displayed one day at a time. The most recent day's log file, or the optionally specified date.
 	 *
@@ -33,6 +47,11 @@ class Logs_List_Table extends WP_List_Table {
 	 * @var string|null
 	 */
 	protected ?string $selected_date = null;
+
+	/**
+	 * The parsed (capped) log file for the selected date, set by {@see Logs_List_Table::prepare_items()}.
+	 */
+	protected ?Parsed_Log_File $parsed_log_file = null;
 
 	/**
 	 * Logs_Table constructor.
@@ -65,26 +84,46 @@ class Logs_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Read the log file and parse the data.
-	 *
-	 * TODO: Move out of here. This should be a generic PSR-Log-Data class.
-	 *
-	 * @return array<array{time:string,datetime:?DateTime,level:string,message:string,context:?\stdClass}>
+	 * The path to the log file for the selected date, or the most recent log file, or null when there are none.
 	 */
-	public function get_data(): array {
+	public function get_selected_log_filepath(): ?string {
 
 		$log_files = $this->api->get_log_files();
 
 		if ( empty( $log_files ) ) {
 			// TODO: "No logs yet." message. Maybe with "current log level is:".
-			return array();
+			return null;
 		} elseif ( ! is_null( $this->selected_date ) && isset( $log_files[ $this->selected_date ] ) ) {
-			$filepath = $log_files[ $this->selected_date ];
+			return $log_files[ $this->selected_date ];
 		} else {
-			$filepath = array_pop( $log_files );
+			return array_pop( $log_files );
+		}
+	}
+
+	/**
+	 * Read the log file and parse the data.
+	 *
+	 * TODO: Move out of here. This should be a generic PSR-Log-Data class.
+	 *
+	 * @return array<array{time:string,datetime:?DateTime,level:string,message:string,context:?string}>
+	 */
+	public function get_data(): array {
+
+		$filepath = $this->get_selected_log_filepath();
+
+		if ( is_null( $filepath ) ) {
+			return array();
 		}
 
-		return $this->api->parse_log( $filepath );
+		return $this->api->parse_log_file( $filepath, self::MAX_DISPLAYED_ENTRIES, self::MAX_ENTRY_BYTES )->entries;
+	}
+
+	/**
+	 * The parsed (capped) log file, for its entry/level counts. Only set after
+	 * {@see Logs_List_Table::prepare_items()} has run.
+	 */
+	public function get_parsed_log_file(): ?Parsed_Log_File {
+		return $this->parsed_log_file;
 	}
 
 	/**
@@ -117,7 +156,14 @@ class Logs_List_Table extends WP_List_Table {
 		$hidden                = array();
 		$sortable              = array();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $this->get_data();
+
+		$filepath = $this->get_selected_log_filepath();
+
+		$this->parsed_log_file = is_null( $filepath )
+			? new Parsed_Log_File( array(), 0, array() )
+			: $this->api->parse_log_file( $filepath, self::MAX_DISPLAYED_ENTRIES, self::MAX_ENTRY_BYTES );
+
+		$this->items = $this->parsed_log_file->entries;
 	}
 
 	/**
@@ -127,7 +173,7 @@ class Logs_List_Table extends WP_List_Table {
 	 *
 	 * @used-by WP_List_Table::display_rows()
 	 *
-	 * @param array{time:string, level:string, message:string, context:array<mixed>} $item The current item.
+	 * @param array{time:string, level:string, message:string, context:?string} $item The current item.
 	 * @return void
 	 */
 	public function single_row( $item ) {
@@ -139,8 +185,8 @@ class Logs_List_Table extends WP_List_Table {
 	/**
 	 * Get the HTML for a column.
 	 *
-	 * @param array{time:string, level:string, message:string, context:array<string, mixed>} $item ...whatever type get_data returns.
-	 * @param string                                                                         $column_name The specified column.
+	 * @param array{time:string, level:string, message:string, context:?string} $item ...whatever type get_data returns.
+	 * @param string                                                            $column_name The specified column.
 	 *
 	 * @see WP_List_Table::column_default()
 	 * @see Logs_List_Table::get_data()
@@ -171,17 +217,25 @@ class Logs_List_Table extends WP_List_Table {
 				$column_output  = '<span class="logs-time">' . $column_output . '</span>';
 				break;
 			case 'context':
+				// The context is stored as its raw JSON string (decoded objects use ~10x the memory
+				// across the whole table); decode it one row at a time, only for display.
 				if ( ! empty( $item['context'] ) ) {
-					$pretty_context = wp_json_encode( $item['context'], JSON_PRETTY_PRINT );
-					// phpcs:disable WordPress.PHP.DisallowShortTernary.Found
-					$un_pretty_context = wp_json_encode( $item['context'] ) ?: '';
-					$column_output     = $pretty_context
-						? sprintf(
-							'<pre data-json="%s" class="log-context-pre">%s</pre>',
-							esc_html( $un_pretty_context ),
-							esc_html( trim( $pretty_context, "'\"" ) )
-						)
-						: esc_html( $this->get_print_r( $item['context'] ) );
+					$context = json_decode( $item['context'] );
+					if ( $context instanceof \stdClass ) {
+						unset( $context->source );
+						$pretty_context = wp_json_encode( $context, JSON_PRETTY_PRINT );
+						// phpcs:disable WordPress.PHP.DisallowShortTernary.Found
+						$un_pretty_context = wp_json_encode( $context ) ?: '';
+						$column_output     = $pretty_context
+							? sprintf(
+								'<pre data-json="%s" class="log-context-pre">%s</pre>',
+								esc_html( $un_pretty_context ),
+								esc_html( trim( $pretty_context, "'\"" ) )
+							)
+							: esc_html( $item['context'] );
+					} else {
+						$column_output = esc_html( $item['context'] );
+					}
 				}
 				break;
 			case 'message':
@@ -211,7 +265,7 @@ class Logs_List_Table extends WP_List_Table {
 		 * e.g. find and replace wc_order:123 with a link to the order.
 		 *
 		 * @param string $column_output
-		 * @param array{time:string, level:string, message:string, context:array<string,mixed>} $item The log entry row.
+		 * @param array{time:string, level:string, message:string, context:?string} $item The log entry row.
 		 * @param string $column_name
 		 * @param Logger_Settings_Interface $logger_settings
 		 * @param BH_WP_PSR_Logger|LoggerInterface $bh_wp_psr_logger
@@ -322,22 +376,5 @@ class Logs_List_Table extends WP_List_Table {
 		echo '<span class="no-items-message">';
 		echo esc_html( __( 'No items found.', 'bh-wp-logger' ) );
 		echo '</span>';
-	}
-
-	/**
-	 * Print an array to a string.
-	 *
-	 * This is probably an array whose source was reading it from a text file.
-	 * This function is used only when {@see wp_json_encode()} returns false.
-	 *
-	 * Is there a better option to print an array?
-	 *
-	 * phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r
-	 *
-	 * @param array<string, mixed> $context The log context array.
-	 */
-	protected function get_print_r( array $context ): string {
-
-		return print_r( $context, true );
 	}
 }

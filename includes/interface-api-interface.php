@@ -8,6 +8,7 @@
 namespace BrianHenryIE\WP_Logger;
 
 use BrianHenryIE\WP_Logger\Admin\AJAX;
+use BrianHenryIE\WP_Logger\API\Parsed_Log_File;
 use BrianHenryIE\WP_Logger\Admin\Logs_List_Table;
 use BrianHenryIE\WP_Logger\Admin\Logs_Page;
 use BrianHenryIE\WP_Logger\Admin\Plugins_Page;
@@ -146,11 +147,26 @@ interface API_Interface {
 	 * Given the path to a log text file, parse its lines into an array of individual log entries parsed into
 	 * time, level, message, and context.
 	 *
-	 * @used-by Logs_List_Table::get_data()
+	 * NB: This loads every entry, at full size, into memory. For UI display prefer
+	 * {@see API_Interface::parse_log_file()}, whose limits keep memory use bounded on large files.
 	 *
 	 * @param string $filepath The full path to the log file.
 	 *
-	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}>
+	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:string|null}>
 	 */
 	public function parse_log( string $filepath ): array;
+
+	/**
+	 * Parse a log file into entries, with limits so memory use stays bounded on large files.
+	 *
+	 * The whole file is always scanned, so the total entry count and per-level counts cover the full
+	 * file; the limits only cap what is kept in memory and returned.
+	 *
+	 * @used-by Logs_List_Table::prepare_items()
+	 *
+	 * @param string $filepath        The full path to the log file.
+	 * @param ?int   $max_entries     Keep only the most recent N entries (null = no limit).
+	 * @param ?int   $max_entry_bytes Cap each entry at this many bytes of log text, appending a truncation note to its message (null = no limit).
+	 */
+	public function parse_log_file( string $filepath, ?int $max_entries = null, ?int $max_entry_bytes = null ): Parsed_Log_File;
 }

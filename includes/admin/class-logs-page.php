@@ -161,25 +161,37 @@ class Logs_Page {
 
 		echo '<p>Current log level: <b>' . esc_html( ucfirst( $this->settings->get_log_level() ) ) . '</b></p>';
 
+		// Parse the log file once; its entries, entry counts and level counts are all used below.
+		$logs_table->prepare_items();
+		$parsed_log_file = $logs_table->get_parsed_log_file();
+
 		// If this is in the logger's private-uploads directory, then it already should be accessible, but if it's in the wc-logs folder, it will not be.
-		$download_url = wp_nonce_url( admin_url( 'admin.php?page=' . $this->settings->get_plugin_slug() . '&date=' . $date . '&download-log=true' ), 'bh-wp-logger-download' );
+		$download_url = wp_nonce_url( admin_url( 'admin.php?page=' . $this->settings->get_plugin_slug() . '&date=' . $chosen_date . '&download-log=true' ), 'bh-wp-logger-download' );
 		$filepath     = $log_files[ $chosen_date ];
 		$filename     = basename( $filepath );
-		// TODO: Show file size here. Show number of entries.
-		echo '<p>Displaying log file at <a href="' . esc_url( $download_url ) . '" download="' . esc_attr( $filename ) . '"><code>' . esc_html( $filepath ) . '</code></a></p>';
+		$filesize     = file_exists( $filepath ) ? (int) filesize( $filepath ) : 0;
+		echo '<p>Displaying log file at <a href="' . esc_url( $download_url ) . '" download="' . esc_attr( $filename ) . '"><code>' . esc_html( $filepath ) . '</code></a> (' . esc_html( (string) size_format( $filesize ) ) . ')</p>';
+
+		if ( ! is_null( $parsed_log_file ) && $parsed_log_file->is_truncated() ) {
+			printf(
+				'<p>Showing the most recent %s of %s entries. Very large entries are shortened. Use the download link above for the full log.</p>',
+				esc_html( number_format_i18n( count( $parsed_log_file->entries ) ) ),
+				esc_html( number_format_i18n( $parsed_log_file->total_entries_count ) )
+			);
+		}
 
 		echo '<p>Display levels: ';
 
-		$log_level_counts = array(
-			LogLevel::ERROR   => 0,
-			LogLevel::WARNING => 0,
-			LogLevel::NOTICE  => 0,
-			LogLevel::INFO    => 0,
-			LogLevel::DEBUG   => 0,
+		$log_level_counts = array_merge(
+			array(
+				LogLevel::ERROR   => 0,
+				LogLevel::WARNING => 0,
+				LogLevel::NOTICE  => 0,
+				LogLevel::INFO    => 0,
+				LogLevel::DEBUG   => 0,
+			),
+			is_null( $parsed_log_file ) ? array() : $parsed_log_file->level_counts
 		);
-		foreach ( $logs_table->get_data() as $datum ) {
-			++$log_level_counts[ strtolower( $datum['level'] ) ];
-		}
 
 		$checkboxes_first = true;
 		foreach ( $log_level_counts as $log_level => $log_level_count ) {
@@ -206,7 +218,6 @@ class Logs_Page {
 
 		// TODO: Add an action here for other plugins to add controls.
 
-		$logs_table->prepare_items();
 		$logs_table->display();
 
 		echo '</div>';
