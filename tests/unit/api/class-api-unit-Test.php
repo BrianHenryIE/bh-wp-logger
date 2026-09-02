@@ -208,7 +208,13 @@ EOD;
 
 			$this->assertSame( 10, $result->total_entries_count );
 			$this->assertTrue( $result->is_truncated() );
-			$this->assertSame( array( 'debug' => 5, 'error' => 5 ), $result->level_counts );
+			$this->assertSame(
+				array(
+					'debug' => 5,
+					'error' => 5,
+				),
+				$result->level_counts
+			);
 
 			$this->assertCount( 3, $result->entries );
 			$this->assertSame( 'Message 8', $result->entries[0]['message'] );
