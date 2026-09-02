@@ -288,6 +288,8 @@ class API implements API_Interface {
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'bh-wp-logger/includes' ):
 				case isset( $frame['file'] ) && false !== stripos( $frame['file'], 'psr/log/Psr/Log/' ):
 				case isset( $frame['file'] ) && str_contains( $frame['file'], 'php-http/logger-plugin' ):
+				case isset( $frame['file'] ) && 'LoggerTrait.php' === basename( $frame['file'] ):
+				case isset( $frame['class'] ) && 'BH_WP_PSR_Logger' === array_reverse( explode( '\\', $frame['class'] ) )[0]:
 					return true;
 				default:
 					return false;
@@ -514,21 +516,46 @@ class API implements API_Interface {
 	 * Given the path to a log file, this returns an array of arrays – an array of log entries, each of which is an
 	 * array containing the time, level, message and context.
 	 *
+	 * NB: This loads every entry, at full size, into memory. For UI display prefer
+	 * {@see API::parse_log_file()}, whose limits keep memory use bounded on large files.
+	 *
 	 * @used-by API::get_last_log_time()
-	 * @used-by Logs_List_Table::get_data()
 	 *
 	 * @param string $filepath Path to the log file to read.
 	 *
-	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}>
+	 * @return array<array{time:string,datetime:DateTime|null,level:string,message:string,context:string|null}>
 	 */
 	public function parse_log( string $filepath ): array {
+		return $this->parse_log_file( $filepath )->entries;
+	}
+
+	/**
+	 * Appended in place of an entry's remaining lines when it exceeds the max-entry-bytes limit.
+	 */
+	protected const LOG_ENTRY_TRUNCATED_MESSAGE = '… [log entry truncated for display – download the log file to view it in full]';
+
+	/**
+	 * Parse a log file into entries, with limits so memory use stays bounded on large files.
+	 *
+	 * The whole file is always scanned (one line at a time), so the total entry count and per-level
+	 * counts cover the full file; the limits only cap what is kept in memory and returned.
+	 *
+	 * @used-by Logs_List_Table::prepare_items()
+	 *
+	 * @param string $filepath        Path to the log file to read.
+	 * @param ?int   $max_entries     Keep only the most recent N entries (null = no limit).
+	 * @param ?int   $max_entry_bytes Cap each entry at this many bytes of log text, appending a
+	 *                                truncation note to its message (null = no limit). A truncated
+	 *                                entry's JSON context is cut short, so its context parses to null.
+	 */
+	public function parse_log_file( string $filepath, ?int $max_entries = null, ?int $max_entry_bytes = null ): Parsed_Log_File {
 
 		// The file is read one line at a time to avoid loading a potentially large log into memory.
 		$file_handle = fopen( $filepath, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
 		if ( false === $file_handle ) {
 			// Failed to open the file.
-			return array();
+			return new Parsed_Log_File( array(), 0, array() );
 		}
 
 		if ( $this->logger instanceof WC_PSR_Logger ) {
@@ -539,7 +566,33 @@ class API implements API_Interface {
 
 		$time_pattern = '/^(?P<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.{1}\d{2}:\d{2})/i';
 
-		$entries = array();
+		/**
+		 * The kept entries. When $max_entries is set, this is used as a ring buffer (index
+		 * $total_entries % $max_entries) so only the most recent entries are retained, and is
+		 * rotated back into chronological order after the file has been read.
+		 */
+		$entries       = array();
+		$total_entries = 0;
+		$level_counts  = array();
+
+		// Parse one entry's accumulated lines: count it, and keep it (in the ring buffer when capped).
+		$record_entry = function ( array $lines ) use ( &$entries, &$total_entries, &$level_counts, $pattern, $max_entries ): void {
+			/** @var string[] $lines */
+			$entry = $this->log_lines_to_entry( $lines, $pattern );
+			if ( is_null( $entry ) ) {
+				return;
+			}
+
+			$level                  = strtolower( $entry['level'] );
+			$level_counts[ $level ] = ( $level_counts[ $level ] ?? 0 ) + 1;
+
+			if ( is_null( $max_entries ) ) {
+				$entries[] = $entry;
+			} else {
+				$entries[ $total_entries % $max_entries ] = $entry;
+			}
+			++$total_entries;
+		};
 
 		/**
 		 * Each log entry begins with a line starting with a timestamp ($time_pattern). Read the file
@@ -547,7 +600,9 @@ class API implements API_Interface {
 		 * line (or the end of the file), then hand the collected lines off to be parsed into a single
 		 * entry. Lines before the first timestamp do not belong to any entry and are discarded.
 		 */
-		$entry_lines = array();
+		$entry_lines        = array();
+		$entry_bytes        = 0;
+		$entry_is_truncated = false;
 
 		while ( false !== ( $line = fgets( $file_handle ) ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 
@@ -556,27 +611,44 @@ class API implements API_Interface {
 			if ( 1 === preg_match( $time_pattern, $line ) ) {
 				// A new entry starts on this line; parse the entry that just ended.
 				if ( count( $entry_lines ) > 0 ) {
-					$entry = $this->log_lines_to_entry( $entry_lines, $pattern );
-					if ( ! is_null( $entry ) ) {
-						$entries[] = $entry;
-					}
+					$record_entry( $entry_lines );
 				}
-				$entry_lines = array( $line );
+				// An entry can be a single enormous line (e.g. an inline JSON context); cap it too.
+				$entry_is_truncated = ! is_null( $max_entry_bytes ) && strlen( $line ) > $max_entry_bytes;
+				if ( $entry_is_truncated ) {
+					$entry_lines = array( substr( $line, 0, $max_entry_bytes ), self::LOG_ENTRY_TRUNCATED_MESSAGE );
+				} else {
+					$entry_lines = array( $line );
+				}
+				$entry_bytes = strlen( $entry_lines[0] );
 			} elseif ( count( $entry_lines ) > 0 ) {
 				// A continuation line, e.g. a stack trace or multi-line JSON context.
+				if ( ! is_null( $max_entry_bytes ) && $entry_bytes + strlen( $line ) > $max_entry_bytes ) {
+					if ( ! $entry_is_truncated ) {
+						$entry_lines[]      = self::LOG_ENTRY_TRUNCATED_MESSAGE;
+						$entry_is_truncated = true;
+					}
+					continue;
+				}
 				$entry_lines[] = $line;
+				$entry_bytes  += strlen( $line );
 			}
 		}
 
 		// Parse the final entry.
 		if ( count( $entry_lines ) > 0 ) {
-			$entry = $this->log_lines_to_entry( $entry_lines, $pattern );
-			if ( ! is_null( $entry ) ) {
-				$entries[] = $entry;
-			}
+			$record_entry( $entry_lines );
 		}
 
-		return $entries;
+		fclose( $file_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+		// Rotate the ring buffer back into chronological order.
+		if ( ! is_null( $max_entries ) && $total_entries > $max_entries ) {
+			$offset  = $total_entries % $max_entries;
+			$entries = array_merge( array_slice( $entries, $offset ), array_slice( $entries, 0, $offset ) );
+		}
+
+		return new Parsed_Log_File( array_values( $entries ), $total_entries, $level_counts );
 	}
 
 	/**
@@ -587,12 +659,16 @@ class API implements API_Interface {
 	 * To recover the context: if the entry ends with `}`, seek in reverse for the line that opens the JSON
 	 * object, decode from there to the end, and treat the lines before it as the remainder of the message.
 	 *
-	 * @used-by API::parse_log()
+	 * The context is returned as its (validated) raw JSON string, NOT decoded: a decoded object tree
+	 * costs roughly an order of magnitude more memory than the JSON text, which matters when many
+	 * entries are held for display. Consumers decode it as needed, one entry at a time.
+	 *
+	 * @used-by API::parse_log_file()
 	 *
 	 * @param string[] $lines   The lines of a single log entry, with newlines already stripped.
 	 * @param string   $pattern The regex used to parse the first line into time/level/message (and, for WooCommerce, an inline context).
 	 *
-	 * @return ?array{time:string,datetime:DateTime|null,level:string,message:string,context:stdClass|null}
+	 * @return ?array{time:string,datetime:DateTime|null,level:string,message:string,context:string|null}
 	 */
 	protected function log_lines_to_entry( array $lines, string $pattern ): ?array {
 
@@ -614,8 +690,9 @@ class API implements API_Interface {
 		if ( isset( $line_one['context'] ) ) {
 
 			// WooCommerce logs the context inline on the first line, after "CONTEXT:".
-			$context = json_decode( $line_one['context'] );
-
+			if ( json_decode( $line_one['context'] ) instanceof stdClass ) {
+				$context = $line_one['context'];
+			}
 		} else {
 
 			$context_lines = array_slice( $lines, 1 );
@@ -635,9 +712,13 @@ class API implements API_Interface {
 
 					// The context can contain unescaped literal newlines inside string values (e.g. a
 					// stack trace), which json_decode rejects; escape them and try again.
-					$context = json_decode( $candidate ) ?? json_decode( str_replace( "\n", '\n', $candidate ) );
+					if ( is_null( json_decode( $candidate ) ) ) {
+						$candidate = str_replace( "\n", '\n', $candidate );
+					}
 
-					if ( ! is_null( $context ) ) {
+					if ( json_decode( $candidate ) instanceof stdClass ) {
+						$context = $candidate;
+
 						// Any lines before the JSON object are a continuation of the message.
 						$message_lines = array_slice( $context_lines, 0, $i );
 						if ( count( $message_lines ) > 0 ) {
@@ -651,18 +732,13 @@ class API implements API_Interface {
 			// Fallback: any remaining lines that are not themselves valid JSON are message text.
 			if ( is_null( $context ) ) {
 				foreach ( $context_lines as $context_line ) {
-					$decoded = json_decode( $context_line );
-					if ( is_null( $decoded ) ) {
-						$message .= "\n" . $context_line;
+					if ( json_decode( $context_line ) instanceof stdClass ) {
+						$context = $context_line;
 					} else {
-						$context = $decoded;
+						$message .= "\n" . $context_line;
 					}
 				}
 			}
-		}
-
-		if ( $context instanceof stdClass && isset( $context->source ) ) {
-			unset( $context->source );
 		}
 
 		return array(
@@ -670,7 +746,7 @@ class API implements API_Interface {
 			'datetime' => $datetime,
 			'level'    => $level,
 			'message'  => $message,
-			'context'  => $context instanceof stdClass ? $context : null,
+			'context'  => $context,
 		);
 	}
 }

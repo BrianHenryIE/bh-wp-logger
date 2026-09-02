@@ -94,18 +94,23 @@ class Admin_Notices extends Notices {
 			return;
 		}
 
-		// Check is the ajax request relevant.
+		// Check is the ajax request relevant: only register this notice when the dismissal targets it.
+		// Nonce verification is left to the WPTRT Dismiss handler ({@see \WPTRT\AdminNotices\Dismiss::ajax_maybe_dismiss_notice()});
+		// dying here on a nonce mismatch would break dismissing every other plugin's WPTRT notices,
+		// whose nonces are for their own notice ids.
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- read-only comparison to decide whether to register the notice; the Dismiss handler verifies the nonce.
 		if ( wp_doing_ajax() ) {
-			$action = "wptrt_dismiss_notice_{$this->settings->get_plugin_slug()}-recent-error";
-			if ( ! isset( $_POST['action'] )
+			if ( ! isset( $_POST['action'], $_POST['id'] )
 				|| ! is_string( $_POST['action'] )
+				|| ! is_string( $_POST['id'] )
 				|| 'wptrt_dismiss_notice' !== sanitize_key( wp_unslash( $_POST['action'] ) )
-				|| false === check_admin_referer( $action, 'nonce' ) // `false === ` doesn't do anything because it `die()`s if it fails.
+				|| sanitize_key( wp_unslash( $_POST['id'] ) ) !== "{$this->settings->get_plugin_slug()}-recent-error"
 			) {
 
 				return;
 			}
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		$error_detail_option_name = $this->get_error_detail_option_name();
 

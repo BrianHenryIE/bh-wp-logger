@@ -180,10 +180,11 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			 * Return null to cancel logging this message.
 			 *
 			 * @param array{level:string,message:string,context:array} $log_data
+			 * @param string $plugin_slug The plugin slug the logger is running as.
 			 * @param Logger_Settings_Interface $settings
 			 * @param BH_WP_PSR_Logger $bh_wp_psr_logger
 			 */
-			$log_data = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_log', $log_data, $settings, $bh_wp_psr_logger );
+			$log_data = apply_filters( $this->settings->get_plugin_slug() . '_bh_wp_logger_log', $log_data, $this->settings->get_plugin_slug(), $settings, $bh_wp_psr_logger );
 
 			if ( empty( $log_data ) ) {
 				return;

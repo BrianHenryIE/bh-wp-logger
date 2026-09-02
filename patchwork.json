@@ -1,5 +1,6 @@
 {
   "redefinable-internals": [
+    "debug_backtrace",
     "constant",
     "realpath"
   ]

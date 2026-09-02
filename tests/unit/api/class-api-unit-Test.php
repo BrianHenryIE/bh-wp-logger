@@ -152,6 +152,107 @@ EOD;
 	}
 
 	/**
+	 * The context is returned as its raw JSON string, not decoded (decoded object trees use roughly
+	 * an order of magnitude more memory, which caused out-of-memory errors on the logs page).
+	 *
+	 * @covers ::parse_log
+	 * @covers ::log_lines_to_entry
+	 */
+	public function test_parse_log_returns_context_as_json_string(): void {
+
+		$log_contents = <<<'EOD'
+2026-08-23T00:00:01+00:00 DEBUG First message
+{"key":"value"}
+2026-08-23T00:00:02+00:00 INFO Second message with no context
+EOD;
+
+		$temp_file = tempnam( sys_get_temp_dir(), 'log' ) . '.txt';
+
+		try {
+			file_put_contents( $temp_file, $log_contents );
+
+			$sut = new API( $this->makeEmpty( Logger_Settings_Interface::class ), $this->logger );
+
+			$result = $sut->parse_log( $temp_file );
+
+			$this->assertCount( 2, $result );
+			$this->assertSame( '{"key":"value"}', $result[0]['context'] );
+			$this->assertNull( $result[1]['context'] );
+		} finally {
+			unlink( $temp_file );
+		}
+	}
+
+	/**
+	 * With a max-entries limit, only the most recent entries are kept (in order), while the total
+	 * count and level counts still cover the whole file.
+	 *
+	 * @covers ::parse_log_file
+	 */
+	public function test_parse_log_file_keeps_only_the_most_recent_entries(): void {
+
+		$lines = array();
+		for ( $i = 1; $i <= 10; $i++ ) {
+			$level   = 0 === $i % 2 ? 'ERROR' : 'DEBUG';
+			$lines[] = sprintf( '2026-08-23T00:00:%02d+00:00 %s Message %d', $i, $level, $i );
+		}
+
+		$temp_file = tempnam( sys_get_temp_dir(), 'log' ) . '.txt';
+
+		try {
+			file_put_contents( $temp_file, implode( "\n", $lines ) );
+
+			$sut = new API( $this->makeEmpty( Logger_Settings_Interface::class ), $this->logger );
+
+			$result = $sut->parse_log_file( $temp_file, 3 );
+
+			$this->assertSame( 10, $result->total_entries_count );
+			$this->assertTrue( $result->is_truncated() );
+			$this->assertSame( array( 'debug' => 5, 'error' => 5 ), $result->level_counts );
+
+			$this->assertCount( 3, $result->entries );
+			$this->assertSame( 'Message 8', $result->entries[0]['message'] );
+			$this->assertSame( 'Message 9', $result->entries[1]['message'] );
+			$this->assertSame( 'Message 10', $result->entries[2]['message'] );
+		} finally {
+			unlink( $temp_file );
+		}
+	}
+
+	/**
+	 * An entry larger than the max-entry-bytes limit is cut short with a truncation note, so a single
+	 * enormous entry (e.g. a whole email in the context) cannot exhaust memory.
+	 *
+	 * @covers ::parse_log_file
+	 */
+	public function test_parse_log_file_truncates_oversized_entries(): void {
+
+		$log_contents = "2026-08-23T00:00:01+00:00 DEBUG Big entry\n"
+			. str_repeat( "Lorem ipsum dolor sit amet.\n", 100 )
+			. '2026-08-23T00:00:02+00:00 INFO Small entry';
+
+		$temp_file = tempnam( sys_get_temp_dir(), 'log' ) . '.txt';
+
+		try {
+			file_put_contents( $temp_file, $log_contents );
+
+			$sut = new API( $this->makeEmpty( Logger_Settings_Interface::class ), $this->logger );
+
+			$result = $sut->parse_log_file( $temp_file, null, 256 );
+
+			$this->assertSame( 2, $result->total_entries_count );
+
+			$big_entry_message = $result->entries[0]['message'];
+			$this->assertLessThan( 512, strlen( $big_entry_message ) );
+			$this->assertStringContainsString( 'truncated', $big_entry_message );
+
+			$this->assertSame( 'Small entry', $result->entries[1]['message'] );
+		} finally {
+			unlink( $temp_file );
+		}
+	}
+
+	/**
 	 * Parsing date in and out of int / datetime results in a one-second difference, which is fine.
 	 *
 	 * @covers ::get_last_log_time

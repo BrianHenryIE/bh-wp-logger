@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+* Breaking: `$plugin_slug` is now the second argument (after the filtered value) of the `{$plugin_slug}_bh_wp_logger_log` and `{$plugin_slug}_bh_wp_logger_column` filters
+* Fix: the custom "logs directory is publicly accessible" warning message was hooked on a stale pre-0.4.0 bh-wp-private-uploads filter name and never applied; migrated to `bh_wp_private_uploads_url_is_public_warning`, matching this logger's own instance by plugin slug
+* Fix: dismissing any other plugin's WPTRT admin notice (e.g. bh-wp-private-uploads' "directory is publicly accessible") returned 403 – the recent-error notice's ajax gate called `check_admin_referer()` on every `wptrt_dismiss_notice` request instead of first checking the notice id
+* Fix: out-of-memory error viewing large log files – the logs page now parses the file once, keeps only the most recent 1,000 entries, and caps each entry at 64KB (`API::parse_log_file()`), showing "Showing the most recent X of Y entries" when truncated
+* Change: parsed log entries' `context` is now the raw JSON string (decoded per-row for display) instead of a decoded `stdClass` – decoded object trees used ~10x the memory
+* Add: `API_Interface::parse_log_file( $filepath, $max_entries, $max_entry_bytes ): Parsed_Log_File` – full-file entry count and per-level counts with bounded memory
+* Add: log file size and entry counts displayed on the logs page
+* Fix: form-handler redirects used `menu_page_url()`, which returns an empty string in `admin-post.php` context
+* Fix: the download link always pointed at the most recent date rather than the displayed date
+* Fix: log levels beyond the five displayed (e.g. `critical`) no longer cause an undefined-array-key warning when counting
+
 ## 0.3.4 – 2026-07-17
 
 * Require PHP 8.1
