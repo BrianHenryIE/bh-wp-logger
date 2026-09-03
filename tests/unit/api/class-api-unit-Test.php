@@ -23,7 +23,8 @@ class API_Unit_Test extends Unit_Testcase {
 
 		$result = $api->get_backtrace();
 
-		$this->assertEquals( $result[0]['file'], __FILE__ );
+		$frame = $result[array_key_first( $result )];
+		$this->assertEquals( $frame['file'], __FILE__ );
 	}
 
 	/**
