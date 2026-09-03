@@ -1,4 +1,4 @@
-![PHP](https://img.shields.io/badge/PHP-8.1-777BB4?logo=php&logoColor=white) [![WordPress tested 7.0](https://img.shields.io/badge/WordPress-v7.0%20tested-0073aa.svg)](#) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards%20-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-logger/) [![PHPStan ](https://img.shields.io/badge/PHPStan-Level%2010%20-2a5ea7.svg)](https://github.com/szepeviktor/phpstan-wordpress)
+![PHP](https://img.shields.io/badge/PHP-8.1-777BB4?logo=php&logoColor=white) [![WordPress tested 7.0](https://img.shields.io/badge/WordPress-v7.0%20tested-0073aa.svg)](#) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards%20-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-logger/) [![PHPStan ](https://img.shields.io/badge/PHPStan-Level%208%20-2a5ea7.svg)](https://github.com/szepeviktor/phpstan-wordpress)
 
 # BH WP Logger
 
@@ -24,11 +24,11 @@ Uses PHP's `register_shutdown_function()` to catch Exceptions related to the plu
 
 Deletes log files older than 30 days on cron.
 
-Records a full backtrace on errors. Records two steps of backtrace on every log when the level is Debug.
+Records a full backtrace on errors, and three steps of backtrace on warnings and on every log when the log level is Debug. `WP_Hook` objects found in backtraces are replaced with their class name so registered callbacks don't bloat the log file.
 
 ## UI 
 
-Displays logs in `WP_List_Table`.
+Displays logs in `WP_List_Table`. Large log files are parsed with bounded memory – the most recent 1,000 entries are displayed, along with the log file size and per-level entry counts.
 
 ![Logs WP_List_Table](./.github/logs-wp-list-table.png "Logs WP_List_Table")
 
@@ -70,7 +70,7 @@ $logger = Logger::instance();
 Provide the settings:
 
 ```php
-$logger_settings = new class() implements BrianHenryIE\WP_Logger\API\Logger_Settings_Interface {
+$logger_settings = new class() implements BrianHenryIE\WP_Logger\Logger_Settings_Interface {
     use BrianHenryIE\WP_Logger\Logger_Settings_Trait;
     
 	public function get_log_level(): string {
@@ -99,10 +99,10 @@ Then pass around your `$logger` instance.
 
 After the logger has been instantiated once, subsequent calls to `::instance()` return the existing instance and any `$logger_settings` passed is ignored.
 
-To use WooCommerce's native `WC_Logger`, use the `WooCommerce_Logger_Interface` interface (which just extends `Logger_Settings_Interface`) on the settings object.
+To use WooCommerce's native `WC_Logger`, use the `WooCommerce_Logger_Settings_Interface` interface (which just extends `Logger_Settings_Interface`) on the settings object.
 
 ```php
-$logger_settings = new class() implements BrianHenryIE\WP_Logger\WooCommerce\WooCommerce_Logger_Settings_Interface {
+$logger_settings = new class() implements BrianHenryIE\WP_Logger\WooCommerce_Logger_Settings_Interface {
     ...
 ```
 
@@ -145,11 +145,12 @@ E.g. change the log level for specific log messages:
  *
  * @hooked {$plugin_slug}_bh_wp_logger_log
  * 
- * @pararm array{level:string,message:string,context:array} $log_data
+ * @param array{level:string,message:string,context:array} $log_data
+ * @param string $plugin_slug
  * @param Logger_Settings_Interface $settings
  * @param BH_WP_PSR_Logger $bh_wp_psr_logger
  */
-function modify_log_data( array $log_data, \BrianHenryIE\WP_Logger\Logger_Settings_Interface $settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger): ?array {
+function modify_log_data( array $log_data, string $plugin_slug, \BrianHenryIE\WP_Logger\Logger_Settings_Interface $settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger): ?array {
     
     if ( 0 === strpos( $log_data['message'], 'Sending request' ) ) {
         $log_data['level'] = LogLevel::DEBUG;
@@ -157,7 +158,7 @@ function modify_log_data( array $log_data, \BrianHenryIE\WP_Logger\Logger_Settin
 
     return $log_data;
 }
-add_filter( "{$plugin_slug}_bh_wp_logger_log", 'modify_log_data', 10, 3 );
+add_filter( "{$plugin_slug}_bh_wp_logger_log", 'modify_log_data', 10, 4 );
 ```
 
 E.g. turn text in logs into hyperlinks as it is being displayed in the logs table:
@@ -170,6 +171,7 @@ E.g. turn text in logs into hyperlinks as it is being displayed in the logs tabl
  * @hooked {$plugin_slug}_bh_wp_logger_column
  *
  * @param string                                                          $column_output The column output so far.
+ * @param string                                                          $plugin_slug The plugin slug the logger is for.
  * @param array{time:string, level:string, message:string, context:array} $item The log entry row.
  * @param string                                                          $column_name The current column name.
  * @param Logger_Settings_Interface                                       $logger_settings The logger settings.
@@ -177,7 +179,7 @@ E.g. turn text in logs into hyperlinks as it is being displayed in the logs tabl
  *
  * @return string
  */
-function replace_wc_order_id_with_link( string $column_output, array $item, string $column_name,\BrianHenryIE\WP_Logger\Logger_Settings_Interface $logger_settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger ): string {
+function replace_wc_order_id_with_link( string $column_output, string $plugin_slug, array $item, string $column_name, \BrianHenryIE\WP_Logger\Logger_Settings_Interface $logger_settings, \BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger $bh_wp_psr_logger ): string {
 
     if ( 'message' !== $column_name ) {
         return $column_output;
@@ -195,7 +197,7 @@ function replace_wc_order_id_with_link( string $column_output, array $item, stri
 
     return $message;
 }
-add_filter( "{$plugin_slug}_bh_wp_logger_column", 'replace_wc_order_id_with_link', 10, 5 );
+add_filter( "{$plugin_slug}_bh_wp_logger_column", 'replace_wc_order_id_with_link', 10, 6 );
 ```
 
 ## WP_Mock
@@ -246,6 +248,6 @@ Minor concerns:
 
 To date I think it has been used mostly by me, i.e. internal projects. There are no egregious issues. It _should_ work for everyone but I would like some feedback from others on how well it works for you. 
 
-I'll start at Semver 1.0.0 once I've caught up with WPCS ✅, PhpStan ✅ and PhpUnit. There's about 65 tests and 43% coverage. WPCS + PHPStan are ~~both pretty good~~ now 100%.
+I'll start at Semver 1.0.0 once I've caught up with WPCS ✅, PhpStan ✅ and PhpUnit. There are over 90 tests across the unit, wpunit and e2e suites. WPCS is at 100%; PHPStan runs at level 8.
 
 I think that's higher code-quality than most WordPress plugins.

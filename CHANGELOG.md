@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 – 2026-09-03
 
 * Breaking: `$plugin_slug` is now the second argument (after the filtered value) of the `{$plugin_slug}_bh_wp_logger_log` and `{$plugin_slug}_bh_wp_logger_column` filters
 * Fix: the custom "logs directory is publicly accessible" warning message was hooked on a stale pre-0.4.0 bh-wp-private-uploads filter name and never applied; migrated to `bh_wp_private_uploads_url_is_public_warning`, matching this logger's own instance by plugin slug
@@ -12,6 +12,10 @@
 * Fix: form-handler redirects used `menu_page_url()`, which returns an empty string in `admin-post.php` context
 * Fix: the download link always pointed at the most recent date rather than the displayed date
 * Fix: log levels beyond the five displayed (e.g. `critical`) no longer cause an undefined-array-key warning when counting
+* Add: `Remove_WP_Hooks_Processor` – a Monolog processor which replaces `WP_Hook` objects in logged backtraces (`debug_backtrace` frames' `object`/`args`, and logged exceptions' backtrace `args`) with the class name – a single hook object's `callbacks` property lists every callback every plugin has registered on that hook, making the log file size explode; the live `$wp_filter` objects are never modified
+* Fix: the logger's own frames (`LoggerTrait.php`, `BH_WP_PSR_Logger`) are now excluded from the top of logged backtraces
+* Change: no custom post type is registered for the logs private uploads directory (`get_post_type_name()` returns `''` in the bh-wp-private-uploads settings)
+* Dev: add Playwright e2e test dependencies and fix the plugin-activation test's row selector; add `phpstan/phpstan-phpunit`; map additional local plugins into wp-env
 
 ## 0.3.4 – 2026-07-17
 
