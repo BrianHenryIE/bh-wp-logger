@@ -6,6 +6,10 @@ parameters:
     scanDirectories:
         - wp-content/plugins
 #        - vendor/wp-cli # wp-cli was removed because installing it with Composer caused issues with it running in wp-env.
+    scanFiles:
+        - vendor/antecedent/patchwork/Patchwork.php
+        - tests/unit/class-unit-testcase.php
+        - tests/wpunit/class-wpunit-testcase.php
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#LoggerInterface\|null#'

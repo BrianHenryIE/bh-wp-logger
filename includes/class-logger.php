@@ -18,6 +18,7 @@ namespace BrianHenryIE\WP_Logger;
 use BrianHenryIE\WC_Logger\Log_Context_Handler;
 use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
+use BrianHenryIE\WP_Logger\API\Remove_WP_Hooks_Processor;
 use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use BrianHenryIE\WP_Private_Uploads\BH_WP_Private_Uploads_Hooks;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Interface;
@@ -32,6 +33,8 @@ use Psr\Log\NullLogger;
 
 /**
  * Wraps parent class in a singleton so it only needs to be configured once.
+ *
+ * @phpstan-type LogLevel 100|200|250|300|400|500|550|600|'ALERT'|'alert'|'CRITICAL'|'critical'|'DEBUG'|'debug'|'EMERGENCY'|'emergency'|'ERROR'|'error'|'INFO'|'info'|'NOTICE'|'notice'|'WARNING'|'warning'|\Monolog\Level
  */
 class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface {
 
@@ -111,7 +114,8 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 		} else {
 
-			$log_directory       = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs' );
+			$log_directory = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs' );
+			/** @var LogLevel $log_level_threshold @phpstan-ignore varTag.nativeType */
 			$log_level_threshold = $settings->get_log_level();
 
 			/**
@@ -151,6 +155,8 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			$handler->setFormatter( $formatter );
 			$logger->pushHandler( $handler );
 			$logger->pushProcessor( new PsrLogMessageProcessor() );
+			// Backtrace frames can reference `WP_Hook` objects whose callbacks would bloat the log file.
+			$logger->pushProcessor( new Remove_WP_Hooks_Processor() );
 
 			// Make the logs directory inaccessible to the public.
 			$private_uploads_settings = new class( $settings ) implements Private_Uploads_Settings_Interface {
@@ -181,6 +187,13 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 				 */
 				public function get_uploads_subdirectory_name(): string {
 					return 'logs';
+				}
+
+				/**
+				 * Do not register a post type for the plugin's logs.
+				 */
+				public function get_post_type_name(): string {
+					return '';
 				}
 			};
 
