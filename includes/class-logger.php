@@ -18,6 +18,7 @@ namespace BrianHenryIE\WP_Logger;
 use BrianHenryIE\WC_Logger\Log_Context_Handler;
 use BrianHenryIE\WC_Logger\WC_PSR_Logger;
 use BrianHenryIE\WP_Logger\API\BH_WP_PSR_Logger;
+use BrianHenryIE\WP_Logger\API\Remove_WP_Hooks_Processor;
 use BrianHenryIE\WP_Logger\WP_Includes\Plugin_Logger_Actions;
 use BrianHenryIE\WP_Private_Uploads\BH_WP_Private_Uploads_Hooks;
 use BrianHenryIE\WP_Private_Uploads\Private_Uploads_Settings_Interface;
@@ -151,6 +152,8 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			$handler->setFormatter( $formatter );
 			$logger->pushHandler( $handler );
 			$logger->pushProcessor( new PsrLogMessageProcessor() );
+			// Backtrace frames can reference `WP_Hook` objects whose callbacks would bloat the log file.
+			$logger->pushProcessor( new Remove_WP_Hooks_Processor() );
 
 			// Make the logs directory inaccessible to the public.
 			$private_uploads_settings = new class( $settings ) implements Private_Uploads_Settings_Interface {

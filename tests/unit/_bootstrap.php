@@ -9,6 +9,7 @@ WP_Mock::setUsePatchwork( true );
 WP_Mock::bootstrap();
 
 $class_map = array(
+	'WP_Hook'              => codecept_root_dir( 'wordpress/wp-includes/class-wp-hook.php' ),
 	'WP_Error'             => codecept_root_dir( 'wordpress/wp-includes/class-wp-error.php' ),
 	'WP_Filesystem_Base'   => codecept_root_dir( 'wordpress/wp-admin/includes/class-wp-filesystem-base.php' ),
 	'WP_Filesystem_Direct' => codecept_root_dir( 'wordpress/wp-admin/includes/class-wp-filesystem-direct.php' ),
