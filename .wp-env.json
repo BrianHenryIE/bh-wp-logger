@@ -8,7 +8,11 @@
   },
   "mappings": {
     "../setup": "./tests/_wp-env",
+    "wp-content/plugins/admin-menu-editor-pro": "./wp-content/plugins/admin-menu-editor-pro",
+    "wp-content/plugins/debug-log-manager": "./wp-content/plugins/debug-log-manager",
     "wp-content/plugins/development-plugin": "./development-plugin",
+    "wp-content/plugins/siren": "./wp-content/plugins/siren",
+    "wp-content/plugins/social-link-pages": "./wp-content/plugins/social-link-pages",
     "wp-content/plugins/woocommerce": "./wp-content/plugins/woocommerce",
     "wp-content/uploads/development-plugin": "."
   },
