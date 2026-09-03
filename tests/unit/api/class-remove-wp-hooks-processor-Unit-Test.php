@@ -139,4 +139,106 @@ class Remove_WP_Hooks_Processor_Unit_Test extends Unit_Testcase {
 		$this->assertArrayNotHasKey( 'object', $result->context['debug_backtrace'][0] );
 		$this->assertSame( $other_object, $result->context['debug_backtrace'][1]['object'] );
 	}
+
+	/**
+	 * A `WP_Hook` among a frame's `args` should also be replaced — `Throwable::getTrace()` frames omit `object`
+	 * but include `args`, and a `WP_Hook` can be passed to a callback.
+	 *
+	 * @covers ::__invoke
+	 * @covers ::remove_wp_hooks_from_frames
+	 */
+	public function test_replaces_wp_hook_in_frame_args(): void {
+
+		$wp_hook = $this->new_wp_hook();
+
+		$monolog_record = $this->new_log_record(
+			array(
+				'debug_backtrace' => array(
+					array(
+						'function' => 'do_action_ref_array',
+						'args'     => array( 'test_hook_name', $wp_hook ),
+					),
+				),
+			),
+		);
+
+		$sut = new Remove_WP_Hooks_Processor();
+
+		$result = $sut->__invoke( $monolog_record );
+
+		$this->assertSame( 'test_hook_name', $result->context['debug_backtrace'][0]['args'][0] );
+		$this->assertSame( WP_Hook::class, $result->context['debug_backtrace'][0]['args'][1] );
+		$this->assertNotEmpty( $wp_hook->callbacks );
+	}
+
+	/**
+	 * The backtrace of a logged exception, {@see BH_WP_PSR_Logger::log()} `context.exception.backtrace`,
+	 * should be stripped of `WP_Hook`s just like `context.debug_backtrace`.
+	 *
+	 * @see \Throwable::getTrace()
+	 *
+	 * @covers ::__invoke
+	 * @covers ::remove_wp_hooks_from_frames
+	 */
+	public function test_replaces_wp_hook_in_exception_backtrace(): void {
+
+		$wp_hook = $this->new_wp_hook();
+
+		try {
+			throw new \Exception( 'test_exception' );
+		} catch ( \Exception $exception ) {
+			$exception_backtrace = $exception->getTrace();
+		}
+
+		// `Throwable::getTrace()` omits `args` when `zend.exception_ignore_args` is enabled, so add
+		// a deterministic frame shaped like one thrown from inside a hook callback.
+		array_unshift(
+			$exception_backtrace,
+			array(
+				'function' => 'apply_filters',
+				'class'    => 'WP_Hook',
+				'args'     => array( 'filtered_value', $wp_hook ),
+			),
+		);
+
+		// The shape `BH_WP_PSR_Logger::log()` transforms `context['exception']` into.
+		$monolog_record = $this->new_log_record(
+			array(
+				'exception' => array(
+					'class'     => \Exception::class,
+					'message'   => $exception->getMessage(),
+					'backtrace' => $exception_backtrace,
+				),
+			),
+		);
+
+		$sut = new Remove_WP_Hooks_Processor();
+
+		$result = $sut->__invoke( $monolog_record );
+
+		$this->assertSame( WP_Hook::class, $result->context['exception']['backtrace'][0]['args'][1] );
+		$this->assertNotEmpty( $wp_hook->callbacks );
+	}
+
+	/**
+	 * A record whose backtraces contain no `WP_Hook` should be returned unchanged (same instance).
+	 *
+	 * @covers ::__invoke
+	 */
+	public function test_returns_same_record_when_no_wp_hook_found(): void {
+
+		$monolog_record = $this->new_log_record(
+			array(
+				'debug_backtrace' => array(
+					array( 'function' => 'do_action' ),
+				),
+			),
+		);
+
+		$sut = new Remove_WP_Hooks_Processor();
+
+		$result = $sut->__invoke( $monolog_record );
+
+		$this->assertSame( $monolog_record, $result );
+	}
 }
