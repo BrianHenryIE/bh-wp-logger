@@ -185,6 +185,13 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 				public function get_uploads_subdirectory_name(): string {
 					return 'logs';
 				}
+
+				/**
+				 * Do not register a post type for the plugin's logs.
+				 */
+				public function get_post_type_name(): string {
+					return '';
+				}
 			};
 
 			// Mute debug logs from library: the handler drops records below INFO.
