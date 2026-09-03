@@ -8,6 +8,7 @@ use BrianHenryIE\WP_Logger\Logger_Settings_Interface;
 
 /**
  * @coversDefaultClass  \BrianHenryIE\WP_Logger\API\API
+ * @phpstan-import-type BackTraceFrameArray from API
  */
 class API_Unit_Test extends Unit_Testcase {
 
@@ -23,8 +24,9 @@ class API_Unit_Test extends Unit_Testcase {
 
 		$result = $api->get_backtrace();
 
-		$frame = $result[array_key_first( $result )];
-		$this->assertEquals( $frame['file'], __FILE__ );
+		/** @var BackTraceFrameArray $frame */
+		$frame = array_shift( $result );
+		$this->assertEquals( $frame['file'] ?? '', __FILE__ );
 	}
 
 	/**
@@ -32,8 +34,6 @@ class API_Unit_Test extends Unit_Testcase {
 	 * @covers ::log_lines_to_entry
 	 */
 	public function test_parse_logs_simple(): void {
-
-		$this->markTestSkipped( 'Test data file not found at: tests/_data/simple-log-8-lines.log' );
 
 		global $project_root_dir;
 
@@ -209,7 +209,13 @@ EOD;
 
 			$this->assertSame( 10, $result->total_entries_count );
 			$this->assertTrue( $result->is_truncated() );
-			$this->assertSame( array( 'debug' => 5, 'error' => 5 ), $result->level_counts );
+			$this->assertSame(
+				array(
+					'debug' => 5,
+					'error' => 5,
+				),
+				$result->level_counts
+			);
 
 			$this->assertCount( 3, $result->entries );
 			$this->assertSame( 'Message 8', $result->entries[0]['message'] );
@@ -288,9 +294,9 @@ EOD;
 
 				$timestamp = ( new \DateTimeImmutable( '2022-02-23T22:56:00+00:00', new \DateTimeZone( 'UTC' ) ) )->format( 'U' );
 
-				touch( $logfilepath, $timestamp );
+				touch( $logfilepath, (int) $timestamp );
 
-				return array( $logfilepath );
+				return array( '2022-02-23' => $logfilepath );
 			}
 		};
 
@@ -318,7 +324,7 @@ EOD;
 				'args'  => array(
 					'test-last-log-time',
 					'2022-02-23T22:56:01+00:00',
-					60 * 60 * 24, // `DAY_IN_SECONDS`.
+					60 * 60 * 24, // Aka `DAY_IN_SECONDS`.
 				),
 				'times' => 1,
 			)
@@ -327,7 +333,7 @@ EOD;
 		$result = $sut->get_last_log_time();
 
 		$expected = new \DateTime( '2022-02-23T22:56:01+00:00' );
-		$this->assertEquals( $expected->getTimestamp(), $result->getTimestamp() );
+		$this->assertEquals( $expected->getTimestamp(), $result?->getTimestamp() );
 	}
 
 	/**

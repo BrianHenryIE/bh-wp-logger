@@ -35,7 +35,7 @@ class Remove_WP_Hooks_Processor_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction( '_wp_filter_build_unique_id' )->andReturn( '42' );
 
 		$wp_hook = new WP_Hook();
-		$wp_hook->add_filter( 'test_hook_name', 'callback', 10, 3 );
+		$wp_hook->add_filter( 'test_hook_name', fn() => 'callback', 10, 3 );
 
 		return $wp_hook;
 	}

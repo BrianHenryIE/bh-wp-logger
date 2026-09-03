@@ -33,6 +33,8 @@ use Psr\Log\NullLogger;
 
 /**
  * Wraps parent class in a singleton so it only needs to be configured once.
+ *
+ * @phpstan-type LogLevel 100|200|250|300|400|500|550|600|'ALERT'|'alert'|'CRITICAL'|'critical'|'DEBUG'|'debug'|'EMERGENCY'|'emergency'|'ERROR'|'error'|'INFO'|'info'|'NOTICE'|'notice'|'WARNING'|'warning'|\Monolog\Level
  */
 class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface {
 
@@ -112,7 +114,8 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 		} else {
 
-			$log_directory       = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs' );
+			$log_directory = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs' );
+			/** @var LogLevel $log_level_threshold @phpstan-ignore varTag.nativeType */
 			$log_level_threshold = $settings->get_log_level();
 
 			/**
