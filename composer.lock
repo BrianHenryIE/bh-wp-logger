@@ -7459,11 +7459,11 @@
         },
         {
             "name": "wordpress/wordpress",
-            "version": "7.0.2",
+            "version": "7.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/WordPress/wordpress-develop",
-                "reference": "855551c4477bd5a0407221c57dae123c4163b434"
+                "url": "https://github.com/WordPress/wordpress-develop.git",
+                "reference": "daaca56d3d6a9a42a0c87f6eda766c33a77c1d05"
             },
             "require": {
                 "ext-hash": "*",
@@ -7471,20 +7471,58 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "composer/ca-bundle": "1.5.11",
+                "composer/ca-bundle": "1.5.13",
                 "phpcompatibility/phpcompatibility-wp": "~2.1.3",
-                "phpstan/phpstan": "2.1.39",
+                "phpstan/phpstan": "2.2.5",
+                "phpstan/phpstan-phpunit": "2.0.18",
                 "squizlabs/php_codesniffer": "3.13.5",
-                "wp-coding-standards/wpcs": "~3.3.0",
+                "wp-coding-standards/wpcs": "~3.4.1",
                 "yoast/phpunit-polyfills": "^1.1.0"
             },
             "suggest": {
-                "ext-dom": "*"
+                "ext-apcu": "*",
+                "ext-bc": "*",
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "ext-exif": "*",
+                "ext-fileinfo": "*",
+                "ext-filter": "*",
+                "ext-ftp": "*",
+                "ext-gd": "*",
+                "ext-iconv": "*",
+                "ext-igbinary": "*",
+                "ext-imagick": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "ext-memcached": "*",
+                "ext-mysqli": "*",
+                "ext-opcache": "*",
+                "ext-openssl": "*",
+                "ext-redis": "*",
+                "ext-shmop": "*",
+                "ext-simplexml": "*",
+                "ext-sockets": "*",
+                "ext-sodium": "*",
+                "ext-ssh2": "*",
+                "ext-timezonedb": "*",
+                "ext-xml": "*",
+                "ext-xmlreader": "*",
+                "ext-zip": "*",
+                "ext-zlib": "*"
             },
             "type": "library",
+            "autoload-dev": {
+                "psr-4": {
+                    "WordPress\\PHPStan\\": "tests/phpstan/"
+                }
+            },
             "scripts": {
                 "phpstan": [
                     "@php ./vendor/bin/phpstan analyse --memory-limit=2G"
+                ],
+                "phpstan:baselines": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@php ./tests/phpstan/generate-baselines.php"
                 ],
                 "compat": [
                     "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist --report=summary,source"
@@ -7517,7 +7555,7 @@
             "support": {
                 "issues": "https://core.trac.wordpress.org/"
             },
-            "time": "2026-07-17T17:58:37+00:00"
+            "time": "2026-08-19T20:05:06+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
