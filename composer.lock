@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "132d3719c90a0eda0edf059b0ca64935",
+    "content-hash": "7d605fb3db098589adab322d83209fd8",
     "packages": [
         {
             "name": "brianhenryie/bh-wc-logger",
@@ -116,16 +116,16 @@
         },
         {
             "name": "brianhenryie/bh-wp-private-uploads",
-            "version": "0.4.0",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads.git",
-                "reference": "eb02977d6162f3468222b62c5678da84d6a4cb16"
+                "reference": "11aa63f7504b2f6cfec79474566dc3314f8aa422"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BrianHenryIE/bh-wp-private-uploads/zipball/eb02977d6162f3468222b62c5678da84d6a4cb16",
-                "reference": "eb02977d6162f3468222b62c5678da84d6a4cb16",
+                "url": "https://api.github.com/repos/BrianHenryIE/bh-wp-private-uploads/zipball/11aa63f7504b2f6cfec79474566dc3314f8aa422",
+                "reference": "11aa63f7504b2f6cfec79474566dc3314f8aa422",
                 "shasum": ""
             },
             "require": {
@@ -136,7 +136,7 @@
             },
             "require-dev": {
                 "10up/wp_mock": "^1.0",
-                "alleyinteractive/wordpress-autoloader": "^1.1",
+                "alleyinteractive/wordpress-autoloader": "^1.2",
                 "antecedent/patchwork": "^2.1",
                 "behat/behat": "^3.29",
                 "brianhenryie/color-logger": "*",
@@ -149,7 +149,7 @@
                 "lucatume/wp-browser": "^4",
                 "phpstan/extension-installer": "*",
                 "phpunit/phpcov": "*",
-                "rector/rector": "^2.5",
+                "rector/rector": "^2.6",
                 "squizlabs/php_codesniffer": "*",
                 "szepeviktor/phpstan-wordpress": "*",
                 "wordpress/wordpress": "*",
@@ -189,9 +189,9 @@
             "description": "WordPress library for serving private/protected file uploads.",
             "support": {
                 "issues": "https://github.com/BrianHenryIE/bh-wp-private-uploads/issues",
-                "source": "https://github.com/BrianHenryIE/bh-wp-private-uploads/tree/0.4.0"
+                "source": "https://github.com/BrianHenryIE/bh-wp-private-uploads/tree/0.5.0"
             },
-            "time": "2026-07-13T01:33:59+00:00"
+            "time": "2026-09-03T16:45:17+00:00"
         },
         {
             "name": "monolog/monolog",
