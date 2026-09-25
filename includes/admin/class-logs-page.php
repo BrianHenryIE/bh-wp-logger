@@ -57,7 +57,7 @@ class Logs_Page {
 		global $pagenow;
 		/** @var string $plugin_page */
 		global $plugin_page;
-		if ( 'admin.php' !== $pagenow && $this->settings->get_plugin_slug() . '-logs' !== $plugin_page ) {
+		if ( 'admin.php' !== $pagenow || $this->settings->get_plugin_slug() . '-logs' !== $plugin_page ) {
 			return;
 		}
 

@@ -165,4 +165,85 @@ class Logs_Page_Unit_Test extends Unit_Testcase {
 
 		$sut->enqueue_scripts();
 	}
+
+	/**
+	 * The `global $title` should be set on the logs page.
+	 *
+	 * @covers ::set_page_title
+	 */
+	public function test_set_page_title_on_logs_page(): void {
+		global $pagenow, $plugin_page, $title;
+		$pagenow     = 'admin.php';
+		$plugin_page = 'test-plugin-logs';
+		$title       = null;
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_name' => 'Test Plugin',
+			)
+		);
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		$sut = new Logs_Page( $api, $settings, $logger );
+		$sut->set_page_title();
+
+		$this->assertSame( 'Test Plugin Logs page', $title );
+	}
+
+	/**
+	 * Other admin.php pages (e.g. WooCommerce settings) must not have their title overwritten.
+	 *
+	 * @covers ::set_page_title
+	 */
+	public function test_set_page_title_not_on_other_admin_php_page(): void {
+		global $pagenow, $plugin_page, $title;
+		$pagenow     = 'admin.php';
+		$plugin_page = 'wc-settings';
+		$title       = 'WooCommerce Settings';
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_name' => 'Test Plugin',
+			)
+		);
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		$sut = new Logs_Page( $api, $settings, $logger );
+		$sut->set_page_title();
+
+		$this->assertSame( 'WooCommerce Settings', $title );
+	}
+
+	/**
+	 * Pages outside admin.php (e.g. edit.php) must not have their title overwritten.
+	 *
+	 * @covers ::set_page_title
+	 */
+	public function test_set_page_title_not_on_other_pagenow(): void {
+		global $pagenow, $plugin_page, $title;
+		$pagenow     = 'edit.php';
+		$plugin_page = null;
+		$title       = 'Posts';
+
+		$api      = $this->makeEmpty( API_Interface::class );
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => 'test-plugin',
+				'get_plugin_name' => 'Test Plugin',
+			)
+		);
+		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
+
+		$sut = new Logs_Page( $api, $settings, $logger );
+		$sut->set_page_title();
+
+		$this->assertSame( 'Posts', $title );
+	}
 }
