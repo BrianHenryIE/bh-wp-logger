@@ -71,7 +71,7 @@
         "brianhenryie/color-logger": "*",
         "brianhenryie/php-codecoverage-markdown": "*",
         "johnpbloch/wordpress": "*",
-        "lucatume/wp-browser": "^4.5",
+        "lucatume/wp-browser": "^4.7",
         "php-stubs/woocommerce-stubs": "*",
         "phpstan/extension-installer": "*",
         "phpstan/phpstan-phpunit": "^2.0",
