@@ -118,15 +118,15 @@ foreach ( $log_levels as $log_level ) {
     $log_levels_option[ $log_level ] = ucfirst( $log_level );
 }
 
-$setting_fields[] = array(
-    'title'    => __( 'Log Level', 'text-domain' ),
-    'label'    => __( 'Enable Logging', 'text-domain' ),
-    'type'     => 'select',
-    'options'  => $log_levels_option,
-    'desc'    => __( 'Increasingly detailed levels of logs. ', 'text-domain' ) . '<a href="' . admin_url( 'admin.php?page=plugin-slug-logs' ) . '">View Logs</a>',
-    'desc_tip' => false,
-    'default'  => 'notice',
-    'id'       => 'text-domain-log-level',
+$setting_fields['log_level'] = array(
+    'title'       => __( 'Log Level', 'text-domain' ),
+    'label'       => __( 'Enable Logging', 'text-domain' ),
+    'type'        => 'select',
+    'options'     => $log_levels_option,
+    'description' => __( 'Increasingly detailed levels of logs. ', 'text-domain' ) . '<a href="' . admin_url( 'admin.php?page=plugin-slug-logs' ) . '">View Logs</a>',
+    'desc_tip'    => false,
+    'default'     => 'notice',
+    'id'          => 'log_level',
 );
 ```
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fix: the `<title>` of every other `admin.php` page (e.g. WooCommerce settings) was overwritten with "{Plugin Name} Logs page" – `Logs_Page::set_page_title()` used `&&` instead of `||` in its early-return guard
+
 ## 0.4.0 – 2026-09-03
 
 * Breaking: `$plugin_slug` is now the second argument (after the filtered value) of the `{$plugin_slug}_bh_wp_logger_log` and `{$plugin_slug}_bh_wp_logger_column` filters
