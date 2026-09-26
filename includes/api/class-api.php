@@ -110,6 +110,10 @@ class API implements API_Interface {
 	/**
 	 * Scan the logs files dir for the latest log file, or the log file matching the supplied date.
 	 *
+	 * Logs are written to `wp-content/uploads/logs/{plugin-slug}/`. Log files written by earlier versions
+	 * of this library to `wp-content/uploads/logs/` are also read, so they remain visible and deletable
+	 * on the logs page. Where both directories have a file for the same date, the per-plugin one wins.
+	 *
 	 * TODO: Test the regex. It seems to be pulling in all files that match a date?
 	 *
 	 * @param ?string $date In 'Y-m-d' format. e.g. '2021-09-16'.
@@ -124,37 +128,67 @@ class API implements API_Interface {
 			/** @var string $log_files_dir */
 			$log_files_dir = constant( 'WC_LOG_DIR' );
 
+			$log_files_dirs = array( $log_files_dir );
+
 		} else {
 
-			$log_files_dir = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' );
+			$log_files_dirs = array(
+				// Legacy location, pre 0.5.0, scanned first so the per-plugin directory overwrites duplicates.
+				wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' ),
+				$this->get_log_files_dir(),
+			);
 		}
 
-		$files      = scandir( $log_files_dir );
 		$logs_files = array();
 
-		if ( ! empty( $files ) ) {
+		foreach ( $log_files_dirs as $log_files_dir ) {
+
+			if ( ! is_dir( $log_files_dir ) ) {
+				continue;
+			}
+
+			$files = scandir( $log_files_dir );
+
+			if ( empty( $files ) ) {
+				continue;
+			}
+
 			foreach ( $files as $filename ) {
-				if ( ! in_array( $filename, array( '.', '..' ), true ) ) {
+				if ( in_array( $filename, array( '.', '..' ), true ) ) {
+					continue;
+				}
 
-					if ( ! is_dir( $filename ) && strstr( $filename, '.log' ) ) {
+				if ( is_dir( $log_files_dir . $filename ) || ! strstr( $filename, '.log' ) ) {
+					continue;
+				}
 
-						if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
-							$logs_files[ "{$regex_matches[1]}" ] = $log_files_dir . $filename;
-
-							if ( ! is_null( $date ) && $regex_matches[1] === $date ) {
-								$path     = $log_files_dir . $filename;
-								$realpath = realpath( $path );
-								return array( $date => false === $realpath ? $path : $realpath );
-							}
-						}
-					}
+				if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
+					$logs_files[ "{$regex_matches[1]}" ] = $log_files_dir . $filename;
 				}
 			}
+		}
+
+		if ( ! is_null( $date ) ) {
+			if ( ! isset( $logs_files[ $date ] ) ) {
+				return array();
+			}
+			$path     = $logs_files[ $date ];
+			$realpath = realpath( $path );
+			return array( $date => false === $realpath ? $path : $realpath );
 		}
 
 		ksort( $logs_files );
 
 		return $logs_files;
+	}
+
+	/**
+	 * The directory this plugin's log files are written to: `wp-content/uploads/logs/{plugin-slug}/`.
+	 *
+	 * @return string With trailing slash.
+	 */
+	public function get_log_files_dir(): string {
+		return wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' . $this->settings->get_plugin_slug() . '/' );
 	}
 
 	/**

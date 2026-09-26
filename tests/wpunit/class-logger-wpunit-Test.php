@@ -149,4 +149,51 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 		$this->assertInstanceOf( \Monolog\Logger::class, $logger );
 	}
+
+	/**
+	 * Log files should be written to a per-plugin subdirectory: wp-content/uploads/logs/{plugin-slug}/.
+	 *
+	 * @covers ::__construct
+	 */
+	public function test_log_file_written_to_per_plugin_subdirectory(): void {
+
+		$settings = new class() implements Logger_Settings_Interface {
+
+			public function get_log_level(): string {
+				return LogLevel::DEBUG;
+			}
+
+			public function get_plugin_name(): string {
+				return 'Test';
+			}
+
+			public function get_plugin_slug(): string {
+				return 'logger-wpunit-test-subdir';
+			}
+
+			public function get_plugin_basename(): string {
+				return 'logger-wpunit-test-subdir/logger-wpunit-test-subdir.php';
+			}
+
+			public function get_cli_base(): ?string {
+				return null;
+			}
+		};
+
+		$expected_dir  = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/logger-wpunit-test-subdir' );
+		$expected_file = sprintf( '%s/logger-wpunit-test-subdir-%s.log', $expected_dir, gmdate( 'Y-m-d' ) );
+
+		$sut = new Logger( $settings );
+
+		$sut->info( 'test log entry' );
+
+		$this->assertFileExists( $expected_file );
+		$this->assertStringContainsString( 'test log entry', (string) file_get_contents( $expected_file ) );
+
+		wp_delete_file( $expected_file );
+		foreach ( glob( $expected_dir . '/*' ) ?: array() as $file ) {
+			wp_delete_file( $file );
+		}
+		rmdir( $expected_dir );
+	}
 }
