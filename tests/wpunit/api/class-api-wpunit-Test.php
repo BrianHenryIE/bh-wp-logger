@@ -76,42 +76,17 @@ class API_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * Log files written to `wp-content/uploads/logs/` by earlier versions should still be listed.
+	 * Log files in the old shared `wp-content/uploads/logs/` directory are not read.
 	 *
 	 * @covers ::get_log_files
 	 */
-	public function test_get_log_files_reads_legacy_directory(): void {
+	public function test_get_log_files_ignores_parent_logs_directory(): void {
 		file_put_contents( $this->legacy_dir . $this->plugin_slug . '-2026-01-01.log', "log\n" );
 		file_put_contents( $this->plugin_dir . $this->plugin_slug . '-2026-01-02.log', "log\n" );
 
 		$sut = $this->get_sut();
 
-		$result = $sut->get_log_files();
-
-		$this->assertSame(
-			array(
-				'2026-01-01' => $this->legacy_dir . $this->plugin_slug . '-2026-01-01.log',
-				'2026-01-02' => $this->plugin_dir . $this->plugin_slug . '-2026-01-02.log',
-			),
-			$result
-		);
-	}
-
-	/**
-	 * Where both directories have a file for the same date, the per-plugin one wins.
-	 *
-	 * @covers ::get_log_files
-	 */
-	public function test_get_log_files_per_plugin_directory_takes_precedence(): void {
-		file_put_contents( $this->legacy_dir . $this->plugin_slug . '-2026-01-02.log', "legacy\n" );
-		file_put_contents( $this->plugin_dir . $this->plugin_slug . '-2026-01-02.log', "new\n" );
-
-		$sut = $this->get_sut();
-
-		$result = $sut->get_log_files( '2026-01-02' );
-
-		$this->assertCount( 1, $result );
-		$this->assertStringEndsWith( $this->plugin_slug . '/' . $this->plugin_slug . '-2026-01-02.log', $result['2026-01-02'] );
+		$this->assertSame( array( '2026-01-02' ), array_keys( $sut->get_log_files() ) );
 	}
 
 	/**
