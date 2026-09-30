@@ -110,8 +110,6 @@ class API implements API_Interface {
 	/**
 	 * Scan the logs files dir for the latest log file, or the log file matching the supplied date.
 	 *
-	 * TODO: Test the regex. It seems to be pulling in all files that match a date?
-	 *
 	 * @param ?string $date In 'Y-m-d' format. e.g. '2021-09-16'.
 	 *
 	 * @return array<string, string> Y-m-d index with path as the value.
@@ -150,7 +148,7 @@ class API implements API_Interface {
 				continue;
 			}
 
-			if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
+			if ( 1 === preg_match( '/^' . preg_quote( $this->settings->get_plugin_slug(), '/' ) . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
 				$logs_files[ "{$regex_matches[1]}" ] = $log_files_dir . $filename;
 			}
 		}

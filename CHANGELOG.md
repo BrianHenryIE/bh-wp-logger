@@ -3,7 +3,7 @@
 ## 0.5.0 - 2026-09-30
 
 * Breaking: log files are now written to `wp-content/uploads/logs/{plugin-slug}/` rather than `wp-content/uploads/logs/`. **NB: Existing log files in the old directory are not migrated**
-* Add: `API::get_log_files_dir()`
+* Add: `API_Interface::get_log_files_dir()`
 * Fix: the `<title>` of every other `admin.php` page (e.g. WooCommerce settings) was overwritten with "{Plugin Name} Logs page" – `Logs_Page::set_page_title()` used `&&` instead of `||` in its early-return guard
 
 ## 0.4.0 – 2026-09-03

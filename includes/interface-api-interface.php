@@ -31,6 +31,13 @@ interface API_Interface {
 	public function get_log_files( ?string $date = null ): array;
 
 	/**
+	 * The directory this plugin's log files are written to: `wp-content/uploads/logs/{plugin-slug}/`.
+	 *
+	 * @return string With trailing slash.
+	 */
+	public function get_log_files_dir(): string;
+
+	/**
 	 * Get the URL for the settings page Logs link.
 	 *
 	 * @param ?string $date A date string Y-m-d or null to get the most recent.
