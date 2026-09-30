@@ -151,6 +151,24 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	}
 
 	/**
+	 * Directory created by {@see self::test_log_file_written_to_per_plugin_subdirectory()}, removed in {@see self::tearDown()}.
+	 */
+	protected ?string $per_plugin_log_dir = null;
+
+	protected function tearDown(): void {
+		if ( null !== $this->per_plugin_log_dir && is_dir( $this->per_plugin_log_dir ) ) {
+			// GLOB_BRACE so dotfiles (e.g. `.htaccess`) are matched too, otherwise `rmdir()` fails.
+			foreach ( glob( $this->per_plugin_log_dir . '/{,.}[!.,!..]*', GLOB_BRACE ) ?: array() as $file ) {
+				wp_delete_file( $file );
+			}
+			rmdir( $this->per_plugin_log_dir );
+		}
+		$this->per_plugin_log_dir = null;
+
+		parent::tearDown();
+	}
+
+	/**
 	 * Log files should be written to a per-plugin subdirectory: wp-content/uploads/logs/{plugin-slug}/.
 	 *
 	 * @covers ::__construct
@@ -180,8 +198,8 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 			}
 		};
 
-		$expected_dir  = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/logger-wpunit-test-subdir' );
-		$expected_file = sprintf( '%s/logger-wpunit-test-subdir-%s.log', $expected_dir, gmdate( 'Y-m-d' ) );
+		$this->per_plugin_log_dir = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/logger-wpunit-test-subdir' );
+		$expected_file            = sprintf( '%s/logger-wpunit-test-subdir-%s.log', $this->per_plugin_log_dir, gmdate( 'Y-m-d' ) );
 
 		$sut = new Logger( $settings );
 
@@ -189,11 +207,5 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 		$this->assertFileExists( $expected_file );
 		$this->assertStringContainsString( 'test log entry', (string) file_get_contents( $expected_file ) );
-
-		wp_delete_file( $expected_file );
-		foreach ( glob( $expected_dir . '/*' ) ?: array() as $file ) {
-			wp_delete_file( $file );
-		}
-		rmdir( $expected_dir );
 	}
 }
