@@ -110,8 +110,6 @@ class API implements API_Interface {
 	/**
 	 * Scan the logs files dir for the latest log file, or the log file matching the supplied date.
 	 *
-	 * TODO: Test the regex. It seems to be pulling in all files that match a date?
-	 *
 	 * @param ?string $date In 'Y-m-d' format. e.g. '2021-09-16'.
 	 *
 	 * @return array<string, string> Y-m-d index with path as the value.
@@ -126,35 +124,56 @@ class API implements API_Interface {
 
 		} else {
 
-			$log_files_dir = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' );
+			$log_files_dir = $this->get_log_files_dir();
 		}
 
-		$files      = scandir( $log_files_dir );
 		$logs_files = array();
 
-		if ( ! empty( $files ) ) {
-			foreach ( $files as $filename ) {
-				if ( ! in_array( $filename, array( '.', '..' ), true ) ) {
+		if ( ! is_dir( $log_files_dir ) ) {
+			return $logs_files;
+		}
 
-					if ( ! is_dir( $filename ) && strstr( $filename, '.log' ) ) {
+		$files = scandir( $log_files_dir );
 
-						if ( 1 === preg_match( '/^' . $this->settings->get_plugin_slug() . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
-							$logs_files[ "{$regex_matches[1]}" ] = $log_files_dir . $filename;
+		if ( empty( $files ) ) {
+			return $logs_files;
+		}
 
-							if ( ! is_null( $date ) && $regex_matches[1] === $date ) {
-								$path     = $log_files_dir . $filename;
-								$realpath = realpath( $path );
-								return array( $date => false === $realpath ? $path : $realpath );
-							}
-						}
-					}
-				}
+		foreach ( $files as $filename ) {
+			if ( in_array( $filename, array( '.', '..' ), true ) ) {
+				continue;
 			}
+
+			if ( is_dir( $log_files_dir . $filename ) || ! strstr( $filename, '.log' ) ) {
+				continue;
+			}
+
+			if ( 1 === preg_match( '/^' . preg_quote( $this->settings->get_plugin_slug(), '/' ) . '-(\d{4}-\d{2}-\d{2}).*/', $filename, $regex_matches ) ) {
+				$logs_files[ "{$regex_matches[1]}" ] = $log_files_dir . $filename;
+			}
+		}
+
+		if ( ! is_null( $date ) ) {
+			if ( ! isset( $logs_files[ $date ] ) ) {
+				return array();
+			}
+			$path     = $logs_files[ $date ];
+			$realpath = realpath( $path );
+			return array( $date => false === $realpath ? $path : $realpath );
 		}
 
 		ksort( $logs_files );
 
 		return $logs_files;
+	}
+
+	/**
+	 * The directory this plugin's log files are written to: `wp-content/uploads/logs/{plugin-slug}/`.
+	 *
+	 * @return string With trailing slash.
+	 */
+	public function get_log_files_dir(): string {
+		return wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' . $this->settings->get_plugin_slug() . '/' );
 	}
 
 	/**

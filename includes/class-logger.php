@@ -114,7 +114,8 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 
 		} else {
 
-			$log_directory = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs' );
+			// Each plugin gets its own subdirectory: wp-content/uploads/logs/{plugin-slug}.
+			$log_directory = wp_normalize_path( WP_CONTENT_DIR . '/uploads/logs/' . $settings->get_plugin_slug() );
 			/** @var LogLevel $log_level_threshold @phpstan-ignore varTag.nativeType */
 			$log_level_threshold = $settings->get_log_level();
 
@@ -127,7 +128,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			 */
 			$log_format = "%datetime% %level_name% %message%\n%context%\n";
 
-			// /path/to/.../wp-content/uploads/logs/bh-wp-logger-test-plugin-2024-04-20.log
+			// /path/to/.../wp-content/uploads/logs/bh-wp-logger-test-plugin/bh-wp-logger-test-plugin-2024-04-20.log
 			$logfile = sprintf(
 				'%s/%s-%s.log',
 				$log_directory,
@@ -183,10 +184,10 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 				}
 
 				/**
-				 * Use wp-content/uploads/logs as the logs directory.
+				 * Use wp-content/uploads/logs/{plugin-slug} as the logs directory.
 				 */
 				public function get_uploads_subdirectory_name(): string {
-					return 'logs';
+					return 'logs/' . $this->logger_settings->get_plugin_slug();
 				}
 
 				/**
