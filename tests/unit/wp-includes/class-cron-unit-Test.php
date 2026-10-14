@@ -126,7 +126,7 @@ class Cron_Unit_Test extends Unit_Testcase {
 
 		$cron = new Cron( $api, $settings, $logger );
 
-		$cron_hook = 'delete_logs_development-plugin';
+		$cron_hook = 'delete_logs_development_plugin';
 
 		\WP_Mock::userFunction(
 			'wp_get_scheduled_event',
