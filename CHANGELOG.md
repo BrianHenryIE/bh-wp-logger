@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0 - Unreleased
+
+* Breaking: wp_options names and the admin notice id derived from the plugin slug now use underscores instead of hyphens, e.g. `my_plugin_recent_error_data`, `my_plugin_recent_error`, `wptrt_notice_dismissed_my_plugin_recent_error`, `my_plugin_last_logs_view_time`. **NB: Existing values saved under the old hyphenated option names are not migrated**
+* Breaking: add `Logger_Settings_Interface::get_plugin_slug_underscored()` – implemented in `Logger_Settings_Trait`; settings classes that implement the interface without the trait must add it
+
 ## 0.5.0 - 2026-09-30
 
 * Breaking: log files are now written to `wp-content/uploads/logs/{plugin-slug}/` rather than `wp-content/uploads/logs/`. **NB: Existing log files in the old directory are not migrated**

@@ -199,7 +199,7 @@ class Logger extends BH_WP_PSR_Logger implements API_Interface, LoggerInterface 
 			};
 
 			// Mute debug logs from library: the handler drops records below INFO.
-			$private_uploads_logger = new \Monolog\Logger( $settings->get_plugin_slug() . '-private-uploads' );
+			$private_uploads_logger = new \Monolog\Logger( $settings->get_plugin_slug_underscored() . '_logger_private_uploads' );
 			$private_uploads_logger->pushHandler( new PsrHandler( $logger, \Monolog\Logger::INFO ) );
 
 			// Don't use the Private_Uploads singleton in case the parent plugin also needs it.
