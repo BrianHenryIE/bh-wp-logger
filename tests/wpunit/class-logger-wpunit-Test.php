@@ -38,6 +38,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 				return 'test';
 			}
 
+			public function get_plugin_slug_underscored(): string {
+				return 'test';
+			}
+
 			public function get_plugin_basename(): string {
 				return 'test/test.php';
 			}
@@ -75,6 +79,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 			}
 
 			public function get_plugin_slug(): string {
+				return 'test';
+			}
+
+			public function get_plugin_slug_underscored(): string {
 				return 'test';
 			}
 
@@ -118,6 +126,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 			}
 
 			public function get_plugin_slug(): string {
+				return 'test';
+			}
+
+			public function get_plugin_slug_underscored(): string {
 				return 'test';
 			}
 
@@ -187,6 +199,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 			public function get_plugin_slug(): string {
 				return 'logger-wpunit-test-subdir';
+			}
+
+			public function get_plugin_slug_underscored(): string {
+				return 'logger_wpunit_test_subdir';
 			}
 
 			public function get_plugin_basename(): string {

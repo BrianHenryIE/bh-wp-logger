@@ -43,7 +43,8 @@ class API_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => $this->plugin_slug,
+				'get_plugin_slug'             => $this->plugin_slug,
+				'get_plugin_slug_underscored' => str_replace( '-', '_', $this->plugin_slug ),
 			)
 		);
 

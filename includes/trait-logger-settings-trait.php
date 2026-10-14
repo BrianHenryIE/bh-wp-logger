@@ -91,6 +91,15 @@ trait Logger_Settings_Trait {
 	}
 
 	/**
+	 * The plugin slug with hyphens replaced by underscores. Used in wp_options names and HTML ids.
+	 *
+	 * @throws Exception When the basename cannot be determined.
+	 */
+	public function get_plugin_slug_underscored(): string {
+		return str_replace( '-', '_', $this->get_plugin_slug() );
+	}
+
+	/**
 	 * The plugin basename. Used to add the Logs link on `plugins.php`.
 	 *
 	 * @see https://core.trac.wordpress.org/ticket/42670

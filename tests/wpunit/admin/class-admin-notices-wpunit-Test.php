@@ -25,7 +25,8 @@ class Admin_Notices_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'bh-wp-logger-tests',
+				'get_plugin_slug'             => 'bh-wp-logger-tests',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_tests',
 			)
 		);
 		$logger   = new ColorLogger();
@@ -57,8 +58,9 @@ class Admin_Notices_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'bh-wp-logger-tests',
-				'get_plugin_name' => 'BH WP Logger Tests',
+				'get_plugin_slug'             => 'bh-wp-logger-tests',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_tests',
+				'get_plugin_name'             => 'BH WP Logger Tests',
 			)
 		);
 

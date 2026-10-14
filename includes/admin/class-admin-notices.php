@@ -47,7 +47,7 @@ class Admin_Notices extends Notices {
 	 * @see BH_WP_PSR_Logger::log()
 	 */
 	protected function get_error_detail_option_name(): string {
-		return sprintf( '%s_recent_error_data', str_replace( '-', '_', $this->settings->get_plugin_slug() ) );
+		return $this->settings->get_plugin_slug_underscored() . '_recent_error_data';
 	}
 
 	/**
@@ -104,7 +104,7 @@ class Admin_Notices extends Notices {
 				|| ! is_string( $_POST['action'] )
 				|| ! is_string( $_POST['id'] )
 				|| 'wptrt_dismiss_notice' !== sanitize_key( wp_unslash( $_POST['action'] ) )
-				|| sanitize_key( wp_unslash( $_POST['id'] ) ) !== sprintf( '%s_recent_error', str_replace( '-', '_', $this->settings->get_plugin_slug() ) )
+				|| sanitize_key( wp_unslash( $_POST['id'] ) ) !== $this->settings->get_plugin_slug_underscored() . '_recent_error'
 			) {
 
 				return;
@@ -137,7 +137,7 @@ class Admin_Notices extends Notices {
 			/**
 			 * E.g. "wptrt_notice_dismissed_bh_wp_logger_development_plugin_recent_error".
 			 */
-			$is_dismissed_option_name = sprintf( 'wptrt_notice_dismissed_%s_recent_error', str_replace( '-', '_', $this->settings->get_plugin_slug() ) );
+			$is_dismissed_option_name = 'wptrt_notice_dismissed_' . $this->settings->get_plugin_slug_underscored() . '_recent_error';
 
 			$error_text = trim( $last_error['message'] );
 			$error_time = $last_error['timestamp'];
@@ -172,7 +172,7 @@ class Admin_Notices extends Notices {
 
 			// ID must be globally unique because it is the CSS id that will be used.
 			$this->add(
-				sprintf( '%s_recent_error', str_replace( '-', '_', $this->settings->get_plugin_slug() ) ),
+				$this->settings->get_plugin_slug_underscored() . '_recent_error',
 				$title,   // The title for this notice.
 				$content, // The content for this notice.
 				array(

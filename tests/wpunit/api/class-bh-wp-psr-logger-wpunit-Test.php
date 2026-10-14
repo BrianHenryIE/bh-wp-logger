@@ -24,8 +24,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$setttings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -69,8 +70,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$setttings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -107,8 +109,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -146,8 +149,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -178,8 +182,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 

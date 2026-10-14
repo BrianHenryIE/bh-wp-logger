@@ -23,7 +23,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug'             => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 		$api      = $this->makeEmpty(
@@ -76,7 +77,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug'             => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 		$api      = $this->makeEmpty( API_Interface::class, array() );
@@ -125,7 +127,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug'             => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 		$api      = $this->makeEmpty( API_Interface::class, array() );

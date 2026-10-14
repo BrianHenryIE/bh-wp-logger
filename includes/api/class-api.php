@@ -416,7 +416,7 @@ class API implements API_Interface {
 	 * @return string
 	 */
 	public function get_last_log_time_transient_name(): string {
-		return $this->settings->get_plugin_slug() . '-last-log-time';
+		return $this->settings->get_plugin_slug_underscored() . '_last_log_time';
 	}
 
 	/**
@@ -484,7 +484,7 @@ class API implements API_Interface {
 	 */
 	public function get_last_logs_view_time(): ?DateTimeInterface {
 
-		$option_name                    = sprintf( '%s_last_logs_view_time', str_replace( '-', '_', $this->settings->get_plugin_slug() ) );
+		$option_name                    = $this->settings->get_plugin_slug_underscored() . '_last_logs_view_time';
 		$last_log_view_time_atom_string = get_option( $option_name );
 
 		if ( ! is_string( $last_log_view_time_atom_string ) ) {
@@ -515,7 +515,7 @@ class API implements API_Interface {
 	 * phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 	 */
 	public function set_last_logs_view_time( ?DateTimeInterface $date_time = null ): void {
-		$option_name = sprintf( '%s_last_logs_view_time', str_replace( '-', '_', $this->settings->get_plugin_slug() ) );
+		$option_name = $this->settings->get_plugin_slug_underscored() . '_last_logs_view_time';
 
 		try {
 			$date_time ??= new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );

@@ -53,7 +53,10 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
+			array(
+				'get_plugin_slug'             => 'bh-wp-logger-development-plugin',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_development_plugin',
+			)
 		);
 		$logger   = $this->logger;
 
@@ -103,7 +106,10 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
+			array(
+				'get_plugin_slug'             => 'bh-wp-logger-development-plugin',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_development_plugin',
+			)
 		);
 		$logger   = $this->logger;
 
@@ -152,7 +158,10 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
+			array(
+				'get_plugin_slug'             => 'bh-wp-logger-development-plugin',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_development_plugin',
+			)
 		);
 		$logger   = $this->logger;
 

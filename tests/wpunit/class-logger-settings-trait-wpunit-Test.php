@@ -79,6 +79,22 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
+	 * @covers ::get_plugin_slug_underscored
+	 */
+	public function test_get_plugin_slug_underscored(): void {
+
+		$sut = new class() {
+			use \BrianHenryIE\WP_Logger\Logger_Settings_Trait;
+
+			public function get_plugin_basename(): string {
+				return 'bh-wp-logger-development-plugin/development-plugin.php';
+			}
+		};
+
+		$this->assertEquals( 'bh_wp_logger_development_plugin', $sut->get_plugin_slug_underscored() );
+	}
+
+	/**
 	 * @covers ::get_plugin_basename
 	 */
 	public function test_get_plugin_slug1(): void {

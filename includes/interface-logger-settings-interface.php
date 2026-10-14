@@ -44,6 +44,13 @@ interface Logger_Settings_Interface {
 	public function get_plugin_slug(): string;
 
 	/**
+	 * The plugin slug with hyphens replaced by underscores, used in wp_options names and HTML ids.
+	 *
+	 * @return string
+	 */
+	public function get_plugin_slug_underscored(): string;
+
+	/**
 	 * The plugin basename is used by the logger to add the plugins page action link.
 	 * (and maybe for PHP errors)
 	 *
