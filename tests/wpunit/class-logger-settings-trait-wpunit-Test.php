@@ -41,7 +41,7 @@ class Logger_Settings_Trait_WPUnit_Test extends WPUnit_Testcase {
 			}
 		};
 
-		update_option( 'development-plugin_log_level', 'error' );
+		update_option( 'development_plugin_log_level', 'error' );
 
 		$this->assertEquals( 'error', $sut->get_log_level() );
 	}

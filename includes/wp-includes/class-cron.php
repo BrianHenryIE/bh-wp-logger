@@ -59,7 +59,7 @@ class Cron {
 			return;
 		}
 
-		$cron_hook = "delete_logs_{$this->settings->get_plugin_slug()}";
+		$cron_hook = "delete_logs_{$this->settings->get_plugin_slug_underscored()}";
 
 		if ( false !== wp_get_scheduled_event( $cron_hook ) ) {
 			return;
@@ -73,7 +73,7 @@ class Cron {
 	/**
 	 * Handle the cron job.
 	 *
-	 * @hooked delete_logs_{plugin-slug}
+	 * @hooked delete_logs_{plugin_slug}
 	 */
 	public function delete_old_logs(): void {
 		$action = current_action();

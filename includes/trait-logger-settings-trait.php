@@ -38,7 +38,7 @@ trait Logger_Settings_Trait {
 	 */
 	public function get_log_level(): string {
 		try {
-			$saved_option = get_option( $this->get_plugin_slug() . '_log_level' );
+			$saved_option = get_option( $this->get_plugin_slug_underscored() . '_log_level' );
 			return is_string( $saved_option )
 					&& in_array(
 						$saved_option,

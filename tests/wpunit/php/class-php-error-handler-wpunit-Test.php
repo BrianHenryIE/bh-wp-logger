@@ -133,8 +133,9 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug'     => 'my-plugin',
-				'get_plugin_basename' => 'my-plugin/my-plugin.php',
+				'get_plugin_slug'             => 'my-plugin',
+				'get_plugin_slug_underscored' => 'my_plugin',
+				'get_plugin_basename'         => 'my-plugin/my-plugin.php',
 			)
 		);
 
@@ -171,8 +172,9 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug'     => 'my-plugin',
-				'get_plugin_basename' => 'my-plugin/my-plugin.php',
+				'get_plugin_slug'             => 'my-plugin',
+				'get_plugin_slug_underscored' => 'my_plugin',
+				'get_plugin_basename'         => 'my-plugin/my-plugin.php',
 			)
 		);
 
