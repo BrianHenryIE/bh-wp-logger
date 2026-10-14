@@ -273,7 +273,7 @@ EOD;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 
@@ -303,7 +303,7 @@ EOD;
 		\WP_Mock::userFunction(
 			'get_transient',
 			array(
-				'args'   => array( 'test-last-log-time' ),
+				'args'   => array( 'test_last_log_time' ),
 				'return' => false,
 				'times'  => 1,
 			)
@@ -322,7 +322,7 @@ EOD;
 			'set_transient',
 			array(
 				'args'  => array(
-					'test-last-log-time',
+					'test_last_log_time',
 					'2022-02-23T22:56:01+00:00',
 					60 * 60 * 24, // Aka `DAY_IN_SECONDS`.
 				),
