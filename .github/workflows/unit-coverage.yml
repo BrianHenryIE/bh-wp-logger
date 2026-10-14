@@ -56,7 +56,7 @@ jobs:
         env:
           PLUGIN_SLUG: ${{ github.event.repository.name }}
         run: |
-          find . -depth \( -name '.env.testing' \) -exec sed -i "s/_DB_PORT=\"33066\"/_DB_PORT=\"${{ job.services.mysql.ports['3306'] }}\"/g" {} +
+          find . -depth \( -name '.env.testing' \) -exec sed -i "s/_DB_PORT=\"33063\"/_DB_PORT=\"${{ job.services.mysql.ports['3306'] }}\"/g" {} +
 
       - name: Read .env.testing
         uses: c-py/action-dotenv-to-setenv@v5
