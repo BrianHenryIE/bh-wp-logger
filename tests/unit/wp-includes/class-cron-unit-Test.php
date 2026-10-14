@@ -42,7 +42,6 @@ class Cron_Unit_Test extends Unit_Testcase {
 			Logger_Settings_Interface::class,
 			array(
 				'get_plugin_slug_underscored' => 'development_plugin',
-				'get_plugin_slug_underscored' => 'development_plugin',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
