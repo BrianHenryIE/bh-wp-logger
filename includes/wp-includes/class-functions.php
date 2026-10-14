@@ -66,9 +66,9 @@ class Functions {
 			return;
 		}
 
-		$plugin_slug = $this->settings->get_plugin_slug();
+		$plugin_slug_underscored = $this->settings->get_plugin_slug_underscored();
 
-		$transient_name = "log_deprecated_function_{$function_name}_{$plugin_slug}";
+		$transient_name = "log_deprecated_function_{$function_name}_{$plugin_slug_underscored}";
 
 		$recently_logged = get_transient( $transient_name );
 
@@ -126,9 +126,9 @@ class Functions {
 			return;
 		}
 
-		$plugin_slug = $this->settings->get_plugin_slug();
+		$plugin_slug_underscored = $this->settings->get_plugin_slug_underscored();
 
-		$transient_name = "log_deprecated_argument_{$function_name}_{$plugin_slug}";
+		$transient_name = "log_deprecated_argument_{$function_name}_{$plugin_slug_underscored}";
 
 		$recently_logged = get_transient( $transient_name );
 
@@ -187,9 +187,9 @@ class Functions {
 			return;
 		}
 
-		$plugin_slug = $this->settings->get_plugin_slug();
+		$plugin_slug_underscored = $this->settings->get_plugin_slug_underscored();
 
-		$transient_name = "log_doing_it_wrong_run_{$function_name}_{$plugin_slug}";
+		$transient_name = "log_doing_it_wrong_run_{$function_name}_{$plugin_slug_underscored}";
 
 		$recently_logged = get_transient( $transient_name );
 
@@ -253,9 +253,9 @@ class Functions {
 			return;
 		}
 
-		$plugin_slug = $this->settings->get_plugin_slug();
+		$plugin_slug_underscored = $this->settings->get_plugin_slug_underscored();
 
-		$transient_name = "log_deprecated_hook_run_{$hook}_{$plugin_slug}";
+		$transient_name = "log_deprecated_hook_run_{$hook}_{$plugin_slug_underscored}";
 
 		$recently_logged = get_transient( $transient_name );
 

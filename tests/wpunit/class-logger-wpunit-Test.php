@@ -22,7 +22,7 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	 *
 	 * @covers ::__construct
 	 */
-	public function tests_woocommerce_logger() {
+	public function test_woocommerce_logger(): void {
 
 		$settings = new class() implements WooCommerce_Logger_Settings_Interface {
 
@@ -35,6 +35,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 			}
 
 			public function get_plugin_slug(): string {
+				return 'test';
+			}
+
+			public function get_plugin_slug_underscored(): string {
 				return 'test';
 			}
 
@@ -62,7 +66,7 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	 *
 	 * @covers ::__construct
 	 */
-	public function tests_regular_logger() {
+	public function test_regular_logger(): void {
 
 		$settings = new class() implements Logger_Settings_Interface {
 
@@ -78,6 +82,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 				return 'test';
 			}
 
+			public function get_plugin_slug_underscored(): string {
+				return 'test';
+			}
+
 			public function get_plugin_basename(): string {
 				return 'test/test.php';
 			}
@@ -87,6 +95,7 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 			}
 		};
 
+		/** @phpstan-ignore function.alreadyNarrowedType, instanceof.alwaysFalse  (arrange) */
 		assert( ! ( $settings instanceof WooCommerce_Logger_Settings_Interface ) );
 
 		$sut = new Logger( $settings );
@@ -105,7 +114,7 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	 *
 	 * @covers ::__construct
 	 */
-	public function tests_woocommerce_inactive_logger() {
+	public function test_woocommerce_inactive_logger(): void {
 
 		$settings = new class() implements WooCommerce_Logger_Settings_Interface {
 
@@ -121,6 +130,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 				return 'test';
 			}
 
+			public function get_plugin_slug_underscored(): string {
+				return 'test';
+			}
+
 			public function get_plugin_basename(): string {
 				return 'test/test.php';
 			}
@@ -133,7 +146,7 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 		// Remove WooCommerce from the active plugins list.
 		add_filter(
 			'active_plugins',
-			fn( $active_plugins ) => array_filter(
+			fn( array $active_plugins ) => array_filter(
 				$active_plugins,
 				fn( $element ) => 'woocommerce/woocommerce.php' !== $element
 			),
@@ -187,6 +200,10 @@ class Logger_WPUnit_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 
 			public function get_plugin_slug(): string {
 				return 'logger-wpunit-test-subdir';
+			}
+
+			public function get_plugin_slug_underscored(): string {
+				return 'logger_wpunit_test_subdir';
 			}
 
 			public function get_plugin_basename(): string {

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0 - Unreleased
+
+* Breaking: wp_options names and the admin notice id derived from the plugin slug now use underscores instead of hyphens, e.g. `my_plugin_recent_error_data`, `my_plugin_recent_error`, `wptrt_notice_dismissed_my_plugin_recent_error`, `my_plugin_last_logs_view_time`. **NB: Existing values saved under the old hyphenated option names are not migrated**
+* Breaking: add `Logger_Settings_Interface::get_plugin_slug_underscored()` – implemented in `Logger_Settings_Trait`; settings classes that implement the interface without the trait must add it
+* Breaking: `Logger_Settings_Trait::get_log_level()` reads the `my_plugin_log_level` option instead of `my-plugin_log_level`. **NB: A log level saved under the old option name is no longer read, so the default `info` is used until it is saved under the new name**
+* Breaking: the daily delete-old-logs cron hook is now `delete_logs_my_plugin` instead of `delete_logs_my-plugin`. **NB: The already-scheduled `delete_logs_my-plugin` event is not unscheduled**
+* Change: transient names derived from the plugin slug now use underscores, e.g. `my_plugin_logged_{level}_{md5}`, `log_deprecated_function_{function}_my_plugin`, `log_deprecated_argument_{function}_my_plugin`, `log_doing_it_wrong_run_{function}_my_plugin`, `log_deprecated_hook_run_{hook}_my_plugin`
+* Change: the bh-wp-private-uploads logger channel is now `my_plugin_logger_private_uploads` instead of `my-plugin-private-uploads`
+
 ## 0.5.0 - 2026-09-30
 
 * Breaking: log files are now written to `wp-content/uploads/logs/{plugin-slug}/` rather than `wp-content/uploads/logs/`. **NB: Existing log files in the old directory are not migrated**

@@ -18,7 +18,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	 * * the transient is added
 	 * * the filter to prevent native WordPress logging is added
 	 *
-	 * @covers ::log_deprecated_functions_only_once_per_day()
+	 * @covers ::log_deprecated_functions_only_once_per_day
 	 */
 	public function test_deprecated_function(): void {
 
@@ -38,14 +38,15 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'development-plugin',
+				'get_plugin_slug'             => 'development-plugin',
+				'get_plugin_slug_underscored' => 'development_plugin',
 			)
 		);
 		$logger   = new ColorLogger();
 
 		$sut = new Functions( $api, $settings, $logger );
 
-		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
+		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_development_plugin' ) );
 		assert( false === has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
 
 		$sut->log_deprecated_functions_only_once_per_day( 'my_deprecated_function', 'my_replacement_function', '5.9.0' );
@@ -54,14 +55,14 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 
 		$this->assertTrue( $logger->hasWarning( $log_message ) );
 
-		$this->assertNotFalse( get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
+		$this->assertNotFalse( get_transient( 'log_deprecated_function_my_deprecated_function_development_plugin' ) );
 
 		// `has_filter` function returns the priority.
 		$this->assertNotFalse( has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
 	}
 
 	/**
-	 * @covers ::log_deprecated_functions_only_once_per_day()
+	 * @covers ::log_deprecated_functions_only_once_per_day
 	 */
 	public function test_return_early_when_not_related_to_this_plugin(): void {
 
@@ -91,7 +92,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * @covers ::log_deprecated_functions_only_once_per_day()
+	 * @covers ::log_deprecated_functions_only_once_per_day
 	 */
 	public function test_do_not_log_again_if_transient_present(): void {
 
@@ -104,21 +105,22 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'development-plugin',
+				'get_plugin_slug'             => 'development-plugin',
+				'get_plugin_slug_underscored' => 'development_plugin',
 			)
 		);
 		$logger   = new ColorLogger();
 
 		$sut = new Functions( $api, $settings, $logger );
 
-		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
+		assert( false === get_transient( 'log_deprecated_function_my_deprecated_function_development_plugin' ) );
 
 		$sut->log_deprecated_functions_only_once_per_day( 'my_deprecated_function', 'my_replacement_function', '5.9.0' );
 
 		remove_filter( 'deprecated_function_trigger_error', '__return_false' );
 
 		assert( false === has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
-		assert( false !== get_transient( 'log_deprecated_function_my_deprecated_function_development-plugin' ) );
+		assert( false !== get_transient( 'log_deprecated_function_my_deprecated_function_development_plugin' ) );
 
 		$logger = new ColorLogger();
 		$sut->setLogger( $logger );
@@ -131,5 +133,59 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 
 		// `has_filter` function returns the priority.
 		$this->assertNotFalse( has_filter( 'deprecated_function_trigger_error', '__return_false' ) );
+	}
+
+	protected function get_sut_for_transient_name_tests(): Functions {
+		$api      = $this->makeEmpty(
+			API_Interface::class,
+			array(
+				'is_backtrace_contains_plugin' => true,
+			)
+		);
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug'             => 'development-plugin',
+				'get_plugin_slug_underscored' => 'development_plugin',
+			)
+		);
+
+		return new Functions( $api, $settings, new ColorLogger() );
+	}
+
+	/**
+	 * @covers ::log_deprecated_arguments_only_once_per_day
+	 */
+	public function test_deprecated_argument_transient_name(): void {
+
+		$sut = $this->get_sut_for_transient_name_tests();
+
+		$sut->log_deprecated_arguments_only_once_per_day( 'my_function', 'Use the other argument.', '5.9.0' );
+
+		$this->assertNotFalse( get_transient( 'log_deprecated_argument_my_function_development_plugin' ) );
+	}
+
+	/**
+	 * @covers ::log_doing_it_wrong_only_once_per_day
+	 */
+	public function test_doing_it_wrong_transient_name(): void {
+
+		$sut = $this->get_sut_for_transient_name_tests();
+
+		$sut->log_doing_it_wrong_only_once_per_day( 'my_function', 'Called too early.', '5.9.0' );
+
+		$this->assertNotFalse( get_transient( 'log_doing_it_wrong_run_my_function_development_plugin' ) );
+	}
+
+	/**
+	 * @covers ::log_deprecated_hook_only_once_per_day
+	 */
+	public function test_deprecated_hook_transient_name(): void {
+
+		$sut = $this->get_sut_for_transient_name_tests();
+
+		$sut->log_deprecated_hook_only_once_per_day( 'my_hook', 'my_replacement_hook', '5.9.0', '' );
+
+		$this->assertNotFalse( get_transient( 'log_deprecated_hook_run_my_hook_development_plugin' ) );
 	}
 }

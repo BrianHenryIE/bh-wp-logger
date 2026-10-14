@@ -22,7 +22,7 @@ class BH_WP_Logger_I18n_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	 * @see load_plugin_textdomain()
 	 * @see https://gist.github.com/GaryJones/c8259da3a4501fd0648f19beddce0249
 	 */
-	public function test_load_plugin_textdomain() {
+	public function test_load_plugin_textdomain(): void {
 
 		$this->markTestSkipped( 'Needs one translation before test might pass.' );
 

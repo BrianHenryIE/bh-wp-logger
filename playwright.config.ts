@@ -13,7 +13,7 @@ require( 'dotenv' ).config();
 const WP_BASE_URL =
   process.env.BASEURL ||
   process.env.WP_BASE_URL ||
-  'http://localhost:8888';
+  'http://localhost:8883';
 
 // Set WP_BASE_URL so @wordpress/e2e-test-utils-playwright uses the same base URL.
 process.env.WP_BASE_URL = WP_BASE_URL;

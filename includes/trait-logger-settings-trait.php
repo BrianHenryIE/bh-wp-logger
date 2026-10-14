@@ -38,7 +38,7 @@ trait Logger_Settings_Trait {
 	 */
 	public function get_log_level(): string {
 		try {
-			$saved_option = get_option( $this->get_plugin_slug() . '_log_level' );
+			$saved_option = get_option( $this->get_plugin_slug_underscored() . '_log_level' );
 			return is_string( $saved_option )
 					&& in_array(
 						$saved_option,
@@ -66,7 +66,7 @@ trait Logger_Settings_Trait {
 	 */
 	protected function get_log_levels(): array {
 		if ( ! isset( $this->log_levels ) ) {
-			$this->log_levels = array_values( ( new ReflectionClass( LogLevel::class ) )->getConstants() );
+			$this->log_levels = array_values( array_filter( ( new ReflectionClass( LogLevel::class ) )->getConstants(), 'is_string' ) );
 		}
 		return $this->log_levels;
 	}
@@ -88,6 +88,15 @@ trait Logger_Settings_Trait {
 	 */
 	public function get_plugin_slug(): string {
 		return explode( '/', $this->get_plugin_basename() )[0];
+	}
+
+	/**
+	 * The plugin slug with hyphens replaced by underscores. Used in wp_options names and HTML ids.
+	 *
+	 * @throws Exception When the basename cannot be determined.
+	 */
+	public function get_plugin_slug_underscored(): string {
+		return str_replace( '-', '_', $this->get_plugin_slug() );
 	}
 
 	/**

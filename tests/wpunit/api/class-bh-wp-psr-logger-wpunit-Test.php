@@ -24,8 +24,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$setttings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -69,8 +70,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$setttings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -107,8 +109,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -146,8 +149,9 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
-				'get_log_level'   => 'info',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
 			)
 		);
 
@@ -166,5 +170,32 @@ class BH_WP_PSR_Logger_WPUnit_Test extends WPUnit_Testcase {
 
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$this->assertCount( 1, $this->logger->recordsByLevel['info'] );
+	}
+
+	/**
+	 * Errors are recorded in the `plugin_slug_recent_error_data` option (underscored) for the admin notice.
+	 *
+	 * @covers ::log
+	 */
+	public function test_error_saves_recent_error_option_with_underscored_name(): void {
+
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
+				'get_log_level'               => 'info',
+			)
+		);
+
+		$sut = new BH_WP_PSR_Logger( $settings, $this->logger );
+
+		$sut->error( 'error log message' );
+
+		$recent_error = get_option( 'plugin_slug_recent_error_data' );
+
+		$this->assertIsArray( $recent_error );
+		$this->assertSame( 'error log message', $recent_error['message'] );
+		$this->assertFalse( get_option( 'plugin-slug-recent-error-data' ) );
 	}
 }

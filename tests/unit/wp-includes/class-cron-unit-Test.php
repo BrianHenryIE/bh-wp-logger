@@ -41,14 +41,14 @@ class Cron_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'development-plugin',
+				'get_plugin_slug_underscored' => 'development_plugin',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		$cron = new Cron( $api, $settings, $logger );
 
-		$cron_hook = 'delete_logs_development-plugin';
+		$cron_hook = 'delete_logs_development_plugin';
 
 		\WP_Mock::userFunction(
 			'wp_get_scheduled_event',
@@ -78,14 +78,15 @@ class Cron_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'development-plugin',
+				'get_plugin_slug'             => 'development-plugin',
+				'get_plugin_slug_underscored' => 'development_plugin',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
 
 		$cron = new Cron( $api, $settings, $logger );
 
-		$cron_hook = 'delete_logs_development-plugin';
+		$cron_hook = 'delete_logs_development_plugin';
 
 		\WP_Mock::userFunction(
 			'wp_get_scheduled_event',
@@ -114,7 +115,8 @@ class Cron_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			WooCommerce_Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'development-plugin',
+				'get_plugin_slug'             => 'development-plugin',
+				'get_plugin_slug_underscored' => 'development_plugin',
 			)
 		);
 		$logger   = $this->makeEmpty(
@@ -166,7 +168,7 @@ class Cron_Unit_Test extends Unit_Testcase {
 			array(
 				'logger'     => $color_logger,
 				'get_logger' => $color_logger,
-				'debug'      => function ( $message, $context ) use ( $color_logger ) {
+				'debug'      => function ( string $message, array $context ) use ( $color_logger ) {
 					$color_logger->debug( $message, $context );
 				},
 			)

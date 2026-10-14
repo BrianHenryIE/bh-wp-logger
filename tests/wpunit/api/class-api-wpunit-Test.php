@@ -43,7 +43,8 @@ class API_WPUnit_Test extends WPUnit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => $this->plugin_slug,
+				'get_plugin_slug'             => $this->plugin_slug,
+				'get_plugin_slug_underscored' => str_replace( '-', '_', $this->plugin_slug ),
 			)
 		);
 
@@ -98,5 +99,27 @@ class API_WPUnit_Test extends WPUnit_Testcase {
 		$sut = $this->get_sut();
 
 		$this->assertSame( array(), $sut->get_log_files( '2025-12-31' ) );
+	}
+
+	/**
+	 * The option name uses underscores, derived from the hyphenated plugin slug.
+	 *
+	 * @covers ::set_last_logs_view_time
+	 * @covers ::get_last_logs_view_time
+	 */
+	public function test_last_logs_view_time_option_name_uses_underscores(): void {
+		$sut = $this->get_sut();
+
+		$date_time = new \DateTimeImmutable( '2026-01-02T03:04:05+00:00' );
+
+		$sut->set_last_logs_view_time( $date_time );
+
+		$this->assertSame( '2026-01-02T03:04:05+00:00', get_option( 'api_wpunit_test_last_logs_view_time' ) );
+		$this->assertFalse( get_option( 'api-wpunit-test-last-logs-view-time' ) );
+
+		$result = $sut->get_last_logs_view_time();
+
+		$this->assertNotNull( $result );
+		$this->assertSame( $date_time->getTimestamp(), $result->getTimestamp() );
 	}
 }
