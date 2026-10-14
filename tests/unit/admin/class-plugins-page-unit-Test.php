@@ -167,7 +167,7 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction(
 			'get_option',
 			array(
-				'args'   => array( 'bh-wp-logger-development-plugin-last-logs-view-time', 0 ),
+				'args'   => array( 'bh_wp_logger_development_plugin_last_logs_view_time', 0 ),
 				'return' => time() - 60 * 60, // HOUR_IN_SECONDS.
 			)
 		);

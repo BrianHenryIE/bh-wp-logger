@@ -484,7 +484,7 @@ class API implements API_Interface {
 	 */
 	public function get_last_logs_view_time(): ?DateTimeInterface {
 
-		$option_name                    = $this->settings->get_plugin_slug() . '-last-logs-view-time';
+		$option_name                    = sprintf( '%s_last_logs_view_time', str_replace( '-', '_', $this->settings->get_plugin_slug() ) );
 		$last_log_view_time_atom_string = get_option( $option_name );
 
 		if ( ! is_string( $last_log_view_time_atom_string ) ) {
@@ -515,7 +515,7 @@ class API implements API_Interface {
 	 * phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 	 */
 	public function set_last_logs_view_time( ?DateTimeInterface $date_time = null ): void {
-		$option_name = $this->settings->get_plugin_slug() . '-last-logs-view-time';
+		$option_name = sprintf( '%s_last_logs_view_time', str_replace( '-', '_', $this->settings->get_plugin_slug() ) );
 
 		try {
 			$date_time ??= new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );

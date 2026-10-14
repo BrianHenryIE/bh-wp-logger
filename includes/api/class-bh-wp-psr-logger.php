@@ -194,7 +194,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 
 			if ( LogLevel::ERROR === $level ) {
 				update_option(
-					$this->settings->get_plugin_slug() . '-recent-error-data',
+					sprintf( '%s_recent_error_data', str_replace( '-', '_', $this->settings->get_plugin_slug() ) ),
 					array(
 						'message'   => $message,
 						'timestamp' => time(),
