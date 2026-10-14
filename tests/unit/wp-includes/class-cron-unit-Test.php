@@ -168,7 +168,7 @@ class Cron_Unit_Test extends Unit_Testcase {
 			array(
 				'logger'     => $color_logger,
 				'get_logger' => $color_logger,
-				'debug'      => function ( $message, $context ) use ( $color_logger ) {
+				'debug'      => function ( string $message, array $context ) use ( $color_logger ) {
 					$color_logger->debug( $message, $context );
 				},
 			)

@@ -20,7 +20,7 @@ class BH_WP_Logger_Integration_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testc
 	/**
 	 * Verify admin_enqueue_scripts action is correctly added for styles, at priority 10.
 	 */
-	public function test_action_admin_enqueue_scripts_styles() {
+	public function test_action_admin_enqueue_scripts_styles(): void {
 
 		$action_name       = 'admin_enqueue_scripts';
 		$expected_priority = 10;
@@ -53,7 +53,7 @@ class BH_WP_Logger_Integration_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testc
 	/**
 	 * Verify admin_enqueue_scripts action is added for scripts, at priority 10.
 	 */
-	public function test_action_admin_enqueue_scripts_scripts() {
+	public function test_action_admin_enqueue_scripts_scripts(): void {
 
 		$action_name       = 'admin_enqueue_scripts';
 		$expected_priority = 10;

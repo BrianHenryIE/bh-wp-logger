@@ -164,7 +164,6 @@ class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 			Logger_Settings_Interface::class,
 			array(
 				'get_plugin_slug_underscored' => 'plugin_slug',
-				'get_plugin_slug_underscored' => 'plugin_slug',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );

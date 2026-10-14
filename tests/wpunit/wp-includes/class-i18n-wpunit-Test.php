@@ -20,7 +20,7 @@ class I18n_WPUnit_Test extends WPUnit_Testcase {
 	/**
 	 * Checks if the filter run by WordPress in the load_plugin_textdomain() function is called.
 	 */
-	public function test_load_plugin_textdomain_function() {
+	public function test_load_plugin_textdomain_function(): void {
 
 		$this->markTestSkipped( 'I think this is maybe the wrong way to do it now.' );
 

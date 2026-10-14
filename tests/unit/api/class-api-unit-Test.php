@@ -35,6 +35,7 @@ class API_Unit_Test extends Unit_Testcase {
 	 */
 	public function test_parse_logs_simple(): void {
 
+		/** @var string $project_root_dir {@see tests/bootstrap.php} */
 		global $project_root_dir;
 
 		$simple_log_file = $project_root_dir . '/tests/_data/simple-log-8-lines.log';

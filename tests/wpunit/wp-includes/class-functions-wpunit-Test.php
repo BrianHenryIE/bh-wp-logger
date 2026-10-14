@@ -18,7 +18,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	 * * the transient is added
 	 * * the filter to prevent native WordPress logging is added
 	 *
-	 * @covers ::log_deprecated_functions_only_once_per_day()
+	 * @covers ::log_deprecated_functions_only_once_per_day
 	 */
 	public function test_deprecated_function(): void {
 
@@ -62,7 +62,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * @covers ::log_deprecated_functions_only_once_per_day()
+	 * @covers ::log_deprecated_functions_only_once_per_day
 	 */
 	public function test_return_early_when_not_related_to_this_plugin(): void {
 
@@ -92,7 +92,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * @covers ::log_deprecated_functions_only_once_per_day()
+	 * @covers ::log_deprecated_functions_only_once_per_day
 	 */
 	public function test_do_not_log_again_if_transient_present(): void {
 
@@ -154,7 +154,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * @covers ::log_deprecated_arguments_only_once_per_day()
+	 * @covers ::log_deprecated_arguments_only_once_per_day
 	 */
 	public function test_deprecated_argument_transient_name(): void {
 
@@ -166,7 +166,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * @covers ::log_doing_it_wrong_only_once_per_day()
+	 * @covers ::log_doing_it_wrong_only_once_per_day
 	 */
 	public function test_doing_it_wrong_transient_name(): void {
 
@@ -178,7 +178,7 @@ class Functions_WPUnit_Test extends WPUnit_Testcase {
 	}
 
 	/**
-	 * @covers ::log_deprecated_hook_only_once_per_day()
+	 * @covers ::log_deprecated_hook_only_once_per_day
 	 */
 	public function test_deprecated_hook_transient_name(): void {
 

@@ -21,3 +21,11 @@ parameters:
           # Method BrianHenryIE\WP_Logger\Logger_Settings_Interface@anonymous/class-logger.php:60::get_log_levels() return type has no value type specified in iterable type array.
           message: '#log_levels.* type has no value type specified#'
           path: includes/trait-logger-settings-trait.php
+        - # Using reflection to set method visible
+          # "Comparison operation "<" between int<80100, 80599> and 80100 is always false."
+          # identifier: smaller.alwaysFalse
+          message: '#Comparison operation "<" between int<80100, 80599> and 80100 is always false.#'
+          path: *.*
+        - # Skipped tests
+          identifier: deadCode.unreachable
+          path: tests/*.*

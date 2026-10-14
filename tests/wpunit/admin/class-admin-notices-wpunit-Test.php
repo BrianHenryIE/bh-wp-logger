@@ -15,7 +15,7 @@ class Admin_Notices_WPUnit_Test extends WPUnit_Testcase {
 	/**
 	 * Date should be displayed in UTC and in local time.
 	 */
-	public function test_date_in_notice() {
+	public function test_date_in_notice(): void {
 
 		$this->markTestIncomplete();
 

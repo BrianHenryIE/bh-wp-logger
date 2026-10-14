@@ -40,21 +40,26 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 	 *
 	 * @covers ::init
 	 */
-	public function test_construct() {
+	public function test_construct(): void {
 
 		$api = $this->makeEmpty( API::class );
 
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = new NullLogger();
 
-		$my_handler = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler = function ( int $errno, string $errstr, ?string $errfile = null, ?bool $errline = null ): bool {
+			return false;
+		};
 
 		set_error_handler( $my_handler );
 
 		new PHP_Error_Handler( $api, $settings, $logger );
 
-		$my_handler_2 = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler_2 = function ( int $errno, string $errstr, ?string $errfile = null, ?bool $errline = null ): bool {
+			return false;
+		};
 
+		/** @var array{0:object, 1:string} $previous */
 		$previous = set_error_handler( $my_handler_2 );
 
 		$this->assertEquals( $my_handler, $previous );
@@ -65,14 +70,16 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 	 *
 	 * @covers ::init
 	 */
-	public function test_init() {
+	public function test_init(): void {
 
 		$api = $this->makeEmpty( API::class );
 
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = new NullLogger();
 
-		$my_handler = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler = function ( int $errno, string $errstr, ?string $errfile = null, ?int $errline = null ): bool {
+			return false;
+		};
 
 		set_error_handler( $my_handler );
 
@@ -80,17 +87,18 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 
 		$sut->init();
 
-		$my_handler_2 = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler_2 = function ( int $errno, string $errstr, ?string $errfile = null, ?int $errline = null ) {};
 
+		/** @var array{0:object, 1:string} $previous */
 		$previous = set_error_handler( $my_handler_2 );
 
 		$this->assertNotEquals( $my_handler, $previous );
 
-		$callable_instance = $previous[0];
-		$callable_function = $previous[1];
+		$callable_instance    = $previous[0];
+		$callable_method_name = $previous[1];
 
 		$this->assertInstanceOf( PHP_Error_Handler::class, $callable_instance );
-		$this->assertEquals( 'plugin_error_handler', $callable_function );
+		$this->assertEquals( 'plugin_error_handler', $callable_method_name );
 	}
 
 	/**
@@ -98,14 +106,16 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 	 *
 	 * @covers ::init
 	 */
-	public function test_stores_previous_handler() {
+	public function test_stores_previous_handler(): void {
 
 		$api = $this->makeEmpty( API::class );
 
 		$settings = $this->makeEmpty( Logger_Settings_Interface::class );
 		$logger   = new NullLogger();
 
-		$my_handler = function ( $errno, $errstr, $errfile = null, $errline = null ) {};
+		$my_handler = function ( int $errno, string $errstr, string $errfile, int $errline ): bool {
+			return false;
+		};
 
 		set_error_handler( $my_handler );
 
@@ -126,7 +136,7 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 	 *
 	 * @covers ::plugin_error_handler
 	 */
-	public function test_a_relevant_error() {
+	public function test_a_relevant_error(): void {
 
 		$api = $this->makeEmpty( API::class );
 
@@ -165,7 +175,7 @@ class PHP_Error_Handler_WPUnit_Test extends WPUnit_Testcase {
 	 *
 	 * @covers ::plugin_error_handler
 	 */
-	public function test_irrelevant_error() {
+	public function test_irrelevant_error(): void {
 
 		$api = $this->makeEmpty( API::class );
 

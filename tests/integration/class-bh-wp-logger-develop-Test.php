@@ -22,7 +22,7 @@ class Plugin_Develop_Test extends \BrianHenryIE\WP_Logger\WPUnit_Testcase {
 	/**
 	 * Test the main plugin object is added to PHP's GLOBALS and that it is the correct class.
 	 */
-	public function test_plugin_instantiated() {
+	public function test_plugin_instantiated(): void {
 
 		$this->markTestSkipped( 'outdated' );
 

@@ -66,7 +66,7 @@ trait Logger_Settings_Trait {
 	 */
 	protected function get_log_levels(): array {
 		if ( ! isset( $this->log_levels ) ) {
-			$this->log_levels = array_values( ( new ReflectionClass( LogLevel::class ) )->getConstants() );
+			$this->log_levels = array_values( array_filter( ( new ReflectionClass( LogLevel::class ) )->getConstants(), 'is_string' ) );
 		}
 		return $this->log_levels;
 	}

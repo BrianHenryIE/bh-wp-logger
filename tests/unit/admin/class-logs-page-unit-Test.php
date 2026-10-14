@@ -22,7 +22,7 @@ class Logs_Page_Unit_Test extends Unit_Testcase {
 	 * @covers ::enqueue_styles
 	 * @see wp_enqueue_style()
 	 */
-	public function test_enqueue_styles() {
+	public function test_enqueue_styles(): void {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty(
@@ -80,7 +80,7 @@ class Logs_Page_Unit_Test extends Unit_Testcase {
 	 * @covers ::enqueue_scripts
 	 * @see wp_enqueue_style()
 	 */
-	public function test_enqueue_scripts() {
+	public function test_enqueue_scripts(): void {
 
 		$api      = $this->makeEmpty( API_Interface::class );
 		$settings = $this->makeEmpty(
