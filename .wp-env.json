@@ -12,7 +12,8 @@
     "wp-content/plugins/woocommerce": "./wp-content/plugins/woocommerce",
     "wp-content/uploads/development-plugin": "."
   },
-  "mysqlPort": 33066,
+  "mysqlPort": 33063,
   "phpVersion": "8.1",
+  "port": 8883,
   "testsEnvironment": false
 }
