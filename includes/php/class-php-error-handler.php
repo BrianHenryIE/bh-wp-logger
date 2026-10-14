@@ -93,8 +93,8 @@ class PHP_Error_Handler {
 			return $this->return_error_handler_result( false, $func_args );
 		}
 
-		// e.g. my-plugin-slug-logged-error-4f6ead5467acd...
-		$transient_key = "{$this->settings->get_plugin_slug()}-logged-{$this->errno_to_psr3( $errno )}-" . md5( $errstr );
+		// e.g. my_plugin_slug_logged_error_4f6ead5467acd...
+		$transient_key = "{$this->settings->get_plugin_slug_underscored()}_logged_{$this->errno_to_psr3( $errno )}_" . md5( $errstr );
 
 		$transient_value = get_transient( $transient_key );
 

@@ -155,7 +155,7 @@ class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 			array( \WP_Mock\Functions::type( Cron::class ), 'register_delete_logs_cron_job' )
 		);
 		\WP_Mock::expectActionAdded(
-			'delete_logs_plugin-slug',
+			'delete_logs_plugin_slug',
 			array( \WP_Mock\Functions::type( Cron::class ), 'delete_old_logs' )
 		);
 
@@ -163,7 +163,7 @@ class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );
@@ -188,7 +188,8 @@ class Plugin_Logger_Actions_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'plugin-slug',
+				'get_plugin_slug'             => 'plugin-slug',
+				'get_plugin_slug_underscored' => 'plugin_slug',
 			)
 		);
 		$logger   = $this->makeEmpty( BH_WP_PSR_Logger::class );

@@ -35,6 +35,7 @@ class API_Unit_Test extends Unit_Testcase {
 	 */
 	public function test_parse_logs_simple(): void {
 
+		/** @var string $project_root_dir {@see tests/bootstrap.php} */
 		global $project_root_dir;
 
 		$simple_log_file = $project_root_dir . '/tests/_data/simple-log-8-lines.log';
@@ -273,7 +274,7 @@ EOD;
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 
@@ -303,7 +304,7 @@ EOD;
 		\WP_Mock::userFunction(
 			'get_transient',
 			array(
-				'args'   => array( 'test-last-log-time' ),
+				'args'   => array( 'test_last_log_time' ),
 				'return' => false,
 				'times'  => 1,
 			)
@@ -322,7 +323,7 @@ EOD;
 			'set_transient',
 			array(
 				'args'  => array(
-					'test-last-log-time',
+					'test_last_log_time',
 					'2022-02-23T22:56:01+00:00',
 					60 * 60 * 24, // Aka `DAY_IN_SECONDS`.
 				),

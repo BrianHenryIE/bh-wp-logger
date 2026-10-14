@@ -47,11 +47,11 @@ class Admin_Notices extends Notices {
 	 * @see BH_WP_PSR_Logger::log()
 	 */
 	protected function get_error_detail_option_name(): string {
-		return $this->settings->get_plugin_slug() . '-recent-error-data';
+		return $this->settings->get_plugin_slug_underscored() . '_recent_error_data';
 	}
 
 	/**
-	 * The last error is stored in the option `plugin-slug-recent-error-data` as an array with `message` and `timestamp`.
+	 * The last error is stored in the option `plugin_slug_recent_error_data` as an array with `message` and `timestamp`.
 	 *
 	 * @see Admin_Notices::get_error_detail_option_name()
 	 *
@@ -104,7 +104,7 @@ class Admin_Notices extends Notices {
 				|| ! is_string( $_POST['action'] )
 				|| ! is_string( $_POST['id'] )
 				|| 'wptrt_dismiss_notice' !== sanitize_key( wp_unslash( $_POST['action'] ) )
-				|| sanitize_key( wp_unslash( $_POST['id'] ) ) !== "{$this->settings->get_plugin_slug()}-recent-error"
+				|| sanitize_key( wp_unslash( $_POST['id'] ) ) !== $this->settings->get_plugin_slug_underscored() . '_recent_error'
 			) {
 
 				return;
@@ -135,9 +135,9 @@ class Admin_Notices extends Notices {
 		) {
 
 			/**
-			 * E.g. "wptrt_notice_dismissed_bh-wp-logger-development-plugin-recent-error".
+			 * E.g. "wptrt_notice_dismissed_bh_wp_logger_development_plugin_recent_error".
 			 */
-			$is_dismissed_option_name = "wptrt_notice_dismissed_{$this->settings->get_plugin_slug()}-recent-error";
+			$is_dismissed_option_name = 'wptrt_notice_dismissed_' . $this->settings->get_plugin_slug_underscored() . '_recent_error';
 
 			$error_text = trim( $last_error['message'] );
 			$error_time = $last_error['timestamp'];
@@ -172,7 +172,7 @@ class Admin_Notices extends Notices {
 
 			// ID must be globally unique because it is the CSS id that will be used.
 			$this->add(
-				$this->settings->get_plugin_slug() . '-recent-error',
+				$this->settings->get_plugin_slug_underscored() . '_recent_error',
 				$title,   // The title for this notice.
 				$content, // The content for this notice.
 				array(

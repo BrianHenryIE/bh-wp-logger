@@ -53,7 +53,10 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
+			array(
+				'get_plugin_slug'             => 'bh-wp-logger-development-plugin',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_development_plugin',
+			)
 		);
 		$logger   = $this->logger;
 
@@ -103,7 +106,10 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
+			array(
+				'get_plugin_slug'             => 'bh-wp-logger-development-plugin',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_development_plugin',
+			)
 		);
 		$logger   = $this->logger;
 
@@ -152,7 +158,10 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
-			array( 'get_plugin_slug' => 'bh-wp-logger-development-plugin' )
+			array(
+				'get_plugin_slug'             => 'bh-wp-logger-development-plugin',
+				'get_plugin_slug_underscored' => 'bh_wp_logger_development_plugin',
+			)
 		);
 		$logger   = $this->logger;
 
@@ -167,7 +176,7 @@ class Plugins_Page_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction(
 			'get_option',
 			array(
-				'args'   => array( 'bh-wp-logger-development-plugin-last-logs-view-time', 0 ),
+				'args'   => array( 'bh_wp_logger_development_plugin_last_logs_view_time', 0 ),
 				'return' => time() - 60 * 60, // HOUR_IN_SECONDS.
 			)
 		);

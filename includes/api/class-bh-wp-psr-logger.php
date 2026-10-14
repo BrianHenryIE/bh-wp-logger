@@ -194,7 +194,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 
 			if ( LogLevel::ERROR === $level ) {
 				update_option(
-					$this->settings->get_plugin_slug() . '-recent-error-data',
+					$this->settings->get_plugin_slug_underscored() . '_recent_error_data',
 					array(
 						'message'   => $message,
 						'timestamp' => time(),
@@ -203,7 +203,7 @@ class BH_WP_PSR_Logger extends API implements LoggerInterface {
 			}
 
 			// Add WP CLI command to context.
-			if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) ) {
+			if ( defined( 'WP_CLI' ) && constant( 'WP_CLI' ) && class_exists( WP_CLI::class ) ) {
 				/** @phpstan-ignore booleanAnd.rightAlwaysTrue */
 				/** @var Runner $runner */
 				$runner            = WP_CLI::get_runner();

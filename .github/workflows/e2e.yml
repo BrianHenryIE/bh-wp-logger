@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "Waiting for WordPress to be ready..."
           for i in {1..30}; do
-            if curl -s http://localhost:8888 > /dev/null; then
+            if curl -s http://localhost:8883 > /dev/null; then
               echo "WordPress is ready!"
               break
             fi

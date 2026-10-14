@@ -15,6 +15,7 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 
 	/**
 	 * @covers ::admin_notices
+	 * @covers ::get_error_detail_option_name
 	 */
 	public function test_delete_option_when_on_logs_page(): void {
 
@@ -22,7 +23,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug'             => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 		$api      = $this->makeEmpty(
@@ -43,7 +45,7 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction(
 			'delete_option',
 			array(
-				'args'  => array( 'test-recent-error-data' ),
+				'args'  => array( 'test_recent_error_data' ),
 				'times' => 1,
 			)
 		);
@@ -75,7 +77,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug'             => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 		$api      = $this->makeEmpty( API_Interface::class, array() );
@@ -115,6 +118,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 	 * because the recent-error option is then queried).
 	 *
 	 * @covers ::admin_notices
+	 * @covers ::get_error_detail_option_name
+	 * @covers ::get_last_error
 	 */
 	public function test_proceeds_when_ajax_dismissal_is_for_own_notice(): void {
 
@@ -122,7 +127,8 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$settings = $this->makeEmpty(
 			Logger_Settings_Interface::class,
 			array(
-				'get_plugin_slug' => 'test',
+				'get_plugin_slug'             => 'test',
+				'get_plugin_slug_underscored' => 'test',
 			)
 		);
 		$api      = $this->makeEmpty( API_Interface::class, array() );
@@ -135,7 +141,7 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		\WP_Mock::userFunction(
 			'get_option',
 			array(
-				'args'   => array( 'test-recent-error-data' ),
+				'args'   => array( 'test_recent_error_data' ),
 				'times'  => 1,
 				'return' => false,
 			)
@@ -145,7 +151,7 @@ class Admin_Notices_Unit_Test extends Unit_Testcase {
 		$pagenow = 'index.php';
 
 		$_POST['action'] = 'wptrt_dismiss_notice';
-		$_POST['id']     = 'test-recent-error';
+		$_POST['id']     = 'test_recent_error';
 
 		try {
 			$sut = new Admin_Notices( $api, $settings, $logger );
