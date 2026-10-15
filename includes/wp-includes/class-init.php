@@ -36,11 +36,13 @@ class Init {
 
 	/**
 	 * Check is this a request to download a log.
-	 * Return quietly if not.
-	 * Fail hard if nonce is incorrect.
-	 * Return if required parameters missing.
-	 * Return if plugin slug does not match or if date is malformed.
+	 * Return quietly if not, or if it is for another plugin's log.
+	 * Fail hard if the nonce is incorrect or the user cannot manage options.
+	 * Return if the date is malformed or there is no log for that date.
 	 * Invoke `send_private_file()` to download the file.
+	 *
+	 * The plugin slug is checked before the nonce and capability: bh-wp-logger could be hooked for many plugins,
+	 * each with its own instance of this class, and only the one the request is for should respond to it.
 	 *
 	 * This is really only needed when WooCommerce logger is being used because it stores the log files in
 	 * `/uploads/wc-logs` which has a `.htaccess` preventing downloads.
@@ -49,16 +51,9 @@ class Init {
 	 */
 	public function maybe_download_log(): void {
 
-		if ( ! isset( $_GET['download-log'] ) || ! is_string( $_GET['download-log'] ) ) {
-			return;
-		}
-
-		if ( false === check_admin_referer( 'bh-wp-logger-download' ) ) {
-			$this->logger->warning( 'Bad nonce when downloading log.' );
-			wp_die();
-		}
-
-		if ( 'true' !== sanitize_text_field( wp_unslash( $_GET['download-log'] ) ) ) {
+		if ( ! isset( $_GET['download-log'] ) || ! is_string( $_GET['download-log'] )
+			|| 'true' !== sanitize_text_field( wp_unslash( $_GET['download-log'] ) )
+		) {
 			return;
 		}
 
@@ -71,13 +66,32 @@ class Init {
 
 		$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 
-		if ( ! str_starts_with( $page, $this->settings->get_plugin_slug() ) ) {
+		// Match exactly: one plugin's slug may be a prefix of another's.
+		if ( $this->settings->get_plugin_slug() . '-logs' !== $page ) {
 			return;
 		}
 
-		$date = sanitize_text_field( wp_unslash( $_GET['date'] ) );
+		if ( ! isset( $_GET['_wpnonce'] ) || ! is_string( $_GET['_wpnonce'] )
+			|| ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'bh-wp-logger-download' )
+		) {
+			$this->logger->warning( 'Bad nonce when downloading log.' );
+			wp_die( 'Invalid nonce.', 403 );
+		} elseif ( ! current_user_can( 'manage_options' ) ) {
+			$this->logger->warning( 'User without manage_options capability tried to download log.' );
+			wp_die( 'Not permitted.', 403 );
+		} else {
+			$this->download_log_for_date( sanitize_text_field( wp_unslash( $_GET['date'] ) ) );
+		}
+	}
 
-		if ( 1 !== preg_match( '/\d{4}-\d{2}-\d{2}/', $date ) ) {
+	/**
+	 * Send the log file for the date, if the date is well-formed and a log file exists for it.
+	 *
+	 * @param string $date The requested date, expected in `Y-m-d` format.
+	 */
+	protected function download_log_for_date( string $date ): void {
+
+		if ( 1 !== preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) {
 			return;
 		}
 
@@ -87,9 +101,7 @@ class Init {
 			return;
 		}
 
-		$file = $files[ $date ];
-
-		$this->send_private_file( $file );
+		$this->send_private_file( $files[ $date ] );
 	}
 
 	/**
