@@ -351,4 +351,136 @@ class AJAX_Unit_Test extends Unit_Testcase {
 		( new AJAX( $api_a, $settings_a ) )->delete_all();
 		( new AJAX( $api_b, $settings_b ) )->delete_all();
 	}
+
+	/**
+	 * @covers ::delete
+	 * @covers ::is_request_for_this_plugin
+	 */
+	public function test_delete_other_plugin_slug_returns_silently(): void {
+
+		$api = $this->makeEmpty(
+			API_Interface::class,
+			array(
+				'delete_log' => Expected::never(),
+			)
+		);
+
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => fn() => 'plugin-a',
+			)
+		);
+
+		\WP_Mock::userFunction( 'sanitize_key', array( 'return_arg' => true ) );
+		\WP_Mock::userFunction( 'wp_verify_nonce', array( 'times' => 0 ) );
+		\WP_Mock::userFunction( 'wp_send_json_success', array( 'times' => 0 ) );
+		\WP_Mock::userFunction( 'wp_send_json_error', array( 'times' => 0 ) );
+
+		$sut = new AJAX( $api, $settings );
+
+		$_POST['plugin_slug']    = 'plugin-b';
+		$_POST['_wpnonce']       = 'nonce_value';
+		$_POST['date_to_delete'] = '2022-03-02';
+
+		$sut->delete();
+	}
+
+	/**
+	 * @covers ::delete
+	 * @covers ::get_authorization_error
+	 */
+	public function test_delete_invalid_nonce_sends_error(): void {
+
+		$api = $this->makeEmpty(
+			API_Interface::class,
+			array(
+				'delete_log' => Expected::never(),
+			)
+		);
+
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => fn() => 'plugin-a',
+			)
+		);
+
+		\WP_Mock::userFunction( 'sanitize_key', array( 'return_arg' => true ) );
+		\WP_Mock::userFunction(
+			'wp_verify_nonce',
+			array(
+				'args'   => array( 'bad_nonce', 'bh-wp-logger-delete' ),
+				'times'  => 1,
+				'return' => false,
+			)
+		);
+		\WP_Mock::userFunction( 'current_user_can', array( 'times' => 0 ) );
+		\WP_Mock::userFunction(
+			'wp_send_json_error',
+			array(
+				'args'  => array( \WP_Mock\Functions::type( 'array' ), 403 ),
+				'times' => 1,
+			)
+		);
+
+		$sut = new AJAX( $api, $settings );
+
+		$_POST['plugin_slug']    = 'plugin-a';
+		$_POST['_wpnonce']       = 'bad_nonce';
+		$_POST['date_to_delete'] = '2022-03-02';
+
+		$sut->delete();
+	}
+
+	/**
+	 * @covers ::delete
+	 */
+	public function test_delete_missing_date_sends_400(): void {
+
+		$api = $this->makeEmpty(
+			API_Interface::class,
+			array(
+				'delete_log' => Expected::never(),
+			)
+		);
+
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => fn() => 'plugin-a',
+			)
+		);
+
+		\WP_Mock::userFunction( 'sanitize_key', array( 'return_arg' => true ) );
+		\WP_Mock::userFunction(
+			'wp_verify_nonce',
+			array(
+				'times'  => 1,
+				'return' => true,
+			)
+		);
+		\WP_Mock::userFunction(
+			'current_user_can',
+			array(
+				'times'  => 1,
+				'return' => true,
+			)
+		);
+		\WP_Mock::userFunction( 'wp_send_json_success', array( 'times' => 0 ) );
+		\WP_Mock::userFunction(
+			'wp_send_json_error',
+			array(
+				'args'  => array( \WP_Mock\Functions::type( 'array' ), 400 ),
+				'times' => 1,
+			)
+		);
+
+		$sut = new AJAX( $api, $settings );
+
+		$_POST['plugin_slug'] = 'plugin-a';
+		$_POST['_wpnonce']    = 'nonce_value';
+
+		$sut->delete();
+	}
 }
