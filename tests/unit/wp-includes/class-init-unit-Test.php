@@ -370,4 +370,79 @@ class Init_Unit_Test extends Unit_Testcase {
 		// Currently not logging anything.
 		$this->assertEmpty( $logger->records );
 	}
+
+	/**
+	 * Another plugin's logs page, whose slug starts with this plugin's slug, is not this plugin's to serve.
+	 *
+	 * @covers ::maybe_download_log
+	 */
+	public function test_return_when_page_is_for_plugin_with_longer_slug(): void {
+
+		$logger   = $this->logger;
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => fn() => 'bh-wp-aws',
+			)
+		);
+		$api      = $this->makeEmpty(
+			API_Interface::class,
+			array(
+				'get_log_files' => Expected::never(),
+			)
+		);
+
+		\WP_Mock::userFunction( 'check_admin_referer', array( 'return' => 1 ) );
+		\WP_Mock::userFunction( 'wp_unslash', array( 'return_arg' => 0 ) );
+		\WP_Mock::userFunction( 'sanitize_text_field', array( 'return_arg' => 0 ) );
+
+		$init = new Init( $api, $settings, $logger );
+
+		$_GET['download-log'] = 'true';
+		$_GET['_wpnonce']     = 'a-good-nonce';
+		$_GET['page']         = 'bh-wp-aws-ses-bounce-handler-logs';
+		$_GET['date']         = '2026-10-14';
+
+		$init->maybe_download_log();
+	}
+
+	/**
+	 * The download link on the logs page uses `page={slug}-logs`.
+	 *
+	 * @covers ::maybe_download_log
+	 */
+	public function test_looks_up_log_file_when_page_is_this_plugins_logs_page(): void {
+
+		$logger   = $this->logger;
+		$settings = $this->makeEmpty(
+			Logger_Settings_Interface::class,
+			array(
+				'get_plugin_slug' => fn() => 'bh-wp-aws-ses-bounce-handler',
+			)
+		);
+		$api      = $this->makeEmpty(
+			API_Interface::class,
+			array(
+				'get_log_files' => Expected::once(
+					function ( ?string $date ): array {
+						$this->assertSame( '2026-10-14', $date );
+						return array();
+					}
+				),
+			)
+		);
+
+		\WP_Mock::userFunction( 'check_admin_referer', array( 'return' => 1 ) );
+		\WP_Mock::userFunction( 'wp_unslash', array( 'return_arg' => 0 ) );
+		\WP_Mock::userFunction( 'sanitize_text_field', array( 'return_arg' => 0 ) );
+
+		$init = new Init( $api, $settings, $logger );
+
+		$_GET['download-log'] = 'true';
+		$_GET['_wpnonce']     = 'a-good-nonce';
+		$_GET['page']         = 'bh-wp-aws-ses-bounce-handler-logs';
+		$_GET['date']         = '2026-10-14';
+
+		$init->maybe_download_log();
+	}
 }

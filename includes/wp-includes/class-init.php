@@ -71,7 +71,8 @@ class Init {
 
 		$page = sanitize_text_field( wp_unslash( $_GET['page'] ) );
 
-		if ( ! str_starts_with( $page, $this->settings->get_plugin_slug() ) ) {
+		// Match exactly: bh-wp-logger could be hooked for many plugins, and one plugin's slug may be a prefix of another's.
+		if ( $this->settings->get_plugin_slug() . '-logs' !== $page ) {
 			return;
 		}
 

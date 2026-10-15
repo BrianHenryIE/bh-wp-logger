@@ -166,7 +166,7 @@ class Logs_Page {
 		$parsed_log_file = $logs_table->get_parsed_log_file();
 
 		// If this is in the logger's private-uploads directory, then it already should be accessible, but if it's in the wc-logs folder, it will not be.
-		$download_url = wp_nonce_url( admin_url( 'admin.php?page=' . $this->settings->get_plugin_slug() . '&date=' . $chosen_date . '&download-log=true' ), 'bh-wp-logger-download' );
+		$download_url = wp_nonce_url( admin_url( 'admin.php?page=' . $this->settings->get_plugin_slug() . '-logs&date=' . $chosen_date . '&download-log=true' ), 'bh-wp-logger-download' );
 		$filepath     = $log_files[ $chosen_date ];
 		$filename     = basename( $filepath );
 		$filesize     = file_exists( $filepath ) ? (int) filesize( $filepath ) : 0;
